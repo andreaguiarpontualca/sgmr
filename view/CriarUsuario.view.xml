@@ -1,0 +1,203 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.CriarUsuario"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="pageCriarUsuario" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true"   
+          navButtonPress="onNavBack"       
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <headerContent>
+            <ObjectStatus
+                id="networkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+        </headerContent>            
+		<content>   
+            <VBox class="sapUiSmallMargin">     
+				<f:Form id="criarUsuarioForm"
+				editable="true">
+				<f:title>
+					<core:Title text="{i18n>criarusuario}" />
+				</f:title>
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="{i18n>dadosgerais}">
+						<f:formElements>
+							<f:FormElement label="{i18n>usuario}">
+								<f:fields>
+									<Input 
+										id="usuarioInput"
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										enabled="{layoutTelaModel>HabilitarEditarUsuario}"
+										/>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="{i18n>nome}">
+								<f:fields>
+									<Input 
+										id="nomeInput"
+										value="{criarUsuarioModel>Nome}"
+										maxLength="40"
+										required="true"
+										showClearIcon="true"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
+										/>
+								</f:fields>
+							</f:FormElement>  
+							<f:FormElement label="{i18n>senha}">
+								<f:fields>
+									<Input 
+										id="senhaInput"
+										value="{criarUsuarioModel>Senha}"
+										maxLength="12"
+										required="true"
+										showClearIcon="true"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
+										/>
+								</f:fields>
+							</f:FormElement>  
+							<f:FormElement label="{i18n>confirmarsenha}">
+								<f:fields>
+									<Input 
+										id="confirmarSenhaInput"
+										value="{criarUsuarioModel>ConfirmarSenha}"
+										maxLength="12"
+										required="true"
+										showClearIcon="true"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
+										/>
+								</f:fields>
+							</f:FormElement>                                                                                      
+						</f:formElements>
+					</f:FormContainer>		
+					<f:FormContainer title="{i18n>dadosperfil}">
+						<f:formElements>
+							<!-- <f:FormElement label="{i18n>centro}">
+								<f:fields>
+									<Input 
+										id="centroInput"
+										value="{criarUsuarioModel>Centro}"
+                                        showValueHelp="true"
+										showClearIcon="true"
+										valueHelpOnly="true"
+										required="true"
+										valueHelpRequest="_handleCentroValueHelpRequest"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"								
+										/>
+								</f:fields>
+							</f:FormElement> -->
+							<!-- <f:FormElement label="{i18n>deposito}">
+								<f:fields>
+									<Input 
+										id="depositoInput"
+										value="{criarUsuarioModel>Deposito}"
+                                        maxLength="4"
+										required="true"
+										showClearIcon="true"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
+										/>
+								</f:fields>
+							</f:FormElement>   -->
+							<f:FormElement label="{i18n>perfil}">
+								<f:fields>
+									<Input 
+										id="perfilInput"
+										value="{criarUsuarioModel>Perfil}"
+                                        showValueHelp="true"
+										showClearIcon="true"
+										valueHelpOnly="true"
+										required="true"
+										valueHelpRequest="_handlePerfilValueHelpRequest"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
+										/>
+								</f:fields>
+							</f:FormElement>      
+							<f:FormElement label="{i18n>bloqueado}">
+								<f:fields>
+									<Switch id="bloqueadoSwitch" state="{criarUsuarioModel>Bloqueado}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"	>
+										<layoutData>
+											<FlexItemData growFactor="1" />
+										</layoutData>
+									</Switch>
+								</f:fields>
+							</f:FormElement>    							                                                                               
+						</f:formElements>
+					</f:FormContainer>		
+				</f:formContainers>				
+			</f:Form>           
+        <Table id="idListaAutorizacoesTable" 
+        alternateRowColors="true"
+        autoPopinMode="true" 
+        contextualWidth="Auto"		
+        mode="None"
+        items="{criarUsuarioModel>/Autorizacoes}">
+            <headerToolbar>
+                <OverflowToolbar id="otbSubheader">
+                    <Title text="{i18n>autorizacoes}" level="H2" />
+                    <ToolbarSpacer />  
+                                
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column hAlign="Begin" width="20%">
+                    <Text text="{i18n>autorizacao}" />
+                </Column>
+                <Column hAlign="Begin" width="80%">
+                    <Text text="{i18n>descricao}" />
+                </Column>									
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" >
+                    <cells>
+                        <ObjectIdentifier title="{criarUsuarioModel>CodigoAutorizacao}"/>
+                        <ObjectIdentifier title="{criarUsuarioModel>DescrAutorizacao}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+	</VBox>         
+		</content>
+		<footer>
+			<OverflowToolbar>
+				<Button id="messagePopoverBtn"
+				icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+				type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+				text= "{path: '/', formatter: '.highestSeverityMessages' }"
+				press=".handleMessagePopoverPress"
+				ariaHasPopup="Dialog"/>		 
+				<ToolbarSpacer/>
+                <Button id="confirmarUsuarioButton" text="{i18n>confirmar}" type="Success" press="onConfirmarUsuario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"	></Button>
+                <Button id="cancelarUsuarioButton" text="{i18n>cancelar}" type="Reject" press="onCancelarUsuario" icon="sap-icon://cancel" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"	></Button>   
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>

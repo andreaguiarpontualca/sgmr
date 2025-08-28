@@ -1,0 +1,137 @@
+<mvc:View
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+		    <VBox id="idVBox_EX2500-5" class="sapUiSmallMargin">     
+				<f:Form id="idCabecalhoForm_EX2500-5"
+				editable="true">
+				<f:layout>
+					<f:ResponsiveGridLayout
+						id="idResponsiveGridLayout_EX2500-5"
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer id="idFormContainer_EX2500-5" title="">
+						<f:formElements>
+							<f:FormElement id="idFormElementDate_EX2500-5" label="Data">
+								<f:fields>							
+									<DateTimePicker
+									id="idInputData_EX2500-5"
+									required="true"
+									change="handleChange"
+									class="sapUiSmallMarginBottom"
+									width="100%"
+									value="{
+										'path': 'materialRodanteCriarModel>Data',
+										'type': 'sap.ui.model.type.DateTime',
+										'formatOptions': {
+											'pattern': 'dd/MM/y HH:mm:ss' 
+										}
+									}"/>					
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement id="idFormElementOper_EX2500-5" label="Operação">
+								<f:fields>							
+									<Input 
+										id="idInputOper_EX2500-5"
+										value="{materialRodanteCriarModel>Operacao}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                               
+						</f:formElements>
+					</f:FormContainer>
+					<f:FormContainer id="idFormContainerBlank_EX2500-5" title=" " visible="{= ${device>/system/desktop} ?  true : false }">
+						<f:formElements>
+							<f:FormElement id="idFormElementBlank_EX2500-5">
+								<f:fields>							
+													
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement id="idFormElementBlank2_EX2500-5">
+								<f:fields>							
+								</f:fields>
+							</f:FormElement>                                                                               
+						</f:formElements>
+					</f:FormContainer>		
+					<f:FormContainer  title="Esteira Esquerda">
+						<f:formElements>
+							<f:FormElement label="TAG">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Horímetro">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                                      
+						</f:formElements>
+					</f:FormContainer>	
+					<f:FormContainer title="Esteira Direta">
+						<f:formElements>
+							<f:FormElement label="TAG">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Horímetro">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                                      
+						</f:formElements>
+					</f:FormContainer>											
+				</f:formContainers>				
+			</f:Form>     
+		</VBox>
+</mvc:View>

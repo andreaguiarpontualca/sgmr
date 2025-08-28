@@ -1,0 +1,50 @@
+<mvc:View
+	controllerName="com.pontual.sgmr.controller.EX1200-6"    
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+	<VBox class="sapUiSmallMargin">     
+		<Table id="idOperacoesTable" 
+				alternateRowColors="true"
+				autoPopinMode="false" 
+				contextualWidth="Auto"		
+				growing="true" 
+				growingThreshold="100" 
+				paste="onPaste" 
+				items="{condicaoOperacaoModel>}">
+			<headerToolbar>
+				<OverflowToolbar id="otbSubheader">
+					<Title text="Condições de Operação" level="H2" />
+					<ToolbarSpacer />
+				</OverflowToolbar>
+			</headerToolbar>
+			<columns>
+				<Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="50%">
+					<Text text="Operação" />
+				</Column>
+				<Column hAlign="Center" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true" width="12.5%">
+					<Text text="Condição" />
+				</Column>																									
+			</columns>
+			<items>
+				<ColumnListItem vAlign="Middle">
+					<cells>
+						<ObjectIdentifier title="{condicaoOperacaoModel>operacao}"/>
+						<ComboBox
+							items="{
+								path: 'condicaoModel>/',
+								sorter: { path: 'key' }
+							}">
+							<core:Item key="{condicaoModel>key}" text="{condicaoModel>key}" />
+						</ComboBox>																			
+					</cells>
+				</ColumnListItem>
+			</items>
+		</Table>   
+		</VBox>
+</mvc:View>

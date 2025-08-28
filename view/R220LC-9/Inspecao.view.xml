@@ -1,0 +1,47 @@
+<mvc:View
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+		    <VBox class="sapUiSmallMargin">     
+		<Table 
+				mode="MultiSelect"
+				alternateRowColors="true"
+				autoPopinMode="false" 
+				contextualWidth="Auto"		
+				growing="true" 
+				growingThreshold="100" 
+				paste="onPaste" 
+				items="{inspecaoModel>}">
+			<headerToolbar>
+				<OverflowToolbar id="otbSubheader">
+					<Title text="Inspeção" level="H2" />
+					<ToolbarSpacer />
+				</OverflowToolbar>
+			</headerToolbar>
+			<columns>
+				<Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="50%">
+					<Text text="Marcar ao concluir as verificações." />
+				</Column>																									
+			</columns>
+			<items>
+				<ColumnListItem vAlign="Middle">
+					<cells>
+						<ObjectIdentifier title="{inspecaoModel>inspecao}"/>																			
+					</cells>
+				</ColumnListItem>
+			</items>
+		</Table>   
+					<MessageStrip
+				text="Se houver anomalias, relatar como Observações."
+				type="Warning"
+				showIcon="true"
+				showCloseButton="false"
+				class="sapUiMediumMarginBottom">
+			</MessageStrip>
+		</VBox>
+</mvc:View>

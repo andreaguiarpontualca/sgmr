@@ -1,0 +1,138 @@
+<mvc:View
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+		    <VBox class="sapUiSmallMargin">     
+				<f:Form id="criarUsuarioForm"
+				editable="true">
+				<!-- <f:title>
+					<core:Title text="Cabeçalho" />
+				</f:title> -->
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="">
+						<f:formElements>
+							<f:FormElement label="Data">
+								<f:fields>							
+									<DateTimePicker
+									id="inputData"
+									required="true"
+									change="handleChange"
+									class="sapUiSmallMarginBottom"
+									width="100%"
+									value="{
+										'path': 'materialRodanteCriarModel>Data',
+										'type': 'sap.ui.model.type.DateTime',
+										'formatOptions': {
+											'pattern': 'dd/MM/y HH:mm:ss' 
+										}
+									}"/>					
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Operação">
+								<f:fields>							
+									<Input 
+										value="{materialRodanteCriarModel>Operacao}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                               
+						</f:formElements>
+					</f:FormContainer>
+					<f:FormContainer title=" " visible="{= ${device>/system/desktop} ?  true : false }">
+						<f:formElements>
+							<f:FormElement>
+								<f:fields>							
+													
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement>
+								<f:fields>							
+								</f:fields>
+							</f:FormElement>                                                                               
+						</f:formElements>
+					</f:FormContainer>		
+					<f:FormContainer title="Esteira Esquerda">
+						<f:formElements>
+							<f:FormElement label="TAG">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Horímetro">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                                      
+						</f:formElements>
+					</f:FormContainer>	
+					<f:FormContainer title="Esteira Direta">
+						<f:formElements>
+							<f:FormElement label="TAG">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Horímetro">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                                      
+						</f:formElements>
+					</f:FormContainer>											
+				</f:formContainers>				
+			</f:Form>     
+		</VBox>
+</mvc:View>

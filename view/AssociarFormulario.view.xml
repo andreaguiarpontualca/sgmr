@@ -1,0 +1,124 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.AssociarFormulario"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+	xmlns:core="sap.ui.core"   
+	xmlns:f="sap.ui.layout.form"
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="idPageAssociarFormulario" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true"   
+          navButtonPress="onNavBack"       
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <headerContent>
+        <Button
+                id="idButton"
+				tooltip="{i18n>sincronizar}"
+				icon="sap-icon://synchronize"
+				press="onSincronizar"
+                type="Emphasized"/>
+            <ObjectStatus
+                id="idNetworkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+        </headerContent>            
+		<content>   
+        <VBox class="sapUiSmallMargin" id="idVBox">     
+				<f:Form id="associarFormularioForm"
+				editable="true">
+				<f:title>
+					<core:Title text="{i18n>associarformulariotitle}" id="idTitle" />
+				</f:title>
+				<f:layout>
+					<f:ResponsiveGridLayout id="idResponsiveGridLayout"
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer id="idFormContainer">
+						<f:formElements>
+							<f:FormElement label="{i18n>formulario}" id="idFormElement">
+								<f:fields>
+									<Input 
+										id="formularioInput"
+										value="{listaAssociarFormularioModel>CodigoFormulario}"
+                                        showValueHelp="true"
+										showClearIcon="true"
+										valueHelpOnly="true"
+										required="true"
+										valueHelpRequest="_handleAssociarFormularioValueHelpRequest"
+										enabled="true"										
+										/>
+								</f:fields>
+							</f:FormElement>
+						</f:formElements>
+					</f:FormContainer>		
+
+				</f:formContainers>				
+			</f:Form>           
+                <Table id="idListaModelosEquipamentosTable" 
+                       alternateRowColors="true"
+                       autoPopinMode="true" 
+                       contextualWidth="Auto"		
+                       mode="MultiSelect" 
+                       items="{listaMaterialRodanteModel>}"
+                       selectionChange="onSelectionChange">
+            <headerToolbar>
+                <OverflowToolbar id="idOvrflowToolbar">
+                    <!-- <Title text="{i18n>modelodeequipamentos}" level="H2" /> -->
+                    <ToolbarSpacer id="idToolbarSpacerHeader" />  
+                                
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column hAlign="Begin" width="50%" id="idColumn1">
+                    <Text text="{i18n>modelodeequipamentos}" id="idText1" />
+                </Column>
+                <Column hAlign="Begin" width="50%" id="idColumn2">  
+                    <Text text="{i18n>descricao}" id="idText2" />
+                </Column>								
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" press="onOrdemPress" id="idColumnListItem" selected="{listaMaterialRodanteModel>Selecionado}">	
+                    <cells>
+                        <ObjectIdentifier title="{listaMaterialRodanteModel>Modelo}" id="idObjectIdentifier1"/>
+                        <ObjectIdentifier title="{listaMaterialRodanteModel>DescricaoModelo}" id="idObjectIdentifier2"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+	</VBox>
+		</content>
+		<footer>
+			<OverflowToolbar id="idOverflowToolbar">
+				<Button id="idMessagePopoverBtn"
+					visible="{=!!${message>/}.length}"
+					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+					text= "{path: '/', formatter: '.highestSeverityMessages' }"
+					press=".handleMessagePopoverPress"
+					ariaHasPopup="Dialog"/>                      
+				<ToolbarSpacer id="idToolbarSpacerFooter"/>
+                <Button id="idConfirmarFormularioButton" text="{i18n>confirmar}" type="Success" press="onConfirmarFormulario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"></Button>
+                <Button id="idCancelarFormularioButton" text="{i18n>cancelar}" type="Reject" press="onCancelarFormulario" icon="sap-icon://cancel" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"></Button>   
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>

@@ -1,0 +1,134 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.Configurar"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="pageConfigurar" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true"   
+          navButtonPress="onNavBack"       
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <headerContent>
+            <ObjectStatus
+                id="networkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+        </headerContent>            
+		<content>   
+            <VBox class="sapUiSmallMargin">     
+				<f:Form id="configurarForm"
+				editable="true">
+				<f:title>
+					<core:Title text="{i18n>configurar}" />
+				</f:title>
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="{i18n>dadosconexao}">
+						<f:formElements>
+                            <f:FormElement label="{i18n>protocolo}">
+								<f:fields>
+                                    <RadioButtonGroup id="rbg2" columns="2" selectedIndex="{configurarModel>protocolo}" class="sapUiMediumMarginBottom">
+                                        <RadioButton id="RB2-1" text="HTTP" />
+                                        <RadioButton id="RB2-2" text="HTTPS" />
+                                    </RadioButtonGroup>                                        
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="{i18n>host}">
+								<f:fields>
+									<Input 
+										id="hostInput"
+										value="{configurarModel>host}"
+										showClearIcon="true"
+										required="true"
+										/>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="{i18n>porta}">
+								<f:fields>
+									<Input 
+										value="{configurarModel>porta}"
+                                        maxLength="5"
+                                        type="Number"
+										showClearIcon="true"
+										/>
+								</f:fields>
+							</f:FormElement>      
+							<f:FormElement label="{i18n>cliente}">
+								<f:fields>
+									<Input 
+										value="{configurarModel>cliente}"
+                                        maxLength="3"
+                                        type="Number"
+										showClearIcon="true"
+										/>
+								</f:fields>
+							</f:FormElement>   
+							<f:FormElement label="{i18n>url}" visible="true">
+								<f:fields>
+									<Text text="{configurarModel>url}" />
+								</f:fields>
+							</f:FormElement>  	
+							<f:FormElement label="{i18n>verificardisponibilidade}" visible="false">
+								<f:fields>
+									<Switch state="{configurarModel>verificarDisponibilidade}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}">
+										<layoutData>
+											<FlexItemData growFactor="1" />
+										</layoutData>
+									</Switch>
+								</f:fields>
+							</f:FormElement>  
+							<f:FormElement label="{i18n>exibirmensagemsincronismoautomatio}" visible="false">
+								<f:fields>
+									<Switch state="{configurarModel>exibirMensagemSincAuto}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}">
+										<layoutData>
+											<FlexItemData growFactor="1" />
+										</layoutData>
+									</Switch>
+								</f:fields>
+							</f:FormElement>  													                                                  
+						</f:formElements>
+					</f:FormContainer>		
+				</f:formContainers>								
+			</f:Form>           
+	</VBox>         
+		</content>
+		<footer>
+			<OverflowToolbar>	
+				<Button id="messagePopoverBtn"
+					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+					text= "{path: '/', formatter: '.highestSeverityMessages' }"
+					press=".handleMessagePopoverPress"
+					ariaHasPopup="Dialog"/>					
+				<ToolbarSpacer/>
+				<Button id="testarButton" text="{i18n>testar}" type="Emphasized" press="onTestar" icon="sap-icon://connected" ></Button>
+				<Button id="confirmarConfigurarButton" text="{i18n>confirmar}" type="Success" press="onConfirmar" icon="sap-icon://save" ></Button>
+                <Button id="cancelarConfigurarButton" text="{i18n>cancelar}" type="Reject" press="onCancelar" icon="sap-icon://cancel" ></Button>   
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>

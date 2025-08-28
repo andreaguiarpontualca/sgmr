@@ -1,0 +1,70 @@
+<mvc:View
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+		    <VBox class="sapUiSmallMargin">     
+				<f:Form id="idFormRodasGuias_EX2500-5"
+				editable="true">
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="{i18n>ladoesquerdo}">
+						<f:formElements>
+							<f:FormElement label="A / Desgaste">
+								<f:fields>							
+									<Input 
+									    id="c_e"
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										description="40%"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+									/>		
+								
+								</f:fields>
+							</f:FormElement>                                                                                   
+						</f:formElements>
+					</f:FormContainer>	
+					<f:FormContainer title="{i18n>ladodireito}">
+						<f:formElements>
+							<f:FormElement label="A / Desgaste">
+								<f:fields>
+									<Input 
+									    id="c_d"
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										description="40%"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+									/>						
+								</f:fields>
+							</f:FormElement>					                                                                                     
+						</f:formElements>
+					</f:FormContainer>											
+				</f:formContainers>				
+			</f:Form>     
+		</VBox>
+</mvc:View>

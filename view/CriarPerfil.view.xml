@@ -1,0 +1,131 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.CriarPerfil"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="pageInicio" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true"   
+          navButtonPress="onNavBack"       
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <headerContent>
+            <ObjectStatus
+                id="networkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+        </headerContent>            
+		<content>   
+            <VBox class="sapUiSmallMargin">     
+				<f:Form id="criarPerfilForm"
+				editable="true">
+				<f:title>
+					<core:Title text="{i18n>criarperfil}" />
+				</f:title>
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="{i18n>dadosgerais}">
+						<f:formElements>
+							<f:FormElement label="{i18n>perfil}">
+								<f:fields>
+									<Input 
+                                        id="perfilInput"
+										value="{perfilCriarModel>DescrPerfil}"
+										showClearIcon="true"
+                                        required="true"
+                                        enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"
+										/>
+								</f:fields>
+							</f:FormElement>
+                            <f:FormElement label="{i18n>centros}">
+								<f:fields>
+									<MultiInput
+						            	id="multiInputCentro"
+                                        required="true"
+						            	showValueHelp="true"
+						            	showClearIcon="true"
+						            	valueHelpOnly="true"
+						            	valueHelpRequest="handleValueHelpRequestedCentro" 
+						            	tokenUpdate="handleTokenUpdate"	
+                                        enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"				
+						            	tokens="{perfilCriarModel>/PerfilCentroSet}">
+						            	<tokens>
+						            		<Token text="{perfilCriarModel>Centro}" key="{perfilCriarModel>Centro}" />
+						            	</tokens>					
+						            </MultiInput>
+								</f:fields>
+							</f:FormElement>
+						</f:formElements>
+					</f:FormContainer>		
+				</f:formContainers>				
+			</f:Form>           
+        <Table id="idListaAutorizacoesTable" 
+        alternateRowColors="true"
+        autoPopinMode="true" 
+        contextualWidth="Auto"		
+        mode="{= ${perfilCriarModel>HabilitarTelaCriarPerfil} ? 'MultiSelect' : 'None' }" 
+        items="{perfilCriarModel>/AutorizacaoSet}">
+            <headerToolbar>
+                <OverflowToolbar id="otbSubheader">
+                    <Title text="{i18n>autorizacoes}" level="H2" />
+                    <ToolbarSpacer />  
+                                
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column hAlign="Begin" width="20%">
+                    <Text text="{i18n>autorizacao}" />
+                </Column>
+                <Column hAlign="Begin" width="80%">
+                    <Text text="{i18n>descricao}" />
+                </Column>									
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" press="onOrdemPress" selected="{perfilCriarModel>Selecionado}">	
+                    <cells>
+                        <ObjectIdentifier title="{perfilCriarModel>CodigoAutorizacao}"/>
+                        <ObjectIdentifier title="{perfilCriarModel>DescrAutorizacao}"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+	</VBox>         
+		</content>
+		<footer>
+			<OverflowToolbar>
+				<Button id="messagePopoverBtn"
+					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+					text= "{path: '/', formatter: '.highestSeverityMessages' }"
+					press=".handleMessagePopoverPress"
+					ariaHasPopup="Dialog"/>		                
+				<ToolbarSpacer/>
+                <Button id="confirmarPerfilButton" text="{i18n>confirmar}" type="Success" press="onConfirmarPerfil" icon="sap-icon://save" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"></Button>
+                <Button id="cancelarPerfilButton" text="{i18n>cancelar}" type="Reject" press="onCancelarPerfil" icon="sap-icon://cancel" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"></Button>   
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>

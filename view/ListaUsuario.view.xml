@@ -1,0 +1,84 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.ListaUsuario"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="pageListaUsuario" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true"   
+          navButtonPress="onNavBack"       
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <headerContent>
+        <Button
+				tooltip="{i18n>sincronizar}"
+				icon="sap-icon://synchronize"
+				press="onSincronizar"
+                type="Emphasized"/>
+            <ObjectStatus
+                id="networkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+        </headerContent>            
+		<content>               
+                    <Table id="idListaUsuarioTable" 
+                    alternateRowColors="true"
+                    autoPopinMode="true" 
+                    contextualWidth="Auto"		
+                    growing="false" 
+                    growingThreshold="10" 
+                    items="{listaUsuariosModel>/}">
+                        <headerToolbar>
+                            <OverflowToolbar id="otbSubheader">
+                                <Title text="{i18n>listausuarios}" level="H2" />
+                                <ToolbarSpacer />
+                                <Button id="criarUsuarioButton" width="12rem" text="{i18n>criarusuario}" type="Emphasized" press="onCriarUsuario" icon="sap-icon://person-placeholder" class="sapUiSmallMarginBottom"	></Button>                
+                            </OverflowToolbar>
+                        </headerToolbar>
+                        <columns>
+                            <Column hAlign="Begin">
+                                <Text text="{i18n>usuario}" />
+                            </Column>
+                            <Column hAlign="Begin">
+                                <Text text="{i18n>nome}" />
+                            </Column>                 
+                            <Column hAlign="Begin">
+                                <Text text="{i18n>perfil}" />
+                            </Column>                                                        
+                            <Column hAlign="Center" width="5%">
+                            </Column>	
+                            <Column hAlign="Center" width="5%">
+                            </Column>	                            				                            							
+                        </columns>
+                        <items>
+                            <ColumnListItem vAlign="Middle" navigated="true" type="Navigation" press="onExibirUsuario">
+                                <cells>
+                                    <ObjectIdentifier title="{listaUsuariosModel>CodUsuario}"/>
+                                    <ObjectIdentifier title="{listaUsuariosModel>Nome}"/>                                        
+                                    <ObjectIdentifier title="{listaUsuariosModel>Perfil}"/>
+                                    <Button id="excluirUsuarioButton" type="Reject" press="onExcluirUsuario" icon="sap-icon://delete" class=""	></Button>                
+                                    <Button id="editarUsuarioButton"  type="Emphasized" press="onEditarUsuario" icon="sap-icon://edit" class=""	></Button>  
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+		</content>
+		<footer>
+			<OverflowToolbar>
+                <Button id="messagePopoverBtn"
+				icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+				type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+				text= "{path: '/', formatter: '.highestSeverityMessages' }"
+				press=".handleMessagePopoverPress"
+				ariaHasPopup="Dialog"/>		
+				<ToolbarSpacer/>
+
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>

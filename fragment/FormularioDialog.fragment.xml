@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		title="{i18n>formularioselecionar}"
+		items="{listaFormularioModel>/}"
+		search="_handleAssociarFormularioValueHelpSearch"
+		confirm="_handleAssociarFormularioValueHelpClose"
+		cancel="_handleAssociarFormularioValueHelpClose">
+		<StandardListItem
+			title="{listaFormularioModel>TextForm}"
+			iconDensityAware="false"
+			iconInset="false"
+			/>
+	</SelectDialog>
+</core:FragmentDefinition>

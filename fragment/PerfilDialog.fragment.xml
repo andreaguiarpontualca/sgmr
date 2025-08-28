@@ -1,0 +1,13 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		title="{i18n>perfil}"
+		items="{listaPerfilModel>/}"
+		search="_handlePerfilValueHelpSearch"
+		confirm="_handlePerfilValueHelpClose"
+		cancel="_handlePerfilValueHelpClose">
+		<StandardListItem
+			title="{listaPerfilModel>DescrPerfil}"  />
+	</SelectDialog>
+</core:FragmentDefinition>

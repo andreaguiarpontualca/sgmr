@@ -1,0 +1,77 @@
+<mvc:View
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+		    <VBox class="sapUiSmallMargin">     
+				<f:Form id="criarUsuarioForm"
+				editable="true">
+				<f:title>
+					<core:Title text="Roletes" />
+				</f:title>
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="">
+						<f:formElements>
+							<f:FormElement label="Roletes com Vazamentos?">
+								<f:fields>							
+									<Switch state="{criarUsuarioModel>Bloqueado}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"	>
+										<layoutData>
+											<FlexItemData growFactor="1" />
+										</layoutData>
+									</Switch>				
+								</f:fields>
+							</f:FormElement>                                                                                    
+						</f:formElements>
+					</f:FormContainer>		
+					<f:FormContainer title="Quantidade Lado">
+						<f:formElements>
+							<f:FormElement label="Direito">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Esquerdo">
+								<f:fields>							
+									<Input 
+										value="{criarUsuarioModel>CodUsuario}"
+                                        maxLength="12"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"
+										/>						
+								</f:fields>
+							</f:FormElement>                                                                                      
+						</f:formElements>
+					</f:FormContainer>																
+				</f:formContainers>				
+			</f:Form>     
+		</VBox>
+</mvc:View>

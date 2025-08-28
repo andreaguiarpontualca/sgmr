@@ -1,0 +1,38 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.App"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+    xmlns="sap.m">
+    <Shell id="shell" appWidthLimited="false">
+		<App id="app">
+        <pages>
+                <Page id="page" 
+                title="{i18n>title}" 
+                titleAlignment="Center"
+                showNavButton="false"          
+                class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+            <headerContent>
+                <ObjectStatus
+                    id="networkStatus"
+                    active="false"
+                    inverted="true"
+                    icon="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                    state="{path: 'conexaoModel>statusConexao',
+                            formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+                />
+            </headerContent>            
+            <content>
+    
+            </content>
+            <footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer/>
+    
+                </OverflowToolbar>
+            </footer>
+        </Page>
+        </pages>
+    </App>
+</Shell>
+</mvc:View>

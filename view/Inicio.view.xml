@@ -1,0 +1,62 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.Inicio"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="pageInicio" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="false" 
+          showSubHeader="true"
+          navButtonText="Sair"
+          icon="sap-icon://visits"
+          navButtonPress="onNavBack"         
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+          <headerContent>
+            <Button
+				tooltip="{i18n>sincronizar}"
+				icon="sap-icon://synchronize"
+				press="onSincronizar"
+                type="Emphasized"/>	
+            <ObjectStatus
+                id="networkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+            <Button
+            tooltip="{i18n>sair}"
+            icon="sap-icon://visits"
+            press="onSairApp"
+            type="Attention"/>	
+        </headerContent>    
+		<content>
+            <HBox alignContent="Center" alignItems="Center" justifyContent="Center">
+                <Title text="Bem-vindo {usuarioModel>CodUsuario}" level="H3"/>
+            </HBox>            
+            <VBox id="inicioFormContainer" fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center">
+                <items>
+                    <Button id="entrarMaterialRodanteButton" width="12rem" text="{i18n>materialrodante}" type="Emphasized" press="onEntrarMaterialRodante" icon="sap-icon://cargo-train" class="sapUiSmallMarginBottom"	visible="{acessosModel>materialrodante}"></Button>                                   
+                    <Button id="entrarAdministrativoButton" width="12rem" text="{i18n>administrativo}" type="Emphasized" press="onEntrarAdministrativo" icon="sap-icon://account" class="sapUiSmallMarginBottom"	visible="{acessosModel>administrativo}"></Button>
+                    <Button id="inicioSincronismoButton" width="12rem" text="Sincronizar" type="Emphasized" press="onSincronizar" icon="sap-icon://synchronize" class="sapUiSmallMarginBottom" visible="true"></Button>
+                    
+                </items>
+            </VBox>
+		</content>
+		<footer>
+			<OverflowToolbar>
+				<Button id="messagePopoverBtn"
+					visible="{=!!${message>/}.length}"
+					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+					text= "{path: '/', formatter: '.highestSeverityMessages' }"
+					press=".handleMessagePopoverPress"
+					ariaHasPopup="Dialog"/>                
+				<ToolbarSpacer/>
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>

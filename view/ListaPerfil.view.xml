@@ -1,0 +1,75 @@
+<mvc:View controllerName="com.pontual.sgmr.controller.ListaPerfil"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+    xmlns="sap.m">
+    <Page id="pageInicio" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true"   
+          navButtonPress="onNavBack"       
+          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+        <headerContent>
+        <Button
+				tooltip="{i18n>sincronizar}"
+				icon="sap-icon://synchronize"
+				press="onSincronizar"
+                type="Emphasized"/>
+            <ObjectStatus
+                id="networkStatus"
+                active="false"
+                inverted="true"
+                icon="{path: 'conexaoModel>statusConexao',
+                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao',
+                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+            />
+        </headerContent>            
+		<content>               
+                    <Table id="idListaPerfilTable" 
+                    alternateRowColors="true"
+                    autoPopinMode="true" 
+                    contextualWidth="Auto"		
+                    growing="false" 
+                    growingThreshold="10" 
+                    items="{listaPerfilModel>/}">
+                        <headerToolbar>
+                            <OverflowToolbar id="otbSubheader">
+                                <Title text="{i18n>listaperfis}" level="H2" />
+                                <ToolbarSpacer />
+                                <Button id="criarMaterialRodanteButton" width="12rem" text="{i18n>criarperfil}" type="Emphasized" press="onCriarPerfil" icon="sap-icon://business-card" class="sapUiSmallMarginBottom"	></Button>                
+                            </OverflowToolbar>
+                        </headerToolbar>
+                        <columns>
+                            <Column hAlign="Begin">
+                                <Text text="{i18n>perfil}" />
+                            </Column>
+                            <Column hAlign="Center" width="10%">
+                                <Text text="" />
+                            </Column>										
+                        </columns>
+                        <items>
+                            <ColumnListItem vAlign="Middle" navigated="true" type="Navigation" press="onPerfilPress">
+                                <cells>
+                                    <ObjectIdentifier title="{listaPerfilModel>DescrPerfil}"/>
+                                    <Button id="excluirPerfilButton" type="Reject" press="onEliminarPerfil" icon="sap-icon://delete" class="sapUiSmallMarginBottom"	></Button>                
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+		</content>
+		<footer>
+			<OverflowToolbar>
+				<Button id="messagePopoverBtn"
+					visible="{=!!${message>/}.length}"
+					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+					text= "{path: '/', formatter: '.highestSeverityMessages' }"
+					press=".handleMessagePopoverPress"
+					ariaHasPopup="Dialog"/>                      
+				<ToolbarSpacer/>
+
+			</OverflowToolbar>
+		</footer>
+    </Page>
+</mvc:View>
