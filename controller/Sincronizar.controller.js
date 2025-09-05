@@ -117,17 +117,17 @@ sap.ui.define([
 
 
             onEliminarmaterialRodante: function (oEvent) {
-                var omaterialRodante = oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getPath());
+                var omaterialRodante = oEvent.getSource().getBindingContext("listaEquipamentoModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaEquipamentoModel").getPath());
                 var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData()
                 var oUsuario = aUsuarios.find(function (pUsuario) {
                     return pUsuario.materialRodante === omaterialRodante.DescrmaterialRodante
                 })
                 if (oUsuario == undefined) {
                     omaterialRodante.Sincronizado = "E"
-                    oController.getOwnerComponent().getModel("listaMaterialRodanteModel").refresh()
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh()
                     oController.limparTabelaIndexDB("tb_materialRodante").then(
                         function (result) {
-                            oController.gravarTabelaIndexDB("tb_materialRodante", oController.getOwnerComponent().getModel("listaMaterialRodanteModel").getData()).then(
+                            oController.gravarTabelaIndexDB("tb_materialRodante", oController.getOwnerComponent().getModel("listaEquipamentoModel").getData()).then(
                                 function (result) {
                                     MessageToast.show("materialRodante marcado para eliminação.");
                                     oController.materialRodanteUpdate().then(
@@ -163,7 +163,7 @@ sap.ui.define([
             },
 
             onMaterialRodantePress: function (oEvent) {
-                var omaterialRodante = oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getPath());
+                var omaterialRodante = oEvent.getSource().getBindingContext("listaEquipamentoModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaEquipamentoModel").getPath());
                 var oObjetoNovo = JSON.parse(JSON.stringify(omaterialRodante));
                 oObjetoNovo.HabilitarTelaCriarmaterialRodante = false
                 oController.getOwnerComponent().getModel("materialRodanteCriarModel").setData(oObjetoNovo);

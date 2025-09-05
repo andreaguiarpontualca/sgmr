@@ -1,0 +1,53 @@
+<mvc:View
+	controllerName="com.pontual.sgmr.controller.Formulario"    
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+	xmlns:core="sap.ui.core"    
+    displayBlock="true"
+>
+    <VBox
+        id="idVBox_R220LC-9"
+        class="sapUiSmallMargin"
+    >
+			<Table id="idAtendimentoOperacoesCestoTable" 
+				alternateRowColors="true"
+				autoPopinMode="false" 
+				contextualWidth="Auto"		
+				growing="true" 
+				growingThreshold="100" 
+				mode="None"
+                paste="onPaste"                
+				noDataText="{i18n>sincronizarcontinuar}"
+				items="{
+					path: 'materialRodanteFormularioModel>/Condicoes',					
+					sorter: [{
+							path: 'Condicao', 
+							descending: false
+						}]
+				}"	>        
+            <columns>
+                <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="30%">
+                    <Text text="Condição" />
+                </Column>         
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle">
+                    <cells>
+                        <VBox>
+                            <ObjectStatus text ="{materialRodanteFormularioModel>Condicao}" />		                            
+                            <ComboBox            
+                                selectedKey="{materialRodanteFormularioModel>Nivel}"                                  
+                                items="{
+                                    path: 'materialRodanteFormularioModel>/NivelCombo',
+                                    sorter: { path: 'text' }
+                                }">
+                                <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
+                            </ComboBox>   
+                        </VBox>                                                
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+</mvc:View>

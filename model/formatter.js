@@ -80,6 +80,39 @@ sap.ui.define(function () {
 			}
 		},
 
+		getLadoIcone: function (value) {
+			if (value == "Direito") {
+				return "sap-icon://navigation-right-arrow"
+			} else {
+				return "sap-icon://navigation-left-arrow"
+			}
+		},	
+		
+		getDesgasteVisivel: function (value) {	
+			if (value != 0.00) {
+				return true
+			} else {
+				return false
+			}
+		},
+
+		getStatusEquipamento: function (value) {	
+			switch (value) {
+				case "P":
+					return "Warning"
+					break;
+				case "E":
+					return "Error"
+					break;
+				case "S":
+					return "Success"
+					break
+				default:
+					return "None"
+					break;
+			}
+		}		
+
 	};
 
 	return Formatter;

@@ -99,8 +99,8 @@ sap.ui.define([
                     vPodeGravar = false;
 
                 } else {
-                    if (oController.getOwnerComponent().getModel("listamaterialRodanteModel").getData().length != undefined) {
-                        var omaterialRodanteExistente = oController.getOwnerComponent().getModel("listamaterialRodanteModel").getData().find((oElement) => oElement.DescrmaterialRodante.toUpperCase() == omaterialRodante.DescrmaterialRodante.toUpperCase());
+                    if (oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().length != undefined) {
+                        var omaterialRodanteExistente = oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().find((oElement) => oElement.DescrmaterialRodante.toUpperCase() == omaterialRodante.DescrmaterialRodante.toUpperCase());
                         if (omaterialRodanteExistente != undefined) {
                             omaterialRodanteInput.setValueState("Error");
                             var oMockMessage = {
@@ -139,14 +139,14 @@ sap.ui.define([
                        // oController.getOwnerComponent().getModel("materialRodanteCriarModel").setProperty(element + '/Selecionado', true )
                     });
 
-                    if (oController.getOwnerComponent().getModel("listamaterialRodanteModel").getData().length == undefined) {
-                        oController.getOwnerComponent().getModel("listamaterialRodanteModel").setData([])
-                        oController.getOwnerComponent().getModel("listamaterialRodanteModel").getData().push(omaterialRodante)
+                    if (oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().length == undefined) {
+                        oController.getOwnerComponent().getModel("listaEquipamentoModel").setData([])
+                        oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().push(omaterialRodante)
                     } else {
-                        oController.getOwnerComponent().getModel("listamaterialRodanteModel").getData().push(omaterialRodante)
+                        oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().push(omaterialRodante)
                     }
-                    var oObjetoNovo = JSON.parse(JSON.stringify(oController.getOwnerComponent().getModel("listamaterialRodanteModel").getData()));
-                    oController.getOwnerComponent().getModel("listamaterialRodanteModel").refresh();
+                    var oObjetoNovo = JSON.parse(JSON.stringify(oController.getOwnerComponent().getModel("listaEquipamentoModel").getData()));
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
                     oController.limparTabelaIndexDB("tb_materialRodante").then(
                         function (result) {
                             oController.gravarTabelaIndexDB("tb_materialRodante", oObjetoNovo).then(
