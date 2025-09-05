@@ -1,0 +1,97 @@
+<mvc:View
+	controllerName="com.pontual.sgmr.controller.Componentes"    
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+	xmlns:core="sap.ui.core"    
+    displayBlock="true"
+>
+    <VBox
+        id="idComponente"
+        class="sapUiSmallMargin"
+    >
+			<Table id="idComponentesTable" 
+				alternateRowColors="true"
+				autoPopinMode="false" 
+				contextualWidth="Auto"		
+				growing="true" 
+				growingThreshold="100" 
+				mode="None"
+                paste="onPaste"                
+				noDataText="{i18n>sincronizarcontinuar}"
+				items="{
+					path: 'materialRodanteFormularioModel>/Componentes',					
+					sorter: [{
+							path: 'Componente', 
+							descending: false
+						}, {
+							path: 'Lado', 
+							descending: false
+						}]
+				}"	>        
+            <headerToolbar>
+                <OverflowToolbar id="otbSubheader">
+                    <ComboBox
+                        width="25%"
+                        selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}"
+                        change="onFiltroChange"
+                        items="{
+                            path: 'materialRodanteFormularioModel>/ComponentesCombo',
+                            sorter: { path: 'text' }
+                        }">
+                        <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
+                    </ComboBox>
+                    <ComboBox
+                        width="25%"        
+                        selectedKey="{materialRodanteFormularioModel>LadoSelecionado}"   
+                        change="onFiltroChange"                                                         
+                        items="{
+                            path: 'materialRodanteFormularioModel>/LadoCombo',
+                            sorter: { path: 'text' }
+                        }">
+                        <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
+                    </ComboBox>
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="30%">
+                    <Text text="Componente" />
+                </Column>
+                <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true" width="70%">
+                    <Text text="Valor Medido" />
+                </Column>             
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle">
+                    <cells>
+                        <ObjectStatus
+                            title="{materialRodanteFormularioModel>Componente}"
+                            text="{materialRodanteFormularioModel>Item}"
+                            active="true" 							
+                            press="onItemPress"                                
+                            state="{materialRodanteFormularioModel>Cor}"
+                            icon="{
+                                    path:'materialRodanteFormularioModel>Lado',
+                                    formatter:'com.pontual.sgmr.model.formatter.getLadoIcone'
+                                }" />		                            
+                        <HBox>
+                            <Input 
+                                value="{materialRodanteFormularioModel>Valormedido}"
+                                type="Number"
+                                enabled="true"
+                                required="false"
+                                showClearIcon="true"
+                                textDirection="RTL"								
+                                />                                                   
+                            <Text text="-Desgaste: {materialRodanteFormularioModel>Desgaste}%"
+                                visible="{
+                                    path:'materialRodanteFormularioModel>Desgaste',
+                                    formatter:'com.pontual.sgmr.model.formatter.getDesgasteVisivel'
+                                }"/>    
+                        </HBox>                            
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+</mvc:View>

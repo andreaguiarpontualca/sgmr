@@ -113,20 +113,25 @@
       "layoutTelaModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
-
       "listaAutorizacao": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "listaAssociarFormularioModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
+      "listaComponentesModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },     
+      "listaCondicoesModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },         
+      "listaInspecoesModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },               
       "listaFormularioModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
-      "listaMaterialRodante": {
-        "type": "sap.ui.model.json.JSONModel"
-      },
-      "listaMaterialRodanteModel": {
+      "listaEquipamentoModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "listaCentrosModel": {
@@ -143,7 +148,13 @@
       },
       "materialRodanteCriarModel": {
         "type": "sap.ui.model.json.JSONModel"
+      },     
+      "materialRodanteFormularioModel": {
+        "type": "sap.ui.model.json.JSONModel"
       },
+      "materialRodanteSelecionadoModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },      
       "mensagensModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
@@ -269,122 +280,17 @@
           ]
         },
         {
-          "name": "EX1200-5",
-          "pattern": "EX1200-5",
-          "target": [
-            "EX1200-5"
-          ]
-        },
-        {
-          "name": "EX1200-6",
-          "pattern": "EX1200-6",
-          "target": [
-            "EX1200-6"
-          ]
-        },
-        {
-          "name": "EX1200-7",
-          "pattern": "EX1200-7",
-          "target": [
-            "EX1200-7"
-          ]
-        },
-        {
-          "name": "EX2500-5",
-          "pattern": "EX2500-5",
-          "target": [
-            "EX2500-5"
-          ]
-        },
-        {
-          "name": "EX5500",
-          "pattern": "EX5500",
-          "target": [
-            "EX5500"
-          ]
-        },
-        {
-          "name": "315",
-          "pattern": "315",
-          "target": [
-            "315"
-          ]
-        },
-        {
-          "name": "320",
-          "pattern": "320",
-          "target": [
-            "320"
-          ]
-        },
-        {
-          "name": "323",
-          "pattern": "323",
-          "target": [
-            "323"
-          ]
-        },
-        {
-          "name": "336",
-          "pattern": "336",
-          "target": [
-            "336"
-          ]
-        },
-        {
-          "name": "349",
-          "pattern": "349",
-          "target": [
-            "349"
-          ]
-        },
-        {
-          "name": "365_374",
-          "pattern": "365_374",
-          "target": [
-            "365_374"
-          ]
-        },
-        {
-          "name": "R220LC-9",
-          "pattern": "R220LC-9",
-          "target": [
-            "R220LC-9"
-          ]
-        },
-        {
-          "name": "D6",
-          "pattern": "D6",
-          "target": [
-            "D6"
-          ]
-        },
-        {
-          "name": "D8",
-          "pattern": "D8",
-          "target": [
-            "D8"
-          ]
-        },
-        {
-          "name": "D9T",
-          "pattern": "D9T",
-          "target": [
-            "D9T"
-          ]
-        },
-        {
-          "name": "D11",
-          "pattern": "D11 ",
-          "target": [
-            "D11"
-          ]
-        },
-        {
           "name": "Sincronizar",
           "pattern": "Sincronizar",
           "target": [
             "Sincronizar"
+          ]
+        },
+        {
+          "name": "Formulario",
+          "pattern": "Formulario",
+          "target": [
+            "Formulario"
           ]
         }
       ],
@@ -473,125 +379,19 @@
           "viewId": "ListaUsuario",
           "viewName": "ListaUsuario"
         },
-
-        "EX1200-5": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "EX1200-5",
-          "viewName": "EX1200-5"
-        },
-        "EX1200-6": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "EX1200-6",
-          "viewName": "EX1200-6"
-        },
-        "EX1200-7": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "EX1200-7",
-          "viewName": "EX1200-7"
-        },
-        "D6": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "D6",
-          "viewName": "D6"
-        },
-        "EX2500-5": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "EX2500-5",
-          "viewName": "EX2500-5"
-        },
-        "EX5500": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "EX5500",
-          "viewName": "EX5500"
-        },
-        "315": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "315",
-          "viewName": "315"
-        },
-        "320": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "320",
-          "viewName": "320"
-        },
-        "323": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "323",
-          "viewName": "323"
-        },
-        "336": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "336",
-          "viewName": "336"
-        },
-        "349": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "349",
-          "viewName": "349"
-        },
-        "365_374": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "365_374",
-          "viewName": "365_374"
-        },
-        "R220LC-9": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "R220LC-9",
-          "viewName": "R220LC-9"
-        },
-        "D8": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "D8",
-          "viewName": "D8"
-        },
-        "D9T": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "D9T",
-          "viewName": "D9T"
-        },
-        "D11": {
-          "viewType": "XML",
-          "transition": "slide",
-          "clearControlAggregation": false,
-          "viewId": "D11",
-          "viewName": "D11"
-        },
         "Sincronizar": {
           "viewType": "XML",
           "transition": "slide",
           "clearControlAggregation": false,
           "viewId": "Sincronizar",
           "viewName": "Sincronizar"
+        },
+        "Formulario": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Formulario",
+          "viewName": "Formulario"
         }
       }
     },

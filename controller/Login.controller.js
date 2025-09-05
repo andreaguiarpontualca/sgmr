@@ -299,14 +299,6 @@ sap.ui.define([
                         db = e.target.result;
                         console.log('Banco de dados sendo criado');
 
-                        if (!db.objectStoreNames.contains('tb_perfil')) {
-                            db.createObjectStore("tb_perfil", { autoIncrement: true });
-                        }
-
-                        if (!db.objectStoreNames.contains('tb_usuario')) {
-                            db.createObjectStore("tb_usuario", { autoIncrement: true });
-                        }
-
                         if (!db.objectStoreNames.contains('tb_autorizacao')) {
                             db.createObjectStore("tb_autorizacao", { autoIncrement: true });
                         }
@@ -319,12 +311,36 @@ sap.ui.define([
                             db.createObjectStore("tb_centros", { autoIncrement: true });
                         }
 
-                        if (!db.objectStoreNames.contains('tb_material_rodante')) {
-                            db.createObjectStore("tb_material_rodante", { autoIncrement: true });
+                        if (!db.objectStoreNames.contains('tb_componentes')) {
+                            db.createObjectStore("tb_componentes", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_condicoes')) {
+                            db.createObjectStore("tb_condicoes", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_inspecoes')) {
+                            db.createObjectStore("tb_inspecoes", { autoIncrement: true });
                         }
 
                         if (!db.objectStoreNames.contains('tb_formulario')) {
                             db.createObjectStore("tb_formulario", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_equipamento')) {
+                            db.createObjectStore("tb_equipamento", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_medicao')) {
+                            db.createObjectStore("tb_medicao", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_perfil')) {
+                            db.createObjectStore("tb_perfil", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_usuario')) {
+                            db.createObjectStore("tb_usuario", { autoIncrement: true });
                         }
 
                     };

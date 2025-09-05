@@ -32,23 +32,29 @@
                     contextualWidth="Auto"		
                     growing="false" 
                     growingThreshold="10" 
-                    items="{listaMaterialRodanteModel>/}">
+                    items="{listaEquipamentoModel>/}">
                         <headerToolbar>
                             <OverflowToolbar id="otbSubheader">
                                 <Title text="Material Rodante" level="H2" />
                                 <ToolbarSpacer />
-                                <SearchField id="searchOrdem" search="onSearchOrdem" width="50%" placeholder="Pesquisa" />	   
+                                <SearchField id="searchEquipamento" search="onSearchEquipamento" width="50%" placeholder="Pesquisa" />	   
                             </OverflowToolbar>
                         </headerToolbar>
                         <columns>
                             <Column hAlign="Begin">
                                 <Text text="Equipamento" />
-                            </Column>								
+                            </Column>		                            						
                         </columns>
                         <items>
                             <ColumnListItem vAlign="Middle" navigated="true" type="Navigation" press="onMaterialRodantePress">
                                 <cells>
-                                    <ObjectIdentifier title="{listaMaterialRodanteModel>Equnr}" text="{listaMaterialRodanteModel>Eqktx}"/>
+                                    <ObjectStatus
+                                        title="{listaEquipamentoModel>Equnr}"
+                                        text="{listaEquipamentoModel>Eqktx}"                     
+                                        state="{
+                                                path:'listaEquipamentoModel>Status',
+                                                formatter:'com.pontual.sgmr.model.formatter.getStatusEquipamento'
+                                            }" />	                                        
                                 </cells>
                             </ColumnListItem>
                         </items>

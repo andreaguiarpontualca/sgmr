@@ -1,7 +1,115 @@
 <mvc:View
-		xmlns:mvc="sap.ui.core.mvc"
-		xmlns:html="http://www.w3.org/1999/xhtml">
-	<html:div style="height:auto;min-height:4em; background-color: #A9EAFF ;line-height: 4em;">
-		Cabecalho
-	</html:div>
+	controllerName="com.pontual.sgmr.controller.Cabecalho"   
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:core="sap.ui.core"   
+    displayBlock="true"
+    xmlns="sap.m">
+
+		    <VBox id="idVBoxCabecalho" class="sapUiSmallMargin">     
+				<f:Form id="idCabecalhoForm"
+				editable="true">
+				<f:layout>
+					<f:ResponsiveGridLayout
+						id="idResponsiveGridLayout_R220LC-9"
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="2"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer id="idFormContainer" title="{i18n>dadosinspecao}">
+						<f:formElements>
+							<f:FormElement id="idFormElementDate" label="{i18n>data}">
+								<f:fields>							
+									<DateTimePicker
+										id="idInputData"
+										required="true"									
+										change="handleChange"
+										class="sapUiSmallMarginBottom"
+										width="100%"
+										value="{
+											'path': 'materialRodanteFormularioModel>Data',
+											'type': 'sap.ui.model.type.DateTime',
+											'formatOptions': {
+												'pattern': 'dd/MM/y HH:mm:ss' 
+											}
+										}"/>					
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement id="idFormElementOper" label="{i18n>ultimoponto}">
+								<f:fields>							
+									<ObjectStatus
+										class="sapMObjectStatusMedium"
+										text="{materialRodanteFormularioModel>UltMedEpto}"
+										inverted="true"
+										state="Indication13" />																	
+								</f:fields>
+							</f:FormElement>                                                                               
+						</f:formElements>
+					</f:FormContainer>	
+					<f:FormContainer  title="{i18n>esteira}">
+						<f:formElements>
+							<f:FormElement label="{i18n>tagdireita}">
+								<f:fields>							
+									<Input 
+										value="{materialRodanteFormularioModel>TagD}"
+                                        maxLength="18"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										/>																
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="{i18n>horimetrodireito}">
+								<f:fields>							
+									<Input 
+										value="{materialRodanteFormularioModel>HorimetoD}"
+										type="Number"
+										enabled="true"
+										required="false"
+										showClearIcon="true"
+										textDirection="RTL"								
+										/>   															
+								</f:fields>
+							</f:FormElement>   
+							<f:FormElement label="{i18n>tagesquerda}">
+								<f:fields>							
+									<Input 
+										value="{materialRodanteFormularioModel>TagE}"
+                                        maxLength="18"
+										required="true"
+										showClearIcon="true"
+										width="100%"
+										/>						
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="{i18n>horimetroesquerda}">
+								<f:fields>							
+									<Input 
+										value="{materialRodanteFormularioModel>HorimetroE}"
+										type="Number"
+										enabled="true"
+										required="false"
+										showClearIcon="true"
+										textDirection="RTL"								
+										/>   				
+								</f:fields>
+							</f:FormElement>  							                                                                                   
+						</f:formElements>
+					</f:FormContainer>											
+				</f:formContainers>				
+			</f:Form>     
+		</VBox>
 </mvc:View>
