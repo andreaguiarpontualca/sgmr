@@ -63,6 +63,31 @@
                             <f:FormElement label="{i18n>centros}">
 								<f:fields>
 									<MultiInput
+									    id="multiInputCentro"
+									    required="true"
+									    showValueHelp="true"
+									    showClearIcon="true"
+									    valueHelpOnly="true"
+									    valueHelpRequest="handleValueHelpRequestedCentro"
+									    tokenUpdate="handleTokenUpdate"
+									    enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"
+									    tokens="{perfilCriarModel>/Centros}">
+  									<tokens>
+  									  <Token
+  									    templateShareable="false"
+  									    key="{= ${perfilCriarModel>key} || ${perfilCriarModel>Centro} || ${perfilCriarModel>Werks} }"
+  									    text="{=
+  									      (${perfilCriarModel>key} || ${perfilCriarModel>Centro} || ${perfilCriarModel>Werks} || '')
+  									      + (
+  									          (${perfilCriarModel>value} || ${perfilCriarModel>Descricao} || ${perfilCriarModel>Name1})
+  									          ? ' - ' + (${perfilCriarModel>value} || ${perfilCriarModel>Descricao} || ${perfilCriarModel>Name1})
+  									          : ''
+  									        )
+  									    }" />
+  									</tokens>
+									</MultiInput>
+
+									<!-- <MultiInput
 						            	id="multiInputCentro"
                                         required="true"
 						            	showValueHelp="true"
@@ -71,11 +96,11 @@
 						            	valueHelpRequest="handleValueHelpRequestedCentro" 
 						            	tokenUpdate="handleTokenUpdate"	
                                         enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"				
-						            	tokens="{perfilCriarModel>/PerfilCentroSet}">
+						            	tokens="{perfilCriarModel>/Centros}">
 						            	<tokens>
 						            		<Token text="{perfilCriarModel>Centro}" key="{perfilCriarModel>Centro}" />
 						            	</tokens>					
-						            </MultiInput>
+						            </MultiInput> -->
 								</f:fields>
 							</f:FormElement>
 						</f:formElements>
