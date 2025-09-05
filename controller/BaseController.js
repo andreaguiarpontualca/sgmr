@@ -603,7 +603,7 @@ sap.ui.define([
 
                 if (oController.checkConnection() == true) {
 
-                    //Carregar dados do servidor quando há conexão
+                    // Carregar dados do servidor quando há conexão
                     var aLeituras = [
                         oController.carregarAutorizacoes().catch(() => oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacao")),
                         oController.carregarPerfil().catch(() => oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel")),
@@ -613,133 +613,72 @@ sap.ui.define([
                         oController.carregarFormulario().catch(() => oController.carregarDadosIndexDB("tb_formulario", "listaFormularioModel"))
                     ];
 
+                    Promise.all(aLeituras).then(function () {
+                        // Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                        var aLimpezas = [
+                            oController.limparTabelaIndexDB("tb_autorizacao"),
+                            oController.limparTabelaIndexDB("tb_perfil"),
+                            oController.limparTabelaIndexDB("tb_centros"),
+                            oController.limparTabelaIndexDB("tb_usuario"),
+                            oController.limparTabelaIndexDB("tb_material_rodante"),
+                            oController.limparTabelaIndexDB("tb_formulario")
+                        ];
 
+                        Promise.all(aLimpezas).then(function () {
+                            var aAutorizacoes = oController.getOwnerComponent().getModel("listaAutorizacao").getData() || [];
+                            var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
+                            var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
+                            var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData() || [];
+                            var aMaterialRodante = oController.getOwnerComponent().getModel("listaMaterialRodanteModel").getData() || [];
+                            var aFormularios = oController.getOwnerComponent().getModel("listaFormularioModel").getData() || [];
 
-                    Promise.all(aLeituras).then(
-                        function (result) {
-                            //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                            oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
-                            var aLimpezas = [
-                                oController.limparTabelaIndexDB("tb_autorizacao"),
-                                oController.limparTabelaIndexDB("tb_perfil"),
-                                oController.limparTabelaIndexDB("tb_centros"),
-                                oController.limparTabelaIndexDB("tb_usuario"),
-                                oController.limparTabelaIndexDB("tb_material_rodante"),
-                                oController.limparTabelaIndexDB("tb_formulario"),
+                            var aGravacoes = [
+                                oController.gravarTabelaIndexDB("tb_autorizacao", aAutorizacoes),
+                                oController.gravarTabelaIndexDB("tb_perfil", aPerfis),
+                                oController.gravarTabelaIndexDB("tb_centros", aCentros),
+                                oController.gravarTabelaIndexDB("tb_usuario", aUsuarios),
+                                oController.gravarTabelaIndexDB("tb_material_rodante", aMaterialRodante),
+                                oController.gravarTabelaIndexDB("tb_formulario", aFormularios)
                             ];
-                            Promise.all(aLimpezas).then(
-                                function (result) {
-                                    var aAutorizacoes = oController.getOwnerComponent().getModel("listaAutorizacao").getData();
-                                    var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData();
-                                    var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData();
-                                    var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData();
-                                    var aMaterialRodante = oController.getOwnerComponent().getModel("listaMaterialRodanteModel").getData();
-                                    var aFormularios = oController.getOwnerComponent().getModel("listaFormularioModel").getData();
 
-                                    var aGravacoes = [
-                                        oController.gravarTabelaIndexDB("tb_autorizacao", aAutorizacoes),
-                                        oController.gravarTabelaIndexDB("tb_perfil", aPerfis),
-                                        oController.gravarTabelaIndexDB("tb_centros", aCentros),
-                                        oController.gravarTabelaIndexDB("tb_usuario", aUsuarios),
-                                        oController.gravarTabelaIndexDB("tb_material_rodante", aMaterialRodante),
-                                        oController.gravarTabelaIndexDB("tb_formulario", aFormularios)
-                                    ];
-                                    Promise.all(aGravacoes).then(
-                                        function (result) {
-                                            if (pCatalogo) {
-                                                /* oController.carregarCatalogos().then(
-                                                    function (result) {
-                                                        oController.limparTabelaIndexDB("tb_catalogo").then(
-                                                            function (result) {
-                                                                var aCatalogos = oController.getOwnerComponent().getModel("catalogosModel").getData();
-                                                                oController.gravarTabelaIndexDB("tb_catalogo", aCatalogos).then(
-                                                                    function (result) { */
-                                                oController.carregarCodes().then(
-                                                    function (result) {
-                                                        oController.limparTabelaIndexDB("tb_code").then(
-                                                            function (result) {
-                                                                var aCodes = oController.getOwnerComponent().getModel("codesModel").getData();
-                                                                oController.gravarTabelaIndexDB("tb_code", aCodes).then(
-                                                                    function (result) {
-
-                                                                        resolve(result)
-                                                                    }).catch(
-                                                                        function (result) {
-
-                                                                            oController.closeBusyDialog();
-                                                                            reject(result)
-                                                                        })
-                                                                //resolve()
-                                                            }).catch(
-                                                                function (result) {
-                                                                    oController.closeBusyDialog();
-                                                                    reject(result)
-                                                                })
-                                                        //resolve()
-                                                    }).catch(
-                                                        function (result) {
-                                                            oController.closeBusyDialog();
-                                                            reject(result)
-                                                        });
-                                                /* }).catch(
-                                                    function (result) {
-                                                        oController.closeBusyDialog();
-                                                        reject(result)
-                                                    })
-                                            //resolve()
-                                        }).catch(
-                                            function (result) {
-                                                oController.closeBusyDialog();
-                                                reject(result)
-                                            })
-                                    //resolve()
-                                }).catch(
-                                    function (result) {
-                                        oController.closeBusyDialog();
-                                        reject(result)
-                                    })*/
-                                            } else {
-                                                resolve()
-                                            }
-
-                                        }).catch(
-                                            function (result) {
-                                                oController.closeBusyDialog();
-                                                reject(result)
-                                            })
-                                    //resolve()
-                                }).catch(
-                                    function (result) {
-                                        oController.closeBusyDialog();
-                                        reject(result)
-                                    })
-                            //resolve()
-                        }).catch(
-                            function (result) {
+                            // Aguarda todas as gravações antes de continuar
+                            Promise.all(aGravacoes).then(function () {
+                                resolve();
+                            }).catch(function (err) {
                                 oController.closeBusyDialog();
-                                reject(result)
-                            })
+                                reject(err);
+                            });
+
+                        }).catch(function (err) {
+                            oController.closeBusyDialog();
+                            reject(err);
+                        });
+
+                    }).catch(function (err) {
+                        oController.closeBusyDialog();
+                        reject(err);
+                    });
+
                 } else {
                     // Sem conexão - carregar dados do IndexedDB
                     oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregarIDB"));
-                    var aLeituras = [
+                    var aLeiturasOffline = [
                         oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacao"),
                         oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
                         oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel"),
                         oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")
-                    ]
+                    ];
 
-                    Promise.all(aLeituras).then(
-                        function (result) {
-                            oController.closeBusyDialog();
-                            resolve()
-                        }).catch(
-                            function (result) {
-                                oController.closeBusyDialog();
-                                reject(result)
-                            })
+                    Promise.all(aLeiturasOffline).then(function () {
+                        oController.closeBusyDialog();
+                        resolve();
+                    }).catch(function (err) {
+                        oController.closeBusyDialog();
+                        reject(err);
+                    });
                 }
-            })
+            });
 
         },
 
