@@ -660,7 +660,47 @@ sap.ui.define([
 
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
-                                resolve();
+
+                                var aForms = oController.agruparFormularios(aMaterialRodante)
+                                var aLeiturasForm = [
+                                    oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
+                                    oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
+                                    oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel"))
+                                ];
+
+                                Promise.all(aLeiturasForm).then(
+                                    function () {
+                                        //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                                        var aLimpezas = [
+                                            oController.limparTabelaIndexDB("tb_componentes"),
+                                            oController.limparTabelaIndexDB("tb_condicoes"),
+                                            oController.limparTabelaIndexDB("tb_inspecoes")
+                                        ];
+                                        Promise.all(aLimpezas).then(
+                                            function () {
+                                                var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
+                                                var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
+                                                var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                                var aGravacoes = [
+                                                    oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
+                                                    oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
+                                                    oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
+                                                ];
+                                                Promise.all(aGravacoes).then(
+                                                    function (result) {
+                                                        resolve()
+                                                    })
+                                            }).catch(
+                                                function (result) {
+                                                    oController.closeBusyDialog();
+                                                    resolve()
+                                                })
+                                    }).catch(
+                                        function (result) {
+                                            oController.closeBusyDialog();
+                                            resolve()
+                                        })
                             }).catch(function (err) {
                                 oController.closeBusyDialog();
                                 reject(err);
@@ -1076,97 +1116,97 @@ sap.ui.define([
         },
 
         // ...existing code...
-prepararUsuario: function () {
-    return new Promise((resolve, reject) => {
-        oController = this;
-        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
+        prepararUsuario: function () {
+            return new Promise((resolve, reject) => {
+                oController = this;
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
 
-        var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
-        var aUsuarioPromises = [];
+                var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
+                var aUsuarioPromises = [];
 
-        if (aUsuarios && aUsuarios.length) {
-            aUsuarios.forEach(oUsuario => {
-                // normaliza Bloqueado para o payload
-                var sBloqueado = (oUsuario.Bloqueado === true || oUsuario.Bloqueado === "X") ? "X" : "";
+                if (aUsuarios && aUsuarios.length) {
+                    aUsuarios.forEach(oUsuario => {
+                        // normaliza Bloqueado para o payload
+                        var sBloqueado = (oUsuario.Bloqueado === true || oUsuario.Bloqueado === "X") ? "X" : "";
 
-                if(oUsuario.Sincronizado === ""){
-                    return;
+                        if (oUsuario.Sincronizado === "") {
+                            return;
+                        }
+
+                        // monta objeto que será enviado
+                        var oUsuarioSet = {
+                            "Chave": "1",
+                            "CodUsuario": oUsuario.CodUsuario,
+                            "Nome": oUsuario.Nome,
+                            "Senha": oUsuario.Senha,
+                            "Deposito": oUsuario.Deposito,
+                            "Bloqueado": sBloqueado,
+                            "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
+                            "Sincronizado": oUsuario.Sincronizado
+                        };
+
+                        // payload isolado por usuário (evita reuso de referência)
+                        var oPayload = {
+                            Chave: "1",
+                            UsuarioSet: [oUsuarioSet]
+                        };
+
+                        // empurra a promise para o array correto (mantém mesma interface do enviarDados)
+                        aUsuarioPromises.push(oController.enviarDados("ListaUsuarioSet", oPayload));
+                    });
                 }
 
-                // monta objeto que será enviado
-                var oUsuarioSet = {
-                    "Chave": "1",
-                    "CodUsuario": oUsuario.CodUsuario,
-                    "Nome": oUsuario.Nome,
-                    "Senha": oUsuario.Senha,
-                    "Deposito": oUsuario.Deposito,
-                    "Bloqueado": sBloqueado,
-                    "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
-                    "Sincronizado": oUsuario.Sincronizado
-                };
+                if (aUsuarioPromises.length > 0) {
+                    Promise.all(aUsuarioPromises).then(function (results) {
+                        console.log("prepararUsuario -> resultados recebidos:", results);
 
-                // payload isolado por usuário (evita reuso de referência)
-                var oPayload = {
-                    Chave: "1",
-                    UsuarioSet: [oUsuarioSet]
-                };
+                        results.forEach(function (oResp, idx) {
+                            try {
+                                // normaliza várias formas de resposta possíveis
+                                var oFirst = null;
+                                if (oResp && oResp.UsuarioSet && Array.isArray(oResp.UsuarioSet.results) && oResp.UsuarioSet.results.length > 0) {
+                                    oFirst = oResp.UsuarioSet.results[0];
+                                } else if (oResp && Array.isArray(oResp.results) && oResp.results.length > 0) {
+                                    oFirst = oResp.results[0];
+                                } else if (oResp && (oResp.Tipomensagem || oResp.Mensagem)) {
+                                    oFirst = oResp;
+                                } else {
+                                    console.warn("prepararUsuario -> resposta em formato inesperado (índice " + idx + "):", oResp);
+                                    oFirst = { Tipomensagem: "", Mensagem: "" };
+                                }
 
-                // empurra a promise para o array correto (mantém mesma interface do enviarDados)
-                aUsuarioPromises.push(oController.enviarDados("ListaUsuarioSet", oPayload));
+                                var vTipo;
+                                switch ((oFirst && oFirst.Tipomensagem) || "") {
+                                    case "S": vTipo = "Success"; break;
+                                    case "E": vTipo = "Error"; break;
+                                    default: vTipo = "Information"; break;
+                                }
+
+                                var sMsg = (oFirst && oFirst.Mensagem) || (oResp && oResp.Mensagem) || "";
+
+                                var oMensagem = {
+                                    "title": "Gestão de usuário",
+                                    "description": sMsg,
+                                    "type": vTipo,
+                                    "subtitle": sMsg
+                                };
+                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem);
+                            } catch (e) {
+                                console.error("prepararUsuario -> erro ao processar resultado no índice " + idx + ":", e, oResp);
+                            }
+                        });
+
+                        resolve();
+                    }).catch(function (err) {
+                        console.error("prepararUsuario -> Promise.all rejeitado:", err);
+                        // Não fechar o busy dialog aqui - será fechado no sincronizar principal
+                        reject(err);
+                    });
+                } else {
+                    resolve();
+                }
             });
-        }
-
-        if (aUsuarioPromises.length > 0) {
-            Promise.all(aUsuarioPromises).then(function (results) {
-                console.log("prepararUsuario -> resultados recebidos:", results);
-
-                results.forEach(function (oResp, idx) {
-                    try {
-                        // normaliza várias formas de resposta possíveis
-                        var oFirst = null;
-                        if (oResp && oResp.UsuarioSet && Array.isArray(oResp.UsuarioSet.results) && oResp.UsuarioSet.results.length > 0) {
-                            oFirst = oResp.UsuarioSet.results[0];
-                        } else if (oResp && Array.isArray(oResp.results) && oResp.results.length > 0) {
-                            oFirst = oResp.results[0];
-                        } else if (oResp && (oResp.Tipomensagem || oResp.Mensagem)) {
-                            oFirst = oResp;
-                        } else {
-                            console.warn("prepararUsuario -> resposta em formato inesperado (índice " + idx + "):", oResp);
-                            oFirst = { Tipomensagem: "", Mensagem: "" };
-                        }
-
-                        var vTipo;
-                        switch ((oFirst && oFirst.Tipomensagem) || "") {
-                            case "S": vTipo = "Success"; break;
-                            case "E": vTipo = "Error"; break;
-                            default: vTipo = "Information"; break;
-                        }
-
-                        var sMsg = (oFirst && oFirst.Mensagem) || (oResp && oResp.Mensagem) || "";
-
-                        var oMensagem = {
-                            "title": "Gestão de usuário",
-                            "description": sMsg,
-                            "type": vTipo,
-                            "subtitle": sMsg
-                        };
-                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem);
-                    } catch (e) {
-                        console.error("prepararUsuario -> erro ao processar resultado no índice " + idx + ":", e, oResp);
-                    }
-                });
-
-                resolve();
-            }).catch(function (err) {
-                console.error("prepararUsuario -> Promise.all rejeitado:", err);
-                // Não fechar o busy dialog aqui - será fechado no sincronizar principal
-                reject(err);
-            });
-        } else {
-            resolve();
-        }
-    });
-},
+        },
 
 
         /* prepararUsuario: function () {
