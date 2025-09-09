@@ -131,13 +131,13 @@
 								<f:fields>
 									<Input 
 										id="perfilInput"
-										value="{criarUsuarioModel>Perfil}"
-                                        showValueHelp="true"
+										value="{= ${criarUsuarioModel>CodigoPerfil} !== undefined &amp;&amp; ${criarUsuarioModel>CodigoPerfil} !== '' ? ${criarUsuarioModel>CodigoPerfil} + ' - ' + ${criarUsuarioModel>Perfil} : '' }"
+										showValueHelp="true"
 										showClearIcon="true"
 										valueHelpOnly="true"
 										required="true"
 										valueHelpRequest="_handlePerfilValueHelpRequest"
-										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
+										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"                                        
 										/>
 								</f:fields>
 							</f:FormElement>      

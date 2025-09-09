@@ -51,7 +51,7 @@
                         <items>
                             <ColumnListItem vAlign="Middle" navigated="true" type="Navigation" press="onPerfilPress">
                                 <cells>
-                                    <ObjectIdentifier title="{listaPerfilModel>DescrPerfil}"/>
+                                    <ObjectIdentifier title="{listaPerfilModel>CodigoPerfil}" text="{listaPerfilModel>DescrPerfil}"/>
                                     <Button id="excluirPerfilButton" type="Reject" press="onEliminarPerfil" icon="sap-icon://delete" class="sapUiSmallMarginBottom"	></Button>                
                                 </cells>
                             </ColumnListItem>

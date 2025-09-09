@@ -60,7 +60,7 @@
                                 <cells>
                                     <ObjectIdentifier title="{listaUsuariosModel>CodUsuario}"/>
                                     <ObjectIdentifier title="{listaUsuariosModel>Nome}"/>                                        
-                                    <ObjectIdentifier title="{listaUsuariosModel>Perfil}"/>
+                                    <ObjectIdentifier title="{listaUsuariosModel>CodigoPerfil}" text="{listaUsuariosModel>Perfil}"/>
                                     <Button id="excluirUsuarioButton" type="Reject" press="onExcluirUsuario" icon="sap-icon://delete" class=""	></Button>                
                                     <Button id="editarUsuarioButton"  type="Emphasized" press="onEditarUsuario" icon="sap-icon://edit" class=""	></Button>  
                                 </cells>

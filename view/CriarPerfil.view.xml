@@ -53,7 +53,7 @@
 								<f:fields>
 									<Input 
                                         id="perfilInput"
-										value="{perfilCriarModel>DescrPerfil}"
+										value="{= ${perfilCriarModel>CodigoPerfil} ? ${perfilCriarModel>CodigoPerfil} + ' - ' + ${perfilCriarModel>DescrPerfil} : '' }"
 										showClearIcon="true"
                                         required="true"
                                         enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"
