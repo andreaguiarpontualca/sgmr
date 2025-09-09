@@ -341,6 +341,7 @@ sap.ui.define([
         carregarDados: function (pServico, pFiltros) {
             oController = this;
             return new Promise((resolve, reject) => {
+                var aFilters = []
                 var sgmrODataModel = oController.getConnectionModel("sgmrODataModel");
                 sgmrODataModel.setHeaders(oController.getModelHeader());
                 sgmrODataModel.setUseBatch(false);
@@ -357,6 +358,21 @@ sap.ui.define([
                         break;
 
                     case "ListaAutorizacaoSet":
+                        oExpand = ""
+                        aFilters = [];
+                        break;
+
+                    case "ListaEquipamentoSet":
+                        oExpand = ""
+                        aFilters = [];
+                        for (let index = 0; index < pFiltros.length; index++) {
+                            const element = pFiltros[index];
+                            var filter = new sap.ui.model.Filter({ path: element.key, operator: sap.ui.model.FilterOperator.EQ, value1: element.value });
+                            aFilters.push(filter);
+                        }
+                        break;
+
+                    case "ListaFormularioSet":
                         oExpand = ""
                         aFilters = [];
                         break;
@@ -609,7 +625,7 @@ sap.ui.define([
                         oController.carregarPerfil().catch(() => oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel")),
                         oController.carregarCentro().catch(() => oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel")),
                         oController.carregarUsuario().catch(() => oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")),
-                        oController.carregarMaterialRodante().catch(() => oController.carregarDadosIndexDB("tb_material_rodante", "listaMaterialRodanteModel")),
+                        oController.carregarMaterialRodante().catch(() => oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel")),
                         oController.carregarFormulario().catch(() => oController.carregarDadosIndexDB("tb_formulario", "listaFormularioModel"))
                     ];
 
@@ -644,7 +660,47 @@ sap.ui.define([
 
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
-                                resolve();
+
+                                var aForms = oController.agruparFormularios(aMaterialRodante)
+                                var aLeiturasForm = [
+                                    oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
+                                    oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
+                                    oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel"))
+                                ];
+
+                                Promise.all(aLeiturasForm).then(
+                                    function () {
+                                        //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                                        var aLimpezas = [
+                                            oController.limparTabelaIndexDB("tb_componentes"),
+                                            oController.limparTabelaIndexDB("tb_condicoes"),
+                                            oController.limparTabelaIndexDB("tb_inspecoes")
+                                        ];
+                                        Promise.all(aLimpezas).then(
+                                            function () {
+                                                var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
+                                                var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
+                                                var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                                var aGravacoes = [
+                                                    oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
+                                                    oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
+                                                    oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
+                                                ];
+                                                Promise.all(aGravacoes).then(
+                                                    function (result) {
+                                                        resolve()
+                                                    })
+                                            }).catch(
+                                                function (result) {
+                                                    oController.closeBusyDialog();
+                                                    resolve()
+                                                })
+                                    }).catch(
+                                        function (result) {
+                                            oController.closeBusyDialog();
+                                            resolve()
+                                        })
                             }).catch(function (err) {
                                 oController.closeBusyDialog();
                                 reject(err);
@@ -1060,97 +1116,97 @@ sap.ui.define([
         },
 
         // ...existing code...
-prepararUsuario: function () {
-    return new Promise((resolve, reject) => {
-        oController = this;
-        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
+        prepararUsuario: function () {
+            return new Promise((resolve, reject) => {
+                oController = this;
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
 
-        var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
-        var aUsuarioPromises = [];
+                var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
+                var aUsuarioPromises = [];
 
-        if (aUsuarios && aUsuarios.length) {
-            aUsuarios.forEach(oUsuario => {
-                // normaliza Bloqueado para o payload
-                var sBloqueado = (oUsuario.Bloqueado === true || oUsuario.Bloqueado === "X") ? "X" : "";
+                if (aUsuarios && aUsuarios.length) {
+                    aUsuarios.forEach(oUsuario => {
+                        // normaliza Bloqueado para o payload
+                        var sBloqueado = (oUsuario.Bloqueado === true || oUsuario.Bloqueado === "X") ? "X" : "";
 
-                if(oUsuario.Sincronizado === ""){
-                    return;
+                        if (oUsuario.Sincronizado === "") {
+                            return;
+                        }
+
+                        // monta objeto que será enviado
+                        var oUsuarioSet = {
+                            "Chave": "1",
+                            "CodUsuario": oUsuario.CodUsuario,
+                            "Nome": oUsuario.Nome,
+                            "Senha": oUsuario.Senha,
+                            "Deposito": oUsuario.Deposito,
+                            "Bloqueado": sBloqueado,
+                            "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
+                            "Sincronizado": oUsuario.Sincronizado
+                        };
+
+                        // payload isolado por usuário (evita reuso de referência)
+                        var oPayload = {
+                            Chave: "1",
+                            UsuarioSet: [oUsuarioSet]
+                        };
+
+                        // empurra a promise para o array correto (mantém mesma interface do enviarDados)
+                        aUsuarioPromises.push(oController.enviarDados("ListaUsuarioSet", oPayload));
+                    });
                 }
 
-                // monta objeto que será enviado
-                var oUsuarioSet = {
-                    "Chave": "1",
-                    "CodUsuario": oUsuario.CodUsuario,
-                    "Nome": oUsuario.Nome,
-                    "Senha": oUsuario.Senha,
-                    "Deposito": oUsuario.Deposito,
-                    "Bloqueado": sBloqueado,
-                    "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
-                    "Sincronizado": oUsuario.Sincronizado
-                };
+                if (aUsuarioPromises.length > 0) {
+                    Promise.all(aUsuarioPromises).then(function (results) {
+                        console.log("prepararUsuario -> resultados recebidos:", results);
 
-                // payload isolado por usuário (evita reuso de referência)
-                var oPayload = {
-                    Chave: "1",
-                    UsuarioSet: [oUsuarioSet]
-                };
+                        results.forEach(function (oResp, idx) {
+                            try {
+                                // normaliza várias formas de resposta possíveis
+                                var oFirst = null;
+                                if (oResp && oResp.UsuarioSet && Array.isArray(oResp.UsuarioSet.results) && oResp.UsuarioSet.results.length > 0) {
+                                    oFirst = oResp.UsuarioSet.results[0];
+                                } else if (oResp && Array.isArray(oResp.results) && oResp.results.length > 0) {
+                                    oFirst = oResp.results[0];
+                                } else if (oResp && (oResp.Tipomensagem || oResp.Mensagem)) {
+                                    oFirst = oResp;
+                                } else {
+                                    console.warn("prepararUsuario -> resposta em formato inesperado (índice " + idx + "):", oResp);
+                                    oFirst = { Tipomensagem: "", Mensagem: "" };
+                                }
 
-                // empurra a promise para o array correto (mantém mesma interface do enviarDados)
-                aUsuarioPromises.push(oController.enviarDados("ListaUsuarioSet", oPayload));
+                                var vTipo;
+                                switch ((oFirst && oFirst.Tipomensagem) || "") {
+                                    case "S": vTipo = "Success"; break;
+                                    case "E": vTipo = "Error"; break;
+                                    default: vTipo = "Information"; break;
+                                }
+
+                                var sMsg = (oFirst && oFirst.Mensagem) || (oResp && oResp.Mensagem) || "";
+
+                                var oMensagem = {
+                                    "title": "Gestão de usuário",
+                                    "description": sMsg,
+                                    "type": vTipo,
+                                    "subtitle": sMsg
+                                };
+                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem);
+                            } catch (e) {
+                                console.error("prepararUsuario -> erro ao processar resultado no índice " + idx + ":", e, oResp);
+                            }
+                        });
+
+                        resolve();
+                    }).catch(function (err) {
+                        console.error("prepararUsuario -> Promise.all rejeitado:", err);
+                        // Não fechar o busy dialog aqui - será fechado no sincronizar principal
+                        reject(err);
+                    });
+                } else {
+                    resolve();
+                }
             });
-        }
-
-        if (aUsuarioPromises.length > 0) {
-            Promise.all(aUsuarioPromises).then(function (results) {
-                console.log("prepararUsuario -> resultados recebidos:", results);
-
-                results.forEach(function (oResp, idx) {
-                    try {
-                        // normaliza várias formas de resposta possíveis
-                        var oFirst = null;
-                        if (oResp && oResp.UsuarioSet && Array.isArray(oResp.UsuarioSet.results) && oResp.UsuarioSet.results.length > 0) {
-                            oFirst = oResp.UsuarioSet.results[0];
-                        } else if (oResp && Array.isArray(oResp.results) && oResp.results.length > 0) {
-                            oFirst = oResp.results[0];
-                        } else if (oResp && (oResp.Tipomensagem || oResp.Mensagem)) {
-                            oFirst = oResp;
-                        } else {
-                            console.warn("prepararUsuario -> resposta em formato inesperado (índice " + idx + "):", oResp);
-                            oFirst = { Tipomensagem: "", Mensagem: "" };
-                        }
-
-                        var vTipo;
-                        switch ((oFirst && oFirst.Tipomensagem) || "") {
-                            case "S": vTipo = "Success"; break;
-                            case "E": vTipo = "Error"; break;
-                            default: vTipo = "Information"; break;
-                        }
-
-                        var sMsg = (oFirst && oFirst.Mensagem) || (oResp && oResp.Mensagem) || "";
-
-                        var oMensagem = {
-                            "title": "Gestão de usuário",
-                            "description": sMsg,
-                            "type": vTipo,
-                            "subtitle": sMsg
-                        };
-                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem);
-                    } catch (e) {
-                        console.error("prepararUsuario -> erro ao processar resultado no índice " + idx + ":", e, oResp);
-                    }
-                });
-
-                resolve();
-            }).catch(function (err) {
-                console.error("prepararUsuario -> Promise.all rejeitado:", err);
-                // Não fechar o busy dialog aqui - será fechado no sincronizar principal
-                reject(err);
-            });
-        } else {
-            resolve();
-        }
-    });
-},
+        },
 
 
         /* prepararUsuario: function () {
@@ -1418,8 +1474,8 @@ prepararUsuario: function () {
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                 var aFiltros = [
                     {
-                        key: "Centro",
-                        value: oUsuario.Centro
+                        key: "Usuario",
+                        value: oUsuario.CodUsuario
                     }]
                 oController.carregarDados("ListaEquipamentoSet", aFiltros).then(function (result) {
                     var aEquipamentos = []
@@ -1428,7 +1484,7 @@ prepararUsuario: function () {
                         delete oEquipamento.__metadata
                         aEquipamentos.push(oEquipamento);
                     }
-                    oController.getOwnerComponent().getModel("listaMaterialRodanteModel").setData(aEquipamentos)
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").setData(aEquipamentos)
 
                     var vDescricao = "Material Rodante sincronizado " + aEquipamentos.length
                     var oMensagem = {
@@ -1565,56 +1621,138 @@ prepararUsuario: function () {
             })
         },
 
-        carregarCodes: function () {
+        carregarComponentes: function (aFormularios) {
+
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocodes"));
-                var aListaCodes = []
-                var aCatalogos = oController.agruparCatalogos(oController.getOwnerComponent().getModel("catalogosModel").getData())
-
-                for (let index = 0; index < aCatalogos.length; index++) {
-                    const element = aCatalogos[index];
-                    var aFiltros = [{ key: "Catalogo", value: element.key }]
-                    aListaCodes.push(oController.carregarDados("ListaCodesSet", aFiltros))
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocomponentes"));
+                var aComponentes = {
+                    Chave: 'X',
+                    ComponentesSet: []
                 }
-                Promise.all(aListaCodes).then(
+                aFormularios.forEach(oFormulario => {
+                    if (oFormulario.key != "") {
+                        var oComponente = {
+                            Chave: 'X',
+                            IdForm: oFormulario.key,
+                        }
+                        aComponentes.ComponentesSet.push(oComponente);
+                    }
+                })
+
+                oController.enviarDados("ListaComponentesSet", aComponentes).then(function (result) {
+                    var aListaComponentes = []
+                    result.ComponentesSet.results.forEach(element => {
+                        delete element.__metadata
+                        aListaComponentes.push(element);
+                    });
+
+                    oController.getOwnerComponent().getModel("listaComponentesModel").setData(aListaComponentes)
+
+                    var vDescricao = "Componentes sincronizados " + aListaComponentes.length
+                    var oMensagem = {
+                        "title": vDescricao,
+                        "description": "Componentes sincronizados para o dispositivo",
+                        "type": "Success",
+                        "subtitle": "Componentes download"
+                    }
+                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+
+                    resolve()
+                }).catch(
                     function (result) {
-                        var aCodes = []
+                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                        reject(result)
+                    })
+            })
 
-                        for (let x = 0; x < result.length; x++) {
-                            var array3 = aCodes.concat(result[x].results)
-                            aCodes = array3;
+        },
+
+        carregarCondicoes: function (aFormularios) {
+            return new Promise((resolve, reject) => {
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocondicoes"));
+                var aCondicoes = {
+                    Chave: 'X',
+                    CondicoesSet: []
+                }
+                aFormularios.forEach(oFormulario => {
+                    if (oFormulario.key != "") {
+                        var oComponente = {
+                            Chave: 'X',
+                            IdForm: oFormulario.key,
                         }
+                        aCondicoes.CondicoesSet.push(oComponente);
+                    }
+                })
 
-                        var aCatalogos = oController.getOwnerComponent().getModel("catalogosModel").getData();
+                oController.enviarDados("ListaCondicoesSet", aCondicoes).then(function (result) {
+                    var aListaCondicoes = []
+                    result.CondicoesSet.results.forEach(element => {
+                        delete element.__metadata
+                        aListaCondicoes.push(element);
+                    });
 
-                        aCodes.forEach(function (item) {
-                            var oCatalogo = aCatalogos.find(function (catalogo) {
-                                return catalogo.CodeGroup === item.Codegruppe;
-                            });
-                            if (oCatalogo) {
-                                item.Shorttxtgr = oCatalogo.Shorttxtgr;
-                            }
-                        });
+                    oController.getOwnerComponent().getModel("listaCondicoesModel").setData(aListaCondicoes)
 
-                        oController.getOwnerComponent().getModel("codesModel").setData(aCodes)
+                    var vDescricao = "Condições sincronizados " + aListaCondicoes.length
+                    var oMensagem = {
+                        "title": vDescricao,
+                        "description": "Condições sincronizadas para o dispositivo",
+                        "type": "Success",
+                        "subtitle": "Condições download"
+                    }
+                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
 
-                        oController.getOwnerComponent().getModel("codesModel").setData(aCodes)
+                    resolve()
+                }).catch(
+                    function (result) {
+                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                        reject(result)
+                    })
+            })
+        },
 
-                        var vDescricao = "Codes sincronizados " + aCodes.length
-                        var oMensagem = {
-                            "title": vDescricao,
-                            "description": "Codes encaminhados para o dispositivo",
-                            "type": "Success",
-                            "subtitle": "Codes download"
+        carregarInspecoes: function (aFormularios) {
+
+            return new Promise((resolve, reject) => {
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
+                var aInspecoes = {
+                    Chave: 'X',
+                    InspecoesSet: []
+                }
+                aFormularios.forEach(oFormulario => {
+                    if (oFormulario.key != "") {
+                        var oComponente = {
+                            Chave: 'X',
+                            IdForm: oFormulario.key,
                         }
-                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+                        aInspecoes.InspecoesSet.push(oComponente);
+                    }
+                })
 
-                        resolve()
-                    }).catch(
-                        function (result) {
-                            // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                            reject(result)
-                        })
+                oController.enviarDados("ListaInspecoesSet", aInspecoes).then(function (result) {
+                    var aListaInspecoes = []
+                    result.InspecoesSet.results.forEach(element => {
+                        delete element.__metadata
+                        aListaInspecoes.push(element);
+                    });
+
+                    oController.getOwnerComponent().getModel("listaInspecoesModel").setData(aListaInspecoes)
+
+                    var vDescricao = "Inspeções sincronizadas " + aListaInspecoes.length
+                    var oMensagem = {
+                        "title": vDescricao,
+                        "description": "Inspeções sincronizadas para o dispositivo",
+                        "type": "Success",
+                        "subtitle": "Inspeções download"
+                    }
+                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+
+                    resolve()
+                }).catch(
+                    function (result) {
+                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                        reject(result)
+                    })
             })
         },
 
@@ -2093,9 +2231,43 @@ prepararUsuario: function () {
             })
         },
 
+        medicaoUpdate: function (oEvent) {
+            oController = this;
+            return new Promise((resolve, reject) => { resolve() })
+        },
 
+        agruparFormularios: function (pData) {
+            // Input array
+            const data = pData;
 
+            // result array
+            const resultArr = [];
 
+            // grouping by location and resulting with an object using Array.reduce() method
+            const groupByLocation = data.reduce((group, item) => {
+                const { IdForm } = item;
+                group[IdForm] = group[IdForm] ?? [];
+                group[IdForm].push(1);
+                return group;
+            }, {});
+
+            Object.keys(groupByLocation).forEach((item) => {
+                groupByLocation[item] = groupByLocation[item].reduce((a, b) => a + b);
+                resultArr.push({
+                    'key': item,
+                    'Quantidade': groupByLocation[item]
+                })
+            })
+
+            resultArr.sort(function (a, b) {
+                if (a.key < b.key) { return -1; }
+                if (a.key > b.key) { return 1; }
+                return 0;
+            });
+
+            return resultArr;
+
+        },
 
 
     });

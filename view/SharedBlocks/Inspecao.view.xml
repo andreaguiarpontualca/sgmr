@@ -1,0 +1,53 @@
+<mvc:View
+	controllerName="com.pontual.sgmr.controller.Formulario"    
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+	xmlns:core="sap.ui.core"    
+    displayBlock="true"
+>
+    <VBox
+        id="idVBoxInspecao"
+        class="sapUiSmallMargin"
+    >
+			<Table id="idInspecoesTable" 
+				alternateRowColors="true"
+				autoPopinMode="false" 
+				contextualWidth="Auto"		
+				growing="true" 
+				growingThreshold="100" 
+				mode="None"
+                paste="onPaste"                
+				noDataText="{i18n>sincronizarcontinuar}"
+				items="{
+					path: 'materialRodanteFormularioModel>/Inspecoes',					
+					sorter: [{
+							path: 'Inspecao', 
+							descending: false
+						}]
+				}"	>        
+            <columns>
+                <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="90%">
+                    <Text text="Atividade" />
+                </Column>                    
+                <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true" width="10%">
+                    <Text text="Inspecionado" />
+                </Column>                           
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle">
+                    <cells>
+                        <ObjectStatus text="{materialRodanteFormularioModel>Inspecao}" />                        
+                        <Switch state="{materialRodanteFormularioModel>InspecaoSelecionada}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" >
+                            <layoutData>
+                                <FlexItemData growFactor="1" />
+                            </layoutData>
+                        </Switch>	                        
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <Text text="Observações" />        
+        <TextArea value="{materialRodanteFormularioModel>Observacoes}" rows="8" width="100%"/>
+    </VBox>
+</mvc:View>

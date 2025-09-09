@@ -18,318 +18,7 @@ sap.ui.define([
                 oController = this;
                 oView = oController.getView();
 
-                /* var oMaterialRodante = [{
-                    Codigo: "EH-4010",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA HITACHI - EX 1200-5", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "EX 1200-5",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-4011",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA HITACHI - EX 1200-6", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "EX 1200-6",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-                    ]},
-                    {
-                    Codigo: "EH-4042",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA HITACHI - EX 1200-7", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "EX1200-7",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-                    ]},
-                    {
-                    Codigo: "PF-1009",
-                    DescrMaterialRodante: "TRATOR DE ESTEIRA CATERPILLAR - D6", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "D6",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-                    ]},
-                    {
-                    Codigo: "TE-3002",
-                    DescrMaterialRodante: "TRATOR DE ESTEIRA CATERPILLAR - D8", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "D8",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-                    ]},
-                    {
-                    Codigo: "TE-4021",
-                    DescrMaterialRodante: "TRACK DOOZER CATERPILLAR D9T", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "D9T",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-                    ]},
-                    {
-                    Codigo: "TE-6006",
-                    DescrMaterialRodante: "TRATOR DE ESTEIRAS CATERPILLAR D11T CD", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "D11",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-                    ]},
-                    {
-                    Codigo: "EH-5001",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA HITACHI - EX 2500-5", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "EX 2500-5",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-6001",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA HITACHI - EX 5500", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "EX 5500",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-1026",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA CATERPILLAR 315D", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "315",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-1021",
-                    DescrMaterialRodante: "HYDRAULIC EXCAVATOR CATERPILLAR 320D", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "320",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-9999",
-                    DescrMaterialRodante: "323 323 323D", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "323",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-9997",
-                    DescrMaterialRodante: "336 336 336", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "336",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-9998",
-                    DescrMaterialRodante: "349 349 349", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "349",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                    Codigo: "EH-3007",
-                    DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA CATERPILLAR 365C", 
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    CodigoFormulario: "365_374",
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        },
-                        {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: true
-                        }
-
-
-                    ]},
-                    {
-                        Codigo: "EH-1053",
-                        DescrMaterialRodante: "ESCAVADEIRA HIDRÁULICA HYUNDAI - R220LC-9",
-                        Sincronizado: "N",
-                        HabilitarTelaCriarmaterialRodante: true,
-                        CodigoFormulario: "R 220LC-9",
-                        AutorizacaoSet: [
-                            {
-                                CodigoAutorizacao: "01",
-                                DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                                Selecionado: true
-                            },
-
-
-                        ]
-                    }
-                ]
-
-
-                oController.getOwnerComponent().getModel("listaMaterialRodanteModel").setData(oMaterialRodante);
-                oController.getOwnerComponent().getModel("listaMaterialRodanteModel").refresh()
- */
-
-                oView.bindElement("listaMaterialRodanteModel>/");
+                oView.bindElement("listaEquipamentoModel>/");
                 oView.bindElement("layoutTelaModel>/");
                 oView.bindElement("busyDialogModel>/");
 
@@ -342,16 +31,15 @@ sap.ui.define([
 
             },
 
-
             _handleRouteMatched: function (oEvent) {
 
                 oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
 
-              /*   var aFilters = []
-                var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
-                aFilters.push(filter);
-                this.getView().byId("idListaMaterialRodanteTable").getBinding("items").filter(aFilters, "Application");
- */
+                /*   var aFilters = []
+                  var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
+                  aFilters.push(filter);
+                  this.getView().byId("idListaMaterialRodanteTable").getBinding("items").filter(aFilters, "Application");
+   */
                 var oModel = new JSONModel();
                 oModel.setData([]);
                 this.getView().setModel(oModel);
@@ -396,8 +84,22 @@ sap.ui.define([
                 this.getView().setModel(oModel);
                 this.byId("messagePopoverBtn").addDependent(oMessagePopover);
 
-                oView.bindElement("listaMaterialRodanteModel>/");
+                oView.bindElement("listaEquipamentoModel>/");
 
+                oController.lerTabelaIndexDB("tb_medicao").then(
+                    function (result) {
+
+                        oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
+                            var vIdx = result.tb_medicao.findIndex(e => e.Equnr == element.Equnr);
+                            if (vIdx == -1) {
+                                element.Status = 'S';
+                            } else {
+                                element.Status = 'P';
+                            }
+                        });
+
+                    })
+                oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
             },
 
 
@@ -405,64 +107,13 @@ sap.ui.define([
                 this.getRouter().navTo("Administrativo", {}, true /*no history*/);
             },
 
-
-            onEliminarmaterialRodante: function (oEvent) {
-                var oMaterialRodante = oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getPath());
-                var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData()
-                var oUsuario = aUsuarios.find(function (pUsuario) {
-                    return pUsuario.materialRodante === oMaterialRodante.DescrmaterialRodante
-                })
-                if (oUsuario == undefined) {
-                    oMaterialRodante.Sincronizado = "E"
-                    oController.getOwnerComponent().getModel("listaMaterialRodanteModel").refresh()
-                    oController.limparTabelaIndexDB("tb_materialRodante").then(
-                        function (result) {
-                            oController.gravarTabelaIndexDB("tb_materialRodante", oController.getOwnerComponent().getModel("listaMaterialRodanteModel").getData()).then(
-                                function (result) {
-                                    MessageToast.show("materialRodante marcado para eliminação.");
-                                    oController.materialRodanteUpdate().then(
-                                        function (result) {
-                                            MessageToast.show("materialRodante eliminado com sucesso");
-                                            var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                                            oController.getView().getModel().setData(aMensagens);
-                                            oController.getView().getModel().refresh()
-                                        }).catch(
-                                            function (result) {
-
-                                            })
-                                }).catch(
-                                    function (result) {
-
-                                    })
-                        }).catch(
-                            function (result) {
-
-                            })
-                } else {
-                    MessageToast.show("materialRodante associado a usuário. Remova antes de eliminar.");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'materialRodante em uso',
-                        description: 'materialRodante associado a usuário. Remova antes de eliminar.',
-                        subtitle: 'materialRodante',
-                        counter: 1
-                    };
-                    oController.getView().getModel().setData([oMockMessage]);
-                    oController.getView().getModel().refresh()
-                }
-            },
-
             onMaterialRodantePress: function (oEvent) {
-                var oMaterialRodante = oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getPath());
-                var oObjetoNovo = JSON.parse(JSON.stringify(oMaterialRodante));
-                oObjetoNovo.HabilitarTelaCriarmaterialRodante = false
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").setData(oObjetoNovo);
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").refresh();
-                oController.getView().byId("idListaMaterialRodanteTable").setBusy(true);
-                //oController.getOwnerComponent().getRouter().navTo(oMaterialRodante.CodigoFormulario, null, true);                
-                //oController.getOwnerComponent().getRouter().navTo("ObjectPageSection", null, true);
+                var oMaterialRodante = oEvent.getSource().getBindingContext("listaEquipamentoModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaEquipamentoModel").getPath());
+                oMaterialRodante.FormularioCarregado = false
+                oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").setData(oMaterialRodante)
+
                 var oRouter = oController.getOwnerComponent().getRouter();
-                var oDestiny = oMaterialRodante.Modelo.replace(/\s+/g, '');
+                var oDestiny = "Formulario"
                 var oRoute = oRouter.getRoute(oDestiny);
 
                 if (oRoute !== undefined) {
@@ -483,34 +134,6 @@ sap.ui.define([
 
             },
 
-            onCriarmaterialRodante: function (oEvent) {
-
-                var oMaterialRodante = {
-                    CodigomaterialRodante: 0,
-                    DescrmaterialRodante: "",
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: false
-                        }, {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: false
-                        }
-                        
-
-
-                    ]
-                }
-
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").setData(oMaterialRodante);
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").refresh()
-                oController.getOwnerComponent().getRouter().navTo("CriarMaterialRodante", null, true);
-            },
-
             onSincronizar: function (oEvent) {
                 oController.onSincronizarGeral(oController, false)
 
@@ -520,7 +143,7 @@ sap.ui.define([
                 oMessagePopover.toggle(oEvent.getSource());
             },
 
-            onSearchOrdem: function(oEvent) {
+            onSearchEquipamento: function (oEvent) {
                 var sQuery = oEvent.getParameter("query") || oEvent.getSource().getValue();
                 var oTable = this.byId("idListaMaterialRodanteTable");
                 var oBinding = oTable.getBinding("items");
@@ -533,13 +156,13 @@ sap.ui.define([
                     filters: [
                         new sap.ui.model.Filter({
                             path: "Equnr",
-                            test: function(value) {
+                            test: function (value) {
                                 return value && value.toLowerCase().indexOf(sQuery) !== -1;
                             }
                         }),
                         new sap.ui.model.Filter({
                             path: "Eqktx",
-                            test: function(value) {
+                            test: function (value) {
                                 return value && value.toLowerCase().indexOf(sQuery) !== -1;
                             }
                         })
