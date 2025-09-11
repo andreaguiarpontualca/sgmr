@@ -87,6 +87,16 @@
 						</subSections>
 					</ObjectPageSection>	
 
+					<ObjectPageSection titleUppercase="false" title="Anexos">
+						<subSections>
+							<ObjectPageSubSection title="Anexos" titleUppercase="false">
+								<blocks>
+									<blockcolor:Anexos id="anexosBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>						
+
 				</sections>
 
 			</ObjectPageLayout>

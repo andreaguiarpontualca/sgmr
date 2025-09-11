@@ -637,7 +637,7 @@ sap.ui.define([
                             oController.limparTabelaIndexDB("tb_perfil"),
                             oController.limparTabelaIndexDB("tb_centros"),
                             oController.limparTabelaIndexDB("tb_usuario"),
-                            oController.limparTabelaIndexDB("tb_material_rodante"),
+                            oController.limparTabelaIndexDB("tb_equipamento"),
                             oController.limparTabelaIndexDB("tb_formulario")
                         ];
 
@@ -646,7 +646,7 @@ sap.ui.define([
                             var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
                             var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
                             var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData() || [];
-                            var aMaterialRodante = oController.getOwnerComponent().getModel("listaMaterialRodanteModel").getData() || [];
+                            var aMaterialRodante = oController.getOwnerComponent().getModel("listaEquipamentoModel").getData() || [];
                             var aFormularios = oController.getOwnerComponent().getModel("listaFormularioModel").getData() || [];
 
                             var aGravacoes = [
@@ -654,7 +654,7 @@ sap.ui.define([
                                 oController.gravarTabelaIndexDB("tb_perfil", aPerfis),
                                 oController.gravarTabelaIndexDB("tb_centros", aCentros),
                                 oController.gravarTabelaIndexDB("tb_usuario", aUsuarios),
-                                oController.gravarTabelaIndexDB("tb_material_rodante", aMaterialRodante),
+                                oController.gravarTabelaIndexDB("tb_equipamento", aMaterialRodante),
                                 oController.gravarTabelaIndexDB("tb_formulario", aFormularios)
                             ];
 
@@ -2233,7 +2233,208 @@ sap.ui.define([
 
         medicaoUpdate: function (oEvent) {
             oController = this;
-            return new Promise((resolve, reject) => { resolve() })
+            return new Promise((resolve, reject) => {
+                oController.atualizarMedicao().then(
+                    function () {
+                        resolve()
+                    }).catch(
+                        function () {
+                            reject()
+                        })
+            })
+        },
+
+        atualizarMedicao: function () {
+            return new Promise((resolve, reject) => {
+                oController.lerTabelaIndexDB("tb_medicao").then(
+                    function (result) {
+                        if (result.tb_medicao) {
+                            oController.getOwnerComponent().getModel("listaMedicoesModel").setData(result.tb_medicao);
+                            oController.prepararMedicao().then(
+                                function () {
+                                    //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandomedicoes"));
+                                    var aLimpezas = [oController.limparTabelaIndexDB("tb_medicao")]
+                                    Promise.all(aLimpezas).then(
+                                        function () {
+                                            oController.getOwnerComponent().getModel("listaMedicoesModel").setData([])
+                                            resolve()
+                                        }).catch(
+                                            function () {
+                                                // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                                                reject()
+                                            })
+                                }).catch(
+                                    function () {
+                                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                                        reject()
+                                    })
+                        }
+
+                    }).catch(
+                        function (result) {
+                            // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                            reject(result)
+                        })
+
+            })
+        },
+
+        prepararMedicao: function () {
+            return new Promise((resolve, reject) => {
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoordenscorretiva"));
+                var aMedicoes = oController.getOwnerComponent().getModel("listaMedicoesModel").getData();
+                var aListaMedicaoes = {
+                    Chave: 'X',
+                    MedicaoSet: []
+                }
+                var aMedicoesSet = []
+
+                aMedicoes.forEach(oMedicao => {
+
+                    var now = oMedicao.Data;
+                    var hours = now.getHours().toString().padStart(2, '0');
+                    var minutes = now.getMinutes().toString().padStart(2, '0');
+                    var seconds = now.getSeconds().toString().padStart(2, '0');
+                    var timeString = "PT" + hours + "H" + minutes + "M" + seconds + "S"; //"PT10H19M23S"
+
+                    var oMedicaoSet = {
+                        Chave: 'X',
+                        Data: oMedicao.Data,
+                        Eqktx: oMedicao.Eqktx,
+                        Equnr: oMedicao.Equnr,
+                        Formulario: oMedicao.IdForm,
+                        Horimetrod: oMedicao.HorimetoD,
+                        Horimetroe: oMedicao.HorimetoE,
+                        Mensagem: "",
+                        Modelo: oMedicao.Modelo,
+                        Objnr: oMedicao.Objnr,
+                        Observacoes: oMedicao.Observacoes,
+                        Pltxt: oMedicao.Pltxt,
+                        Roleteqtdeld: oMedicao.RoleteQtdeLD,
+                        Roleteqtdele: oMedicao.RoleteQtdeLE,
+                        Roletevazamento: oMedicao.RoleteVazamento,
+                        Status: oMedicao.Status,
+                        Tagd: oMedicao.Tagd,
+                        Tage: oMedicao.Tage,
+                        Tplnr: oMedicao.Tplnr,
+                        Ultmedepto: oMedicao.UltMedEpto,
+                        Usuario: oMedicao.Usuario,
+                        Uuid: oMedicao.Uuid,
+                        ComponentesSet: [],
+                        CondicoesSet: [],
+                        InspecoesSet: [],
+                        AnexosSet: []
+                    };
+
+
+                    oMedicao.Componentes.forEach(oComponente => {
+                        delete oComponente.ListaComponentes
+                        if (oComponente.Valormedido != "" && oComponente.Valormedido != null && oComponente.Valormedido != undefined && oComponente.Valormedido != 0) {
+                            oMedicaoSet.ComponentesSet.push(oComponente)
+                        }
+                    });
+
+                    oMedicao.Condicoes.forEach(oCondicoes => {
+                        delete oCondicoes.ListaCondicoes
+                        oMedicaoSet.CondicoesSet.push(oCondicoes)
+                    });
+
+                    oMedicao.Inspecoes.forEach(oInspecao => {
+                        oMedicaoSet.InspecoesSet.push(oInspecao)
+                    });
+
+                    oMedicao.items.forEach(oAnexo => {
+                        oMedicaoSet.AnexosSet.push(oAnexo)
+                    });
+
+                    aListaMedicaoes.MedicaoSet.push(oMedicaoSet)
+                });
+                var aAnexos = []
+                aListaMedicaoes.MedicaoSet.forEach(oAnexo => {
+                    oAnexo.AnexosSet.forEach(element => {
+                        aAnexos.push(oController.prepararAnexo(element))
+                    });
+
+                })
+
+                Promise.all(aAnexos).then(
+                    function (result) {
+                        aListaMedicaoes.MedicaoSet.forEach(oAnexo => {
+                            oAnexo.AnexosSet.forEach(element => {
+                                delete element.file
+                                element.ImString = result.find(oElement => oElement.id === element.id).ImString
+                            });
+
+                        })
+                        aMedicoesSet.push(oController.enviarDados("ListaMedicaoSet", aListaMedicaoes))
+                        if (aListaMedicaoes.MedicaoSet.length > 0) {
+                            Promise.all(aMedicoesSet).then(
+                                function (result) {
+                                    var aListaMedicoesRetorno = result[0].MedicaoSet.results
+                                    aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
+                                        var vTipo
+                                        switch (oMedicaoRetorno.Retorno) {
+                                            case "S":
+                                                vTipo = "Success"
+                                                break;
+                                            case "E":
+                                                vTipo = "Error"
+                                                break;
+                                            default:
+                                                vTipo = "None"
+                                                break;
+                                        }
+                                        var oMensagem = {
+                                            "title": "Medição",
+                                            "description": oMedicaoRetorno.Mensagem,
+                                            "type": vTipo,
+                                            "subtitle": 'Equipamento: ' + oMedicaoRetorno.Eqktx + '-' + oMedicaoRetorno.Eqktx
+                                        }
+                                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+
+
+                                    });
+
+                                    resolve()
+                                }).catch(
+                                    function () {
+                                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                                        reject()
+                                    })
+                        } else {
+                            resolve()
+                        }
+                    }).catch(
+                        function (result) {
+                        })
+
+            })
+        },
+
+
+        prepararAnexo: function (pAnexo) {
+
+            return new Promise((resolve, reject) => {
+                if (pAnexo.file) {
+                    if (pAnexo.documentType == 'Arquivo Câmera') {
+                        pAnexo.ImString = pAnexo.file
+                        resolve(pAnexo)
+                    } else {
+                        // Usa FileReader para criar a miniatura (Base64)
+                        var oReader = new FileReader();
+                        oReader.onload = function (e) {
+                            var vContent = e.target.result.replace("data:" + pAnexo.mediaType + ";base64,", "")
+                            pAnexo.ImString = vContent
+                            resolve(pAnexo)
+
+                        }.bind(this);
+                        oReader.readAsDataURL(pAnexo.file);
+                    }
+
+                }
+
+            })
         },
 
         agruparFormularios: function (pData) {

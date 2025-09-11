@@ -135,7 +135,7 @@ sap.ui.define([
             },
 
             onSincronizar: function (oEvent) {
-                oController.onSincronizarGeral(oController, false)
+                oController.medicaoUpdate(oController)
 
             },
 

@@ -60,8 +60,13 @@ sap.ui.define([
                         }).catch(function (result) {
 
                         })
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("None");
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText("");
+                    try {
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("None");
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText("");
+                    } catch (error) {
+
+                    }
+
                 }
             },
 
@@ -238,11 +243,8 @@ sap.ui.define([
                             var aListaInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
                             var aListaCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
 
-                            aListaComponentesCombo.forEach(element => {
-                                aComponentesCombo.push({
-                                    key: element.key,
-                                    text: element.key
-                                })
+                            aListaComponetes.forEach(element => {
+                                element.Valormedido = 0
                             });
 
                             aComponentesCombo.push({
@@ -256,12 +258,12 @@ sap.ui.define([
                                     text: "Ambos"
                                 },
                                 {
-                                    key: "Direito",
-                                    text: "Direito"
+                                    key: "Lado Direito",
+                                    text: "Lado Direito"
                                 },
                                 {
-                                    key: "Esquerdo",
-                                    text: "Esquerdo"
+                                    key: "Lado Esquerdo",
+                                    text: "Lado Esquerdo"
                                 }]
 
                             var aNiveisCombo = [
@@ -287,8 +289,8 @@ sap.ui.define([
                             } catch (error) { }
                             oFormulario.TagE = "";
                             oFormulario.TagD = "";
-                            oFormulario.HorimetroE = "";
-                            oFormulario.HorimetoD = "";
+                            oFormulario.HorimetroE = 0;
+                            oFormulario.HorimetoD = 0;
                             oFormulario.Componentes = aListaComponetes;
                             oFormulario.ComponentesCombo = aComponentesCombo
                             oFormulario.ComponenteSelecionado = "Todos"
@@ -297,10 +299,11 @@ sap.ui.define([
                             oFormulario.Condicoes = aListaCondicoes;
                             oFormulario.NivelCombo = aNiveisCombo;
                             oFormulario.RoleteVazamento = false;
-                            oFormulario.RoleteQtdeLD = "";
-                            oFormulario.RoleteQtdeLE = "";
+                            oFormulario.RoleteQtdeLD = 0;
+                            oFormulario.RoleteQtdeLE = 0;
                             oFormulario.Inspecoes = aListaInspecoes;
                             oFormulario.Observacoes = "";
+                            oFormulario.items = [];
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
 

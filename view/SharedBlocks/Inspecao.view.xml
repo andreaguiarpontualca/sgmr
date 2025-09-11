@@ -38,7 +38,7 @@
                 <ColumnListItem vAlign="Middle">
                     <cells>
                         <ObjectStatus text="{materialRodanteFormularioModel>Inspecao}" />                        
-                        <Switch state="{materialRodanteFormularioModel>InspecaoSelecionada}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" >
+                        <Switch state="{materialRodanteFormularioModel>Selecionada}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" >
                             <layoutData>
                                 <FlexItemData growFactor="1" />
                             </layoutData>
