@@ -153,7 +153,7 @@ sap.ui.define([
                     var oPerfil = oSelectedItem.getModel("listaPerfilModel").getProperty(oSelectedItem.getBindingContext("listaPerfilModel").getPath())
 
 
-                    oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/Perfil", oSelectedItem.getTitle());
+                    oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/Perfil", oSelectedItem.getTitle().split("-")[1].trim());
                     oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/CodigoPerfil", oPerfil.CodigoPerfil);
                     oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/Autorizacoes", oPerfil.AutorizacaoSet);
                     oController.getOwnerComponent().getModel("criarUsuarioModel").refresh()
