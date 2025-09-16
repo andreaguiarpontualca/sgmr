@@ -49,11 +49,20 @@
 				<f:formContainers>
 					<f:FormContainer title="{i18n>dadosgerais}">
 						<f:formElements>
-							<f:FormElement label="{i18n>perfil}">
+							<f:FormElement label="{i18n>codigo}">
 								<f:fields>
+									<Text 
+                                        id="perfilCodInput"
+										text="{perfilCriarModel>CodigoPerfil}"
+										visible="{= ${perfilCriarModel>CodigoPerfil} === 0 ? false : true }"										
+										/>									
+								</f:fields>
+							</f:FormElement>							
+							<f:FormElement label="{i18n>perfil}">
+								<f:fields>							
 									<Input 
                                         id="perfilInput"
-										value="{= ${perfilCriarModel>CodigoPerfil} ? ${perfilCriarModel>CodigoPerfil} + ' - ' + ${perfilCriarModel>DescrPerfil} : '' }"
+										value="{perfilCriarModel>DescrPerfil}"
 										showClearIcon="true"
                                         required="true"
                                         enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"

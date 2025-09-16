@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<SelectDialog
+		id="medicaoOpcaoSelectDialog"
+		noDataText="Opções não encontradas"
+		title="{i18n>selecioneumaacao}"
+		search=".onMedicaoOpcaoDialogSearch"
+		confirm=".onMedicaoOpcaoDialogClose"
+		cancel=".onMedicaoOpcaoDialogClose"
+		items="{
+			path: 'medicaoAcoesModel>/'
+		}">
+		<StandardListItem
+			title="{medicaoAcoesModel>acao}"
+			icon="{medicaoAcoesModel>icone}"
+			iconDensityAware="false"
+			iconInset="false"
+			type="Active" 
+            wrapping="true"/>
+	</SelectDialog>
+</core:FragmentDefinition>

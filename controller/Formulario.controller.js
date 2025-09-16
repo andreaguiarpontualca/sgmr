@@ -7,9 +7,10 @@ sap.ui.define([
     "sap/m/Dialog",
     "sap/m/Button",
     'sap/base/util/uid',
-    'sap/m/MessageToast'
+    'sap/m/MessageToast',
+    "sap/m/MessageBox"
 ],
-    function (Controller, formatter, MessagePopover, MessageItem, JSONModel, Dialog, Button, uid, MessageToast) {
+    function (Controller, formatter, MessagePopover, MessageItem, JSONModel, Dialog, Button, uid, MessageToast, MessageBox) {
         "use strict";
         var oView
         var oController
@@ -37,7 +38,11 @@ sap.ui.define([
 
             _handleRouteMatched: function (oEvent) {
                 oBundle = oController.getView().getModel("i18n").getResourceBundle();
+                try {
+                    oView.byId("idFormulario").scrollTo(0);
+                } catch (error) {
 
+                }
                 oController.iniciarMensagens();
 
                 var oEquipamento = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData();
@@ -116,8 +121,8 @@ sap.ui.define([
                 this.byId("messagePopoverBtn").addDependent(oMessagePopover);
             },
 
-            onNavBack: function () {
-                this.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
+            onNavBack: function (oEvent) {
+                oController.onCancelar(oEvent);
             },
 
             handleMessagePopoverPress: function (oEvent) {
@@ -153,7 +158,49 @@ sap.ui.define([
 
             },
 
+            onCancelar: function (oEvent) {
+                MessageBox.confirm(oBundle.getText("cancelargravacao"), {
+                    title: oBundle.getText("cancelar"),               // default
+                    styleClass: "",                                      // default
+                    actions: [sap.m.MessageBox.Action.OK,
+                    sap.m.MessageBox.Action.CANCEL],         // default
+                    emphasizedAction: sap.m.MessageBox.Action.OK,        // default
+                    initialFocus: null,                                  // default
+                    textDirection: sap.ui.core.TextDirection.Inherit,    // default
+                    onClose: function (sAction) {
+                        if (sAction == 'OK') {
+                           oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
+
+                        } else if (sAction == "CANCEL") {
+
+                            return;
+                        }
+                    }
+                });
+            },
+
             onConfirmar: function (oEvent) {
+                MessageBox.confirm(oBundle.getText("confirmagravacao"), {
+                    title: oBundle.getText("confirmacao"),               // default
+                    styleClass: "",                                      // default
+                    actions: [sap.m.MessageBox.Action.OK,
+                    sap.m.MessageBox.Action.CANCEL],         // default
+                    emphasizedAction: sap.m.MessageBox.Action.OK,        // default
+                    initialFocus: null,                                  // default
+                    textDirection: sap.ui.core.TextDirection.Inherit,    // default
+                    onClose: function (sAction) {
+                        if (sAction == 'OK') {
+                            oController.confirmar(oEvent)
+
+                        } else if (sAction == "CANCEL") {
+
+                            return;
+                        }
+                    }
+                });
+            },
+
+            confirmar: function (oEvent) {
                 oView.byId("confirmarButton").setEnabled(false);
                 oView.byId("confirmarButton").setBusy(true);
                 oView.byId("cancelarButton").setEnabled(false);
@@ -203,7 +250,7 @@ sap.ui.define([
                                                         oView.byId("confirmarButton").setBusy(false);
                                                         oView.byId("cancelarButton").setEnabled(true);
                                                         oView.byId("cancelarButton").setBusy(false);
-                                                        oController.getRouter().navTo("ListaUsuario", {}, true /*no history*/);
+                                                        oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
 
                                                     }
                                                 }
@@ -246,6 +293,14 @@ sap.ui.define([
                             aListaComponetes.forEach(element => {
                                 element.Valormedido = 0
                             });
+
+                            aListaComponentesCombo.forEach(element => {
+
+                                aComponentesCombo.push({
+                                    key: element.key,
+                                    text: element.key
+                                })
+                            })
 
                             aComponentesCombo.push({
                                 key: 'Todos',
@@ -304,6 +359,7 @@ sap.ui.define([
                             oFormulario.Inspecoes = aListaInspecoes;
                             oFormulario.Observacoes = "";
                             oFormulario.items = [];
+                            oFormulario.Status = "P"
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
 

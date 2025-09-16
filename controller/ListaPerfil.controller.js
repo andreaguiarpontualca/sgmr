@@ -231,7 +231,7 @@ sap.ui.define([
 
             onCriarPerfil: function (oEvent) {
 
-                var listaAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacao").getData()
+                var listaAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData()
 
                 var oPerfil = {
                     CodigoPerfil: 0,

@@ -4,12 +4,18 @@ sap.ui.define([
     'sap/m/MessageToast',
     'sap/m/MessagePopover',
     'sap/m/MessageItem',
-    'sap/ui/model/json/JSONModel'
+    'sap/ui/model/json/JSONModel',
+    "sap/ui/model/FilterOperator",
+    'sap/ui/model/Sorter',
+    'sap/ui/core/Fragment',
+    'sap/ui/model/Filter',
+    "sap/m/MessageBox",
 ],
-    function (Controller, formatter, MessageToast, MessagePopover, MessageItem, JSONModel) {
+    function (Controller, formatter, MessageToast, MessagePopover, MessageItem, JSONModel, FilterOperator, Sorter, Fragment, Filter, MessageBox) {
         "use strict";
         var oController;
         var oView;
+        var oBundle;
         var oMessagePopover;
 
         return Controller.extend("com.pontual.sgmr.controller.ListaMaterialRodante", {
@@ -21,6 +27,7 @@ sap.ui.define([
                 oView.bindElement("listaEquipamentoModel>/");
                 oView.bindElement("layoutTelaModel>/");
                 oView.bindElement("busyDialogModel>/");
+                oView.bindElement("mensagensModel>/");
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -33,7 +40,8 @@ sap.ui.define([
 
             _handleRouteMatched: function (oEvent) {
 
-                oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                oBundle = oView.getModel("i18n").getResourceBundle();
+                oController.getView().byId("idListaMaterialRodanteTable").setBusy(true);
 
                 /*   var aFilters = []
                   var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
@@ -94,21 +102,25 @@ sap.ui.define([
                             if (vIdx == -1) {
                                 element.Status = 'S';
                             } else {
-                                element.Status = 'P';
+                                element.Status = result.tb_medicao[vIdx].Status
                             }
                         });
+                        oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
+                        oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                    }).catch(
+                        function (result) {
+                            oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                        })
 
-                    })
-                oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
             },
 
 
             onNavBack: function () {
-                this.getRouter().navTo("Administrativo", {}, true /*no history*/);
+                this.getRouter().navTo("Inicio", {}, true /*no history*/);
             },
 
             onMaterialRodantePress: function (oEvent) {
-                var oMaterialRodante = oEvent.getSource().getBindingContext("listaEquipamentoModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaEquipamentoModel").getPath());
+                var oMaterialRodante = oController.getOwnerComponent().getModel("medicaoSelecionadaModel").getData()
                 oMaterialRodante.FormularioCarregado = false
                 oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").setData(oMaterialRodante)
 
@@ -135,7 +147,17 @@ sap.ui.define([
             },
 
             onSincronizar: function (oEvent) {
-                oController.medicaoUpdate(oController)
+                oView.byId("idListaMaterialRodanteTable").setBusy(true);
+                oController.medicaoUpdate(oController).then(
+                    function (result) {
+                        var oModel = new JSONModel();
+                        oModel.setData(oController.getOwnerComponent().getModel("mensagensModel").getData());
+                        oView.setModel(oModel);
+                        oView.byId("idListaMaterialRodanteTable").setBusy(false);
+                    }).catch(
+                    function (result) {
+                        oView.byId("idListaMaterialRodanteTable").setBusy(false);
+                    })
 
             },
 
@@ -169,6 +191,160 @@ sap.ui.define([
                     ],
                     and: false
                 }));
+            },
+
+            /********************************************* MENU OPÇÕES *********************************************************/
+            onMedicaoOpcaoDialogOpen: function (oEvent) {
+
+                var oAtendimentoSelecionado = oEvent.getSource().getBindingContext("listaEquipamentoModel").getObject()
+                oController.getOwnerComponent().getModel("medicaoSelecionadaModel").setData(oAtendimentoSelecionado)
+                oController.getOwnerComponent().getModel("medicaoSelecionadaModel").refresh()
+                if (oAtendimentoSelecionado.Status == 'S') {
+                    oController.onMaterialRodantePress()
+                } else {
+                    oController.carregarAcoes(oAtendimentoSelecionado).then(function () {
+                        var oView = oController.getView();
+                        oController._sInputId = oEvent.getSource().getId();
+
+
+                        // create value help dialog
+                        if (!oController._pDialog) {
+                            oController._pDialog = Fragment.load({
+                                id: oView.getId(),
+                                name: "com.pontual.sgmr.fragment.MedicaoOpcoesAtendimentoDialog",
+                                controller: oController
+                            }).then(function (oValueHelpDialog) {
+                                oView.addDependent(oValueHelpDialog);
+                                return oValueHelpDialog;
+                            });
+                        }
+
+                        // open value help dialog
+                        oController._pDialog.then(function (oValueHelpDialog) {
+                            oValueHelpDialog.open();
+                        });
+                    })
+                }
+
+            },
+
+            onMedicaoOpcaoDialogSearch: function (oEvent) {
+                var sValue = oEvent.getParameter("value");
+                var oFilters = [new Filter(
+                    {
+                        filters: [
+                            new Filter("acao", FilterOperator.Contains, sValue)
+                        ],
+                        and: false
+                    }
+                )];
+                oFilters.push(oFilters);
+
+                oEvent.getSource().getBinding("items").filter([oFilters]);
+            },
+
+
+            onMedicaoOpcaoDialogClose: function (oEvent) {
+                var aSelectedItem = oEvent.getParameter("selectedItem")
+
+                if (aSelectedItem != undefined) {
+                    switch (aSelectedItem.getTitle()) {
+                        case oBundle.getText("editarmedicao"):
+                            oController.onMaterialRodantePress()
+                            break;
+
+                        case oBundle.getText("excluirmedicao"):
+                            oController.onExcluirMedicao()
+                            break;
+
+
+                        default:
+                            break;
+                    }
+                }
+
+            },
+
+
+            carregarAcoes: function () {
+                return new Promise((resolve, reject) => {
+                    var aAcoes = [];
+
+                    aAcoes.push({
+                        acao: oBundle.getText("editarmedicao"),
+                        icone: "sap-icon://edit"
+                    })
+
+
+                    aAcoes.push({
+                        acao: oBundle.getText("excluirmedicao"),
+                        icone: "sap-icon://delete"
+                    })
+
+
+                    aAcoes.sort((a, b) => a.acao.localeCompare(b.acao));
+
+                    oController.getOwnerComponent().getModel("medicaoAcoesModel").setData(aAcoes)
+                    oController.getOwnerComponent().getModel("medicaoAcoesModel").refresh()
+                    resolve()
+                })
+
+            },
+
+            onExcluirMedicao: function () {
+                oController.getView().byId("idListaMaterialRodanteTable").setBusy(true);
+                var oMedicaoSelecionada = oController.getOwnerComponent().getModel("medicaoSelecionadaModel").getData()
+                MessageBox.warning(oBundle.getText("confirmaexclusao"), {
+                    title: oBundle.getText("confirmacao"),               // default
+                    styleClass: "",                                      // default
+                    actions: [sap.m.MessageBox.Action.OK,
+                    sap.m.MessageBox.Action.CANCEL],         // default
+                    emphasizedAction: sap.m.MessageBox.Action.OK,        // default
+                    initialFocus: null,                                  // default
+                    textDirection: sap.ui.core.TextDirection.Inherit,    // default
+                    onClose: function (sAction) {
+                        if (sAction == 'OK') {
+                            oController.excluirMedicao(oMedicaoSelecionada).then(
+                                function (result) {
+                                    oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
+                                    oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                                }
+                            );
+
+                        } else if (sAction == "CANCEL") {
+
+                            return;
+                        }
+                    }
+                });
+            },
+
+            excluirMedicao: function (oMedicaoSelecionada) {
+                return new Promise((resolve, reject) => {
+                    oController.lerTabelaIndexDB("tb_medicao").then(
+                        function (result) {
+                            var aMedicoes = result.tb_medicao.filter(e => e.Equnr != oMedicaoSelecionada.Equnr);
+                                oController.limparTabelaIndexDB("tb_medicao").then(
+                                    function (result) {
+                                        oController.gravarTabelaIndexDB("tb_medicao", aMedicoes).then(
+                                            function (result) {
+                                                oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
+                                                    var vIdx = aMedicoes.findIndex(e => e.Equnr == element.Equnr);
+                                                    if (vIdx == -1) {
+                                                        element.Status = 'S';
+                                                    } else {
+                                                        element.Status = aMedicoes[vIdx].Status
+                                                    }
+                                                });
+                                                resolve()
+                                            })
+                                    })
+                        }).catch(
+                            function (result) {
+                                resolve()
+                            })
+                })
+
             }
 
         });

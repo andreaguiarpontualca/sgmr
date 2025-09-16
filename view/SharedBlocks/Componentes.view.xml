@@ -18,7 +18,6 @@
 				growingThreshold="100" 
 				mode="None"
                 paste="onPaste"                
-				noDataText="{i18n>sincronizarcontinuar}"
 				items="{
 					path: 'materialRodanteFormularioModel>/Componentes',					
 					sorter: [{

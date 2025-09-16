@@ -1,20 +1,25 @@
-<mvc:View controllerName="com.pontual.sgmr.controller.ListaMaterialRodante"
+<mvc:View
+    controllerName="com.pontual.sgmr.controller.ListaMaterialRodante"
     height="100%"
-    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
-    xmlns="sap.m">
-    <Page id="pageInicio" 
-          title="{i18n>title}" 
-          titleAlignment="Center"
-          showNavButton="true"   
-          navButtonPress="onNavBack"       
-          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+    xmlns="sap.m"
+>
+    <Page
+        id="pageInicio"
+        title="{i18n>title}"
+        titleAlignment="Center"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
+    >
         <headerContent>
-        <Button
-				tooltip="{i18n>sincronizar}"
-				icon="sap-icon://synchronize"
-				press="onSincronizar"
-                type="Emphasized"/>
+            <Button
+                tooltip="{i18n>sincronizar}"
+                icon="sap-icon://synchronize"
+                press="onSincronizar"
+                type="Emphasized"
+            />
             <ObjectStatus
                 id="networkStatus"
                 active="false"
@@ -24,54 +29,76 @@
                 state="{path: 'conexaoModel>statusConexao',
                         formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
             />
-        </headerContent>            
-		<content>               
-                    <Table id="idListaMaterialRodanteTable" 
-                    alternateRowColors="true"
-                    autoPopinMode="true" 
-                    contextualWidth="Auto"		
-                    growing="false" 
-                    growingThreshold="10" 
-                    items="{listaEquipamentoModel>/}">
-                        <headerToolbar>
-                            <OverflowToolbar id="otbSubheader">
-                                <Title text="Material Rodante" level="H2" />
-                                <ToolbarSpacer />
-                                <SearchField id="searchEquipamento" search="onSearchEquipamento" width="50%" placeholder="Pesquisa" />	   
-                            </OverflowToolbar>
-                        </headerToolbar>
-                        <columns>
-                            <Column hAlign="Begin">
-                                <Text text="Equipamento" />
-                            </Column>		                            						
-                        </columns>
-                        <items>
-                            <ColumnListItem vAlign="Middle" navigated="true" type="Navigation" press="onMaterialRodantePress">
-                                <cells>
-                                    <ObjectStatus
-                                        title="{listaEquipamentoModel>Equnr}"
-                                        text="{listaEquipamentoModel>Eqktx}"                     
-                                        state="{
+        </headerContent>
+        <content>
+            <Table
+                id="idListaMaterialRodanteTable"
+                alternateRowColors="true"
+                autoPopinMode="true"
+                contextualWidth="Auto"
+                growing="false"
+                growingThreshold="10"
+                items="{listaEquipamentoModel>/}"
+            >
+                <headerToolbar>
+                    <OverflowToolbar id="otbSubheader">
+                        <Title
+                            text="Equipamentos ({= ${listaEquipamentoModel>/}.length})"
+                            level="H2"
+                        />
+                        <ToolbarSpacer />
+                        <SearchField
+                            id="searchEquipamento"
+                            search="onSearchEquipamento"
+                            width="50%"
+                            placeholder="Pesquisa"
+                        />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column hAlign="Begin">
+                        <Text text="Equipamento" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        vAlign="Middle"
+                        navigated="true"
+                        type="Detail"
+                        detailPress="onMedicaoOpcaoDialogOpen"
+                        press="onMaterialRodantePress"
+                    >
+                        <cells>
+                            <ObjectStatus
+                                title="{listaEquipamentoModel>Equnr}"
+                                text="{listaEquipamentoModel>Eqktx}"
+                                icon="{
+                                                path:'listaEquipamentoModel>Status',
+                                                formatter:'com.pontual.sgmr.model.formatter.getIconeEquipamento'
+                                            }"
+                                state="{
                                                 path:'listaEquipamentoModel>Status',
                                                 formatter:'com.pontual.sgmr.model.formatter.getStatusEquipamento'
-                                            }" />	                                        
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-		</content>
-		<footer>
-			<OverflowToolbar>
-				<Button id="messagePopoverBtn"
-					visible="{=!!${message>/}.length}"
-					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-					text= "{path: '/', formatter: '.highestSeverityMessages' }"
-					press=".handleMessagePopoverPress"
-					ariaHasPopup="Dialog"/>                      
-				<ToolbarSpacer/>
-
-			</OverflowToolbar>
-		</footer>
+                                            }"
+                            />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${message>/}.length}"
+                    icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+                    text="{path: '/', formatter: '.highestSeverityMessages' }"
+                    press=".handleMessagePopoverPress"
+                    ariaHasPopup="Dialog"
+                />
+                <ToolbarSpacer />
+            </OverflowToolbar>
+        </footer>
     </Page>
 </mvc:View>

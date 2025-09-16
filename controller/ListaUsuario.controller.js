@@ -199,7 +199,7 @@ sap.ui.define([
                     Autorizacoes: []
                 }
 
-                // var listaAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacao").getData()
+                // var listaAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData()
 
                 // listaAutorizacao.forEach(element => {
                 //     element.Selecionado = false

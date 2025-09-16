@@ -18,7 +18,7 @@
 				growingThreshold="100" 
 				mode="None"
                 paste="onPaste"                
-				noDataText="{i18n>sincronizarcontinuar}"
+				noDataText="{i18n>dadosnaoencontrados}"
 				items="{
 					path: 'materialRodanteFormularioModel>/Condicoes',					
 					sorter: [{

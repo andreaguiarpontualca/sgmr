@@ -81,7 +81,7 @@ sap.ui.define(function () {
 		},
 
 		getLadoIcone: function (value) {
-			if (value == "Direito") {
+			if (value == "Lado Direito") {
 				return "sap-icon://navigation-right-arrow"
 			} else {
 				return "sap-icon://navigation-left-arrow"
@@ -100,18 +100,27 @@ sap.ui.define(function () {
 			switch (value) {
 				case "P":
 					return "Warning"
-					break;
 				case "E":
 					return "Error"
-					break;
 				case "S":
 					return "Success"
-					break
 				default:
 					return "None"
-					break;
 			}
-		}		
+		},
+
+		getIconeEquipamento: function (value) {	
+			switch (value) {
+				case "P":
+					return "sap-icon://status-critical"
+				case "E":
+					return "sap-icon://status-error"
+				case "S":
+					return "sap-icon://message-warning"
+				default:
+					return "sap-icon://status-inactive"
+			}
+		}					
 
 	};
 

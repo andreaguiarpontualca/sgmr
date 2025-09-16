@@ -108,8 +108,8 @@ sap.ui.define([
             },
 
             onSincronizar: function (oEvent) {
-                oController.onSincronizarGeral(oController, true)
-
+                //oController.onSincronizarGeral(oController, true)
+                oController.getOwnerComponent().getRouter().navTo("Sincronizar", null, true);
             },
 
             handleMessagePopoverPress: function (oEvent) {

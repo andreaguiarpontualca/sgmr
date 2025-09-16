@@ -549,7 +549,7 @@ sap.ui.define([
                         delete oAutorizacao.__metadata
                         aAutorizacoes.push(oAutorizacao);
                     }
-                    oController.getOwnerComponent().getModel("listaAutorizacao").setData(aAutorizacoes)
+                    oController.getOwnerComponent().getModel("listaAutorizacaoModel").setData(aAutorizacoes)
 
 
                     var vDescricao = "Autorizações sincronizadas " + aAutorizacoes.length
@@ -591,26 +591,7 @@ sap.ui.define([
             }
         },
 
-        sincronizarReceber1: function (pCatalogo) {
 
-            // oController = this;
-            // return new Promise((resolve, reject) => {
-
-            //     if (oController.checkConnection() == true) {
-
-            //         //Preencher aqui com todos os serviços que precisam ser chamados e carregados
-            //         var aLeituras = [
-            //             oController.carregarPerfil(),
-            //         ]
-
-            //     } else {
-            //         oController.closeBusyDialog();
-            //         reject()
-            //     }
-            // })
-            resolve()
-
-        },
         //Revisar
         sincronizarReceber: function (pCatalogo) {
 
@@ -621,11 +602,11 @@ sap.ui.define([
 
                     // Carregar dados do servidor quando há conexão
                     var aLeituras = [
-                        oController.carregarAutorizacoes().catch(() => oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacao")),
+                        oController.carregarAutorizacoes().catch(() => oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel")),
                         oController.carregarPerfil().catch(() => oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel")),
                         oController.carregarCentro().catch(() => oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel")),
                         oController.carregarUsuario().catch(() => oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")),
-                        oController.carregarMaterialRodante().catch(() => oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel")),
+                        oController.carregarEquipamento().catch(() => oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel")),
                         oController.carregarFormulario().catch(() => oController.carregarDadosIndexDB("tb_formulario", "listaFormularioModel"))
                     ];
 
@@ -642,7 +623,7 @@ sap.ui.define([
                         ];
 
                         Promise.all(aLimpezas).then(function () {
-                            var aAutorizacoes = oController.getOwnerComponent().getModel("listaAutorizacao").getData() || [];
+                            var aAutorizacoes = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData() || [];
                             var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
                             var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
                             var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData() || [];
@@ -720,7 +701,7 @@ sap.ui.define([
                     // Sem conexão - carregar dados do IndexedDB
                     oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregarIDB"));
                     var aLeiturasOffline = [
-                        oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacao"),
+                        oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
                         oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
                         oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel"),
                         oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")
@@ -1431,7 +1412,7 @@ sap.ui.define([
         carregarFormulario: function () {
 
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoequipamentos"));
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoformularios"));
                 /* 				var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                                 var aFiltros = [
                                     {
@@ -1467,7 +1448,7 @@ sap.ui.define([
         },
 
 
-        carregarMaterialRodante: function () {
+        carregarEquipamento: function () {
 
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoequipamentos"));
@@ -2257,8 +2238,39 @@ sap.ui.define([
                                     var aLimpezas = [oController.limparTabelaIndexDB("tb_medicao")]
                                     Promise.all(aLimpezas).then(
                                         function () {
+                                            var aMedicoesErro = oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData();
+                                            var aMedicoesAtuais = oController.getOwnerComponent().getModel("listaMedicoesModel").getData();
+                                            var aMedicoesCorrigir = []
                                             oController.getOwnerComponent().getModel("listaMedicoesModel").setData([])
-                                            resolve()
+                                            if (aMedicoesErro.length > 0) {
+                                                aMedicoesErro.forEach(element => {
+                                                    var oMedicaoAtual = aMedicoesAtuais.find(oElement => oElement.Uuid === element.Uuid);
+                                                    if (oMedicaoAtual) {
+                                                        oMedicaoAtual.Status = "E"
+                                                        aMedicoesCorrigir.push(oMedicaoAtual)
+                                                    }
+                                                });
+                                                oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
+                                                    var vIdx = aMedicoesCorrigir.findIndex(e => e.Equnr == element.Equnr);
+                                                    if (vIdx != -1) {
+                                                        element.Status = 'P';
+                                                    }
+                                                });
+                                                oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
+
+                                                oController.gravarTabelaIndexDB("tb_medicao", aMedicoesCorrigir).then(
+                                                    function (result) {
+                                                        oController.getOwnerComponent().getModel("listaMedicoesModel").setData(aMedicoesCorrigir);
+                                                        oController.getOwnerComponent().getModel("listaMedicoesModel").refresh(true);
+                                                        oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh(true);
+                                                        resolve()
+                                                    })
+
+                                            } else {
+                                                oController.getOwnerComponent().getModel("listaMedicoesModel").setData([])
+                                                resolve()
+                                            }
+
                                         }).catch(
                                             function () {
                                                 // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
@@ -2345,7 +2357,8 @@ sap.ui.define([
                     });
 
                     oMedicao.items.forEach(oAnexo => {
-                        oMedicaoSet.AnexosSet.push(oAnexo)
+                        var oAnexoNovo = Object.assign({}, oAnexo); // Cria uma cópia do objeto para evitar mutações
+                        oMedicaoSet.AnexosSet.push(oAnexoNovo)
                     });
 
                     aListaMedicaoes.MedicaoSet.push(oMedicaoSet)
@@ -2374,7 +2387,7 @@ sap.ui.define([
                                     var aListaMedicoesRetorno = result[0].MedicaoSet.results
                                     aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
                                         var vTipo
-                                        switch (oMedicaoRetorno.Retorno) {
+                                        switch (oMedicaoRetorno.Status) {
                                             case "S":
                                                 vTipo = "Success"
                                                 break;
@@ -2392,7 +2405,11 @@ sap.ui.define([
                                             "subtitle": 'Equipamento: ' + oMedicaoRetorno.Eqktx + '-' + oMedicaoRetorno.Eqktx
                                         }
                                         oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
+                                        oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
+                                        oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
+                                        if (oMedicaoRetorno.Status == 'E') {
+                                            oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(oMedicaoRetorno)
+                                        }
 
                                     });
 

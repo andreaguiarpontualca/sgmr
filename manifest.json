@@ -61,7 +61,9 @@
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
           "bundleName": "com.pontual.sgmr.i18n.i18n",
-          "supportedLocales": [""],
+          "supportedLocales": [
+            ""
+          ],
           "fallbackLocale": ""
         }
       },
@@ -113,7 +115,7 @@
       "layoutTelaModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
-      "listaAutorizacao": {
+      "listaAutorizacaoModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "listaAssociarFormularioModel": {
@@ -121,13 +123,13 @@
       },
       "listaComponentesModel": {
         "type": "sap.ui.model.json.JSONModel"
-      },     
+      },
       "listaCondicoesModel": {
         "type": "sap.ui.model.json.JSONModel"
-      },         
+      },
       "listaInspecoesModel": {
         "type": "sap.ui.model.json.JSONModel"
-      },               
+      },
       "listaFormularioModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
@@ -139,7 +141,10 @@
       },
       "listaMedicoesModel": {
         "type": "sap.ui.model.json.JSONModel"
-      },      
+      },
+      "listaMedicoesErroModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
       "listaPerfilModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
@@ -151,13 +156,19 @@
       },
       "materialRodanteCriarModel": {
         "type": "sap.ui.model.json.JSONModel"
-      },     
+      },
       "materialRodanteFormularioModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "medicaoSelecionadaModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "materialRodanteSelecionadoModel": {
         "type": "sap.ui.model.json.JSONModel"
-      },      
+      },
+      "medicaoAcoesModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
       "mensagensModel": {
         "type": "sap.ui.model.json.JSONModel"
       },

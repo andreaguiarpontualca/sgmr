@@ -18,7 +18,7 @@
 				growingThreshold="100" 
 				mode="None"
                 paste="onPaste"                
-				noDataText="{i18n>sincronizarcontinuar}"
+				noDataText="{i18n>dadosnaoencontrados}"
 				items="{
 					path: 'materialRodanteFormularioModel>/Inspecoes',					
 					sorter: [{
@@ -27,10 +27,10 @@
 						}]
 				}"	>        
             <columns>
-                <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="90%">
+                <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="85%">
                     <Text text="Atividade" />
                 </Column>                    
-                <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true" width="10%">
+                <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true" width="15%">
                     <Text text="Inspecionado" />
                 </Column>                           
             </columns>
