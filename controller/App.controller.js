@@ -1,5 +1,4 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
     "com/pontual/sgmr/controller/BaseController",
     "com/pontual/sgmr/model/formatter"
 ],
