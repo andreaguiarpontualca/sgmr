@@ -98,11 +98,11 @@ sap.ui.define(function () {
 
 		getStatusEquipamento: function (value) {	
 			switch (value) {
-				case "P":
+				case "S":
 					return "Warning"
 				case "E":
 					return "Error"
-				case "S":
+				case "P":
 					return "Success"
 				default:
 					return "None"
@@ -111,11 +111,11 @@ sap.ui.define(function () {
 
 		getIconeEquipamento: function (value) {	
 			switch (value) {
-				case "P":
+				case "S":
 					return "sap-icon://status-critical"
 				case "E":
 					return "sap-icon://status-error"
-				case "S":
+				case "P":
 					return "sap-icon://message-warning"
 				default:
 					return "sap-icon://status-inactive"

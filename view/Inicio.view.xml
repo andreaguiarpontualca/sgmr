@@ -55,7 +55,7 @@
                     <Button
                         id="entrarMaterialRodanteButton"
                         width="12rem"
-                        text="{i18n>materialrodante}"
+                        text="{i18n>inspecionar}"
                         type="Emphasized"
                         press="onEntrarMaterialRodante"
                         icon="sap-icon://cargo-train"

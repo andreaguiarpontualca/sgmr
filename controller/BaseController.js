@@ -1624,6 +1624,10 @@ sap.ui.define([
                     var aListaComponentes = []
                     result.ComponentesSet.results.forEach(element => {
                         delete element.__metadata
+                        delete element.ListaCondicoes
+                        delete element.Medicao
+                        delete element.ListaComponentes
+                        delete element.ListaInspecoes
                         aListaComponentes.push(element);
                     });
 
@@ -1669,6 +1673,10 @@ sap.ui.define([
                     var aListaCondicoes = []
                     result.CondicoesSet.results.forEach(element => {
                         delete element.__metadata
+                        delete element.ListaCondicoes
+                        delete element.Medicao
+                        delete element.ListaComponentes
+                        delete element.ListaInspecoes
                         aListaCondicoes.push(element);
                     });
 
@@ -1714,6 +1722,10 @@ sap.ui.define([
                     var aListaInspecoes = []
                     result.InspecoesSet.results.forEach(element => {
                         delete element.__metadata
+                        delete element.ListaCondicoes
+                        delete element.Medicao
+                        delete element.ListaComponentes
+                        delete element.ListaInspecoes
                         aListaInspecoes.push(element);
                     });
 
@@ -1958,8 +1970,6 @@ sap.ui.define([
             })
 
         },
-
-
 
         carregarUsuario: function () {
             oController = this
@@ -2247,6 +2257,7 @@ sap.ui.define([
                                                     var oMedicaoAtual = aMedicoesAtuais.find(oElement => oElement.Uuid === element.Uuid);
                                                     if (oMedicaoAtual) {
                                                         oMedicaoAtual.Status = "E"
+                                                        oMedicaoAtual.Retorno = element.RetornoSet.results
                                                         aMedicoesCorrigir.push(oMedicaoAtual)
                                                     }
                                                 });
@@ -2316,8 +2327,8 @@ sap.ui.define([
                         Eqktx: oMedicao.Eqktx,
                         Equnr: oMedicao.Equnr,
                         Formulario: oMedicao.IdForm,
-                        Horimetrod: oMedicao.HorimetoD,
-                        Horimetroe: oMedicao.HorimetoE,
+                        Horimetrod: String(oMedicao.HorimetroD),
+                        Horimetroe: String(oMedicao.HorimetroE),
                         Mensagem: "",
                         Modelo: oMedicao.Modelo,
                         Objnr: oMedicao.Objnr,
@@ -2327,8 +2338,8 @@ sap.ui.define([
                         Roleteqtdele: oMedicao.RoleteQtdeLE,
                         Roletevazamento: oMedicao.RoleteVazamento,
                         Status: oMedicao.Status,
-                        Tagd: oMedicao.Tagd,
-                        Tage: oMedicao.Tage,
+                        Tagd: oMedicao.TagD,
+                        Tage: oMedicao.TagE,
                         Tplnr: oMedicao.Tplnr,
                         Ultmedepto: oMedicao.UltMedEpto,
                         Usuario: oMedicao.Usuario,
@@ -2336,7 +2347,8 @@ sap.ui.define([
                         ComponentesSet: [],
                         CondicoesSet: [],
                         InspecoesSet: [],
-                        AnexosSet: []
+                        AnexosSet: [],
+                        RetornoSet: []
                     };
 
 
@@ -2384,32 +2396,37 @@ sap.ui.define([
                         if (aListaMedicaoes.MedicaoSet.length > 0) {
                             Promise.all(aMedicoesSet).then(
                                 function (result) {
-                                    var aListaMedicoesRetorno = result[0].MedicaoSet.results
-                                    aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
-                                        var vTipo
-                                        switch (oMedicaoRetorno.Status) {
-                                            case "S":
-                                                vTipo = "Success"
-                                                break;
-                                            case "E":
-                                                vTipo = "Error"
-                                                break;
-                                            default:
-                                                vTipo = "None"
-                                                break;
-                                        }
-                                        var oMensagem = {
-                                            "title": "Medição",
-                                            "description": oMedicaoRetorno.Mensagem,
-                                            "type": vTipo,
-                                            "subtitle": 'Equipamento: ' + oMedicaoRetorno.Eqktx + '-' + oMedicaoRetorno.Eqktx
-                                        }
-                                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-                                        oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
-                                        oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
-                                        if (oMedicaoRetorno.Status == 'E') {
-                                            oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(oMedicaoRetorno)
-                                        }
+                                    result[0].MedicaoSet.results.forEach(element => {
+                                        var aListaMedicoesRetorno = element.RetornoSet.results
+                                        var vInspecao = element
+                                        var vStatus = vInspecao.Status
+                                        var vEquipamento = vInspecao.Equnr
+                                        aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
+                                            var vTipo
+                                            switch (oMedicaoRetorno.Type) {
+                                                case "S":
+                                                    vTipo = "Success"
+                                                    break;
+                                                case "E":
+                                                    vTipo = "Error"
+                                                    break;
+                                                default:
+                                                    vTipo = "None"
+                                                    break;
+                                            }
+                                            var oMensagem = {
+                                                "title": "Medição",
+                                                "description": oMedicaoRetorno.Message,
+                                                "type": vTipo,
+                                                "subtitle": oMedicaoRetorno.MessageV1
+                                            }
+                                            oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+                                            oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
+                                            oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
+                                            if (vStatus == 'E') {
+                                                oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao)
+                                            }
+                                        });
 
                                     });
 

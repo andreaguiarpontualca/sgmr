@@ -42,7 +42,7 @@
 							<f:FormElement label="Qtde Lado Direito">
 								<f:fields>							
 									<Input 
-										value="{materialRodanteFormularioModel>RoleteQtdeLD}"
+										value="{materialRodanteFormularioModel>RoleteQtdeLD}"																						
 										type="Number"
 										enabled="true"
 										required="false"
@@ -54,7 +54,7 @@
 							<f:FormElement label=" Qtde Lado Esquerdo">
 								<f:fields>							
 									<Input 
-										value="{materialRodanteFormularioModel>RoleteQtdeLE}"
+										value="{materialRodanteFormularioModel>RoleteQtdeLE}"												
 										type="Number"
 										enabled="true"
 										required="false"

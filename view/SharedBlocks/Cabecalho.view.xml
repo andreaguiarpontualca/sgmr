@@ -39,6 +39,8 @@
 										change="handleChange"
 										class="sapUiSmallMarginBottom"
 										width="100%"
+										showCurrentDateButton="true"
+										showCurrentTimeButton="true"
 										value="{
 											'path': 'materialRodanteFormularioModel>Data',
 											'type': 'sap.ui.model.type.DateTime',
@@ -52,7 +54,7 @@
 								<f:fields>							
 									<ObjectStatus
 										class="sapMObjectStatusMedium"
-										text="{materialRodanteFormularioModel>UltMedEpto}"
+										text="{materialRodanteFormularioModel>UltMedEpto}"										
 										inverted="true"
 										state="Indication13" />																	
 								</f:fields>
@@ -61,7 +63,7 @@
 					</f:FormContainer>	
 					<f:FormContainer  title="{i18n>esteira}">
 						<f:formElements>
-							<f:FormElement label="{i18n>tagdireita}">
+							<f:FormElement label="{i18n>taghorimetrodireito}">
 								<f:fields>							
 									<Input 
 										value="{materialRodanteFormularioModel>TagD}"
@@ -69,22 +71,18 @@
 										required="true"
 										showClearIcon="true"
 										width="100%"
-										/>																
-								</f:fields>
-							</f:FormElement>
-							<f:FormElement label="{i18n>horimetrodireito}">
-								<f:fields>							
+										/>			
 									<Input 
-										value="{materialRodanteFormularioModel>HorimetoD}"
+										value="{materialRodanteFormularioModel>HorimetroD}"
 										type="Number"
 										enabled="true"
 										required="false"
 										showClearIcon="true"
 										textDirection="RTL"								
-										/>   															
+										/>   																								
 								</f:fields>
-							</f:FormElement>   
-							<f:FormElement label="{i18n>tagesquerda}">
+							</f:FormElement>
+							<f:FormElement label="{i18n>taghorimetroesquerdo}">
 								<f:fields>							
 									<Input 
 										value="{materialRodanteFormularioModel>TagE}"
@@ -92,21 +90,17 @@
 										required="true"
 										showClearIcon="true"
 										width="100%"
-										/>						
-								</f:fields>
-							</f:FormElement>
-							<f:FormElement label="{i18n>horimetroesquerda}">
-								<f:fields>							
+										/>	
 									<Input 
-										value="{materialRodanteFormularioModel>HorimetroE}"
+										value="{materialRodanteFormularioModel>HorimetroE}"										
 										type="Number"
 										enabled="true"
 										required="false"
 										showClearIcon="true"
 										textDirection="RTL"								
-										/>   				
+										/>   															
 								</f:fields>
-							</f:FormElement>  							                                                                                   
+							</f:FormElement>							                                                                                   
 						</f:formElements>
 					</f:FormContainer>											
 				</f:formContainers>				

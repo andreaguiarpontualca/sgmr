@@ -214,6 +214,7 @@ sap.ui.define([
                             var aMedicoes = result.tb_medicao
                             if (oMedicao.Uuid == "") {
                                 oMedicao.Uuid = uid()
+                                oMedicao.VisibilidadeRetorno = true
                                 aMedicoes.push(oMedicao)
                             } else {
                                 var vIdx = aMedicoes.findIndex((oElement) => oMedicao.Uuid == oElement.Uuid);
@@ -344,8 +345,8 @@ sap.ui.define([
                             } catch (error) { }
                             oFormulario.TagE = "";
                             oFormulario.TagD = "";
-                            oFormulario.HorimetroE = 0;
-                            oFormulario.HorimetoD = 0;
+                            oFormulario.HorimetroE = "0";
+                            oFormulario.HorimetroD = "0";
                             oFormulario.Componentes = aListaComponetes;
                             oFormulario.ComponentesCombo = aComponentesCombo
                             oFormulario.ComponenteSelecionado = "Todos"
@@ -354,12 +355,14 @@ sap.ui.define([
                             oFormulario.Condicoes = aListaCondicoes;
                             oFormulario.NivelCombo = aNiveisCombo;
                             oFormulario.RoleteVazamento = false;
-                            oFormulario.RoleteQtdeLD = 0;
-                            oFormulario.RoleteQtdeLE = 0;
+                            oFormulario.RoleteQtdeLD = "0";
+                            oFormulario.RoleteQtdeLE = "0";
                             oFormulario.Inspecoes = aListaInspecoes;
                             oFormulario.Observacoes = "";
                             oFormulario.items = [];
-                            oFormulario.Status = "P"
+                            oFormulario.Status = "P";
+                            oFormulario.Retorno = [];
+                            oFormulario.VisibilidadeRetorno = false
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
 

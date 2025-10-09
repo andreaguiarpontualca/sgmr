@@ -40,6 +40,7 @@ sap.ui.define([
                     oController.getOwnerComponent().getModel("mensagensModel").setData([])
                     oController.getOwnerComponent().getRouter().navTo("Login", null, true);
                 }
+
             },
 
             onDeviceReady: function () {

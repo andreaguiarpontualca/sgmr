@@ -31,7 +31,7 @@
             <headerToolbar>
                 <OverflowToolbar id="otbSubheader">
                     <ComboBox
-                        width="25%"
+                        width="50%"
                         selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}"
                         change="onFiltroChange"
                         items="{
@@ -41,7 +41,7 @@
                         <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
                     </ComboBox>
                     <ComboBox
-                        width="25%"        
+                        width="50%"        
                         selectedKey="{materialRodanteFormularioModel>LadoSelecionado}"   
                         change="onFiltroChange"                                                         
                         items="{
@@ -75,7 +75,7 @@
                                 }" />		                            
                         <HBox>
                             <Input 
-                                value="{materialRodanteFormularioModel>Valormedido}"
+								value="{materialRodanteFormularioModel>Valormedido}"	                                
                                 type="Number"
                                 enabled="true"
                                 required="false"
