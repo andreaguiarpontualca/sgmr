@@ -343,6 +343,10 @@ sap.ui.define([
                             db.createObjectStore("tb_usuario", { autoIncrement: true });
                         }
 
+                        if (!db.objectStoreNames.contains('tb_listadesgaste')) {
+                            db.createObjectStore("tb_listadesgaste", { autoIncrement: true });
+                        }
+
                     };
 
                     openRequest.onsuccess = function (e) {

@@ -3,9 +3,10 @@ sap.ui.define([
     "com/pontual/sgmr/model/formatter",
     'sap/ui/model/json/JSONModel',
     'sap/ui/model/Filter',
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    'sap/m/MessageToast'
 ],
-    function (Controller, formatter, JSONModel, Filter, FilterOperator) {
+    function (Controller, formatter, JSONModel, Filter, FilterOperator, MessageToast) {
         "use strict";
         var oView
         var oController
@@ -113,6 +114,87 @@ sap.ui.define([
                 });
 
                 oDialog.open();
+            },
+
+            onValidarMedicao: function (oEvent) {
+                var vPath = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getPath()
+                var oComponente = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getProperty(vPath)
+                var vValorMedido = parseFloat(oComponente.Valormedido)
+                var vUltValormedido = parseFloat(oComponente.UltValormedido)
+                var vValido = true
+                if (oComponente.Ordenacao == "D" && vValorMedido > vUltValormedido) {
+                    oEvent.getSource().setValueState("Error")
+                    oEvent.getSource().setValueStateText("Valor informado maior que último valor médido")
+//                    MessageToast.show("Valor informado maior que último valor médido");
+                    vValido = false
+                }
+                if (oComponente.Ordenacao == "C" && vValorMedido < vUltValormedido) {
+                    oEvent.getSource().setValueState("Error")
+                    oEvent.getSource().setValueStateText("Valor informado menor que último valor médido")
+//                    MessageToast.show("Valor informado menor que último valor médido");
+                    vValido = false
+                }
+                if (vValido) {
+                    var vCorPercentualDesgaste = oController.corPercentualDesgaste(oComponente)
+                    oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty(vPath + '/PercDesgasteValueState', vCorPercentualDesgaste)
+                    var vPercentualDesgaste = oController.calcularPercentualDesgaste(oComponente)
+                    oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty(vPath + '/PercDesgaste', vPercentualDesgaste)
+                    oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
+                }
+            },
+
+            // corPercentualDesgaste: function (pPercentual) {
+            //     if (pPercentual > 0 && pPercentual < 33) {
+            //         return 'Indication04' //Verde
+            //     } else if (pPercentual >= 33 && pPercentual < 66) {
+            //         return 'Indication03' //Amarelo
+            //     } else if (pPercentual >= 66) {
+            //         return 'Indication02'//Vermelho
+            //     }
+            // },
+
+            corPercentualDesgaste: function (oComponente) {
+                var aListaDesgaste = oController.getOwnerComponent().getModel("listaDesgastesModel").getData()
+                var vValorMedido = oController.arredondarPara05(oComponente.Valormedido)
+                var oDesgaste = aListaDesgaste.find(c => c.CodiFabr == oComponente.CodiFabr &&
+                    c.Componente == oComponente.IdComponente &&
+                    c.TipoEquipamento == oComponente.ModEquip &&
+                    c.MedidaMm == vValorMedido);
+                if (oDesgaste == undefined) {
+                    return "Indication05"
+                } else {
+                    switch (oDesgaste.Alerta) {
+                        case 'BAIXO':
+                            return 'Indication04' //Verde
+                        case 'MEDIO':
+                            return 'Indication03' //Amarelo           
+                        case 'ALTO':
+                            return 'Indication02'//Vermelho                 
+                        default:
+                            return "Indication05"
+                    }
+                }
+            },
+
+            arredondarPara05: function (numero) {
+                return Math.round(numero * 2) / 2;
+            },
+
+
+            calcularPercentualDesgaste: function (oComponente) {
+                var aListaDesgaste = oController.getOwnerComponent().getModel("listaDesgastesModel").getData()
+                var vValorMedido = oController.arredondarPara05(oComponente.Valormedido)
+                var oDesgaste = aListaDesgaste.find(c => c.CodiFabr == oComponente.CodiFabr &&
+                    c.Componente == oComponente.IdComponente &&
+                    c.TipoEquipamento == oComponente.ModEquip &&
+                    c.MedidaMm == vValorMedido);
+                if (oDesgaste == undefined) {
+                    return "Não cadastrado"
+                } else {
+                    return oDesgaste.PercDesgaste + " %"
+                }
+
+
             }
 
         });

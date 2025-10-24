@@ -10,8 +10,7 @@
           titleAlignment="Center"
           showNavButton="true" 
           showSubHeader="true"
-          navButtonPress="onNavBack"         
-          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+          navButtonPress="onNavBack"  >
 		   <m:headerContent>
 				<m:ObjectStatus
 					id="IdNetworkStatus"

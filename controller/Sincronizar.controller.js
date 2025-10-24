@@ -103,7 +103,7 @@ sap.ui.define([
                     var oAcessos = oController.getOwnerComponent().getModel("acessosModel").getData();
                     oView.byId("downloadPerfilButton").setVisible(oAcessos.perfil);
                     oView.byId("downloadCentrosButton").setVisible(oAcessos.perfil);
-                    oView.byId("downloadAutorizacaoButton").setVisible(oAcessos.perfil);                    
+                    oView.byId("downloadAutorizacaoButton").setVisible(oAcessos.perfil);
                     oView.byId("downloadUsuarioButton").setVisible(oAcessos.usuario);
                 })
             },
@@ -195,10 +195,12 @@ sap.ui.define([
                         var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
                         oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
                             var aForms = oController.agruparFormularios(aDados)
+                            var aModelos = oController.agruparPorCampo(aDados, "Modelo")
                             var aLeiturasForm = [
                                 oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
                                 oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
-                                oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel"))
+                                oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
+                                oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))                                
                             ];
 
                             Promise.all(aLeiturasForm).then(
@@ -208,17 +210,20 @@ sap.ui.define([
                                     var aLimpezas = [
                                         oController.limparTabelaIndexDB("tb_componentes"),
                                         oController.limparTabelaIndexDB("tb_condicoes"),
-                                        oController.limparTabelaIndexDB("tb_inspecoes")
+                                        oController.limparTabelaIndexDB("tb_inspecoes"),
+                                        oController.limparTabelaIndexDB("tb_listadesgaste")
                                     ];
                                     Promise.all(aLimpezas).then(
                                         function () {
                                             var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
                                             var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
                                             var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                            var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();                                            
                                             var aGravacoes = [
                                                 oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
                                                 oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
                                                 oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
+                                                oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes)                                                
                                             ];
                                             Promise.all(aGravacoes).then(
                                                 function (result) {
@@ -265,6 +270,27 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+            onDownloadFormulario: function (oEvent) {
+                var vButton = "downloadFormularioButton"
+                var vTabela = "tb_formulario"
+                var vModel = "listaFormularioModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarFormulario().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            oView.byId(vButton).setBusy(false);
+                            MessageToast.show("Download de Formulários concluído");
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },            
             onUploadMedicao: function (oEvent) {
                 oView.byId("uploadMedicaoButton").setBusy(true);
                 oController.medicaoUpdate(oController, true).then(function () {

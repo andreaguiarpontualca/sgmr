@@ -140,15 +140,165 @@ sap.ui.define([
                     var oMockMessage = {
                         type: 'Error',
                         title: oBundle.getText("campoobrigatorio"),
-                        description: oBundle.getText("campodata"),
+                        description: oBundle.getText("preenchimentoobrigatorio", ["Data"]),
                         subtitle: oBundle.getText("data"),
                         counter: 1
                     };
                     aMockMessages.push(oMockMessage)
 
                     vValido = false;
+                } else {
+                    var vLimiteRetroativo = parseInt(pMedicao.LimiteRetroativo)
+                    if (oController.verificarDiferencaHoras(vLimiteRetroativo, pMedicao.Data)) {
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("Error");
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText(oBundle.getText("campoobrigatorio"));
+
+                        var oMockMessage = {
+                            type: 'Error',
+                            title: oBundle.getText("limiteretroativo"),
+                            description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
+                            subtitle: oBundle.getText("limiteretroativo"),
+                            counter: 1
+                        };
+                        aMockMessages.push(oMockMessage)
+
+                        vValido = false;
+                    }
+
                 }
 
+                if (pMedicao.MedEquipamento == null || pMedicao.MedEquipamento == "") {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("campoobrigatorio"));
+
+                    var oMockMessage = {
+                        type: 'Error',
+                        title: oBundle.getText("campoobrigatorio"),
+                        description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
+                        subtitle: oBundle.getText("ultimoponto"),
+                        counter: 1
+                    };
+                    aMockMessages.push(oMockMessage)
+
+                    vValido = false;
+                } else {
+                    var vMedEpto = parseInt(pMedicao.MedEquipamento)
+                    var vUltMedEqpto = parseInt(pMedicao.UltMedEqpto)
+                    var vDifMaxMedicoes = parseInt(pMedicao.DifMaxMedicoes)
+
+                    if (vMedEpto < vUltMedEqpto) {
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
+
+                        var oMockMessage = {
+                            type: 'Error',
+                            title: oBundle.getText("valormenor"),
+                            description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
+                            subtitle: oBundle.getText("medicao"),
+                            counter: 1
+                        };
+                        aMockMessages.push(oMockMessage)
+
+                        vValido = false;
+                    }
+
+                    if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
+                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
+
+                        var oMockMessage = {
+                            type: 'Error',
+                            title: oBundle.getText("diferencaomedicao"),
+                            description: oBundle.getText("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
+                            subtitle: oBundle.getText("medicao"),
+                            counter: 1
+                        };
+                        aMockMessages.push(oMockMessage)
+
+                        vValido = false;
+                    }
+
+                }
+
+                var aComponentes = oController.agruparPorCampo(pMedicao.Componentes, "ComponenteLado")
+                aComponentes.forEach(oComponente => {
+                    var aCompMedNaoInformada = pMedicao.Componentes.filter(c => c.ComponenteLado == oComponente.key && c.Valormedido == 0);
+                    var aCompMedInformada = pMedicao.Componentes.filter(c => c.ComponenteLado == oComponente.key && c.Valormedido != 0);
+
+                    if (aCompMedNaoInformada != 0 && aCompMedInformada != 0) {
+
+                        var oComp = pMedicao.Componentes.find(c => c.ComponenteLado == oComponente.key);
+
+                        var oMockMessage = {
+                            type: 'Error',
+                            title: oBundle.getText("componentesmedicao", [oComp.Componente, oComp.Lado]),
+                            description: oBundle.getText("componentesmedicaomsg", [oComp.Componente, oComp.Lado]),
+                            subtitle: oBundle.getText("campoobrigatorio"),
+                            counter: 1
+                        };
+                        aMockMessages.push(oMockMessage)
+
+                        pMedicao.Componentes.forEach(element => {
+                            if (element.ComponenteLado == oComp.ComponenteLado) {
+                                element.ValorMedidoValueState = 'Error'
+                            }
+
+                        });
+
+                        oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty("/Componentes", pMedicao.Componentes)
+                        oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
+
+                        vValido = false;
+                    } else {
+
+                    }
+                });
+
+                pMedicao.Componentes.forEach(oComponente => {
+                    var vValorMedido = parseFloat(oComponente.Valormedido)
+                    var vUltimoValorMedido = parseFloat(oComponente.UltValormedido)
+                    switch (oComponente.Ordenacao) {
+                        case "D":
+                            if (vValorMedido != 0 && vValorMedido > vUltimoValorMedido) {
+                                var oMockMessage = {
+                                    type: 'Error',
+                                    title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
+                                    description: oBundle.getText("valormaiormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
+                                    subtitle: oBundle.getText("medicao"),
+                                    counter: 1
+                                };
+                                aMockMessages.push(oMockMessage)
+
+                                oComponente.ValorMedidoValueState = 'Error'
+
+                                vValido = false;
+                            }
+
+                            break;
+                        case "C":
+                            if (vValorMedido != 0 && vValorMedido < vUltimoValorMedido) {
+                                var oMockMessage = {
+                                    type: 'Error',
+                                    title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
+                                    description: oBundle.getText("valormenormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
+                                    subtitle: oBundle.getText("medicao"),
+                                    counter: 1
+                                };
+                                aMockMessages.push(oMockMessage)
+
+                                oComponente.ValorMedidoValueState = 'Error'
+
+                                vValido = false;
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                });
+
+                oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty("/Componentes", pMedicao.Componentes)
+                oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
 
                 var oModel = new JSONModel();
                 oModel.setData(aMockMessages);
@@ -169,7 +319,7 @@ sap.ui.define([
                     textDirection: sap.ui.core.TextDirection.Inherit,    // default
                     onClose: function (sAction) {
                         if (sAction == 'OK') {
-                           oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
+                            oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
 
                         } else if (sAction == "CANCEL") {
 
@@ -270,6 +420,8 @@ sap.ui.define([
                 } else {
                     oView.byId("confirmarButton").setEnabled(true);
                     oView.byId("confirmarButton").setBusy(false);
+                    oView.byId("cancelarButton").setEnabled(true);
+                    oView.byId("cancelarButton").setBusy(false);
                 }
 
             },
@@ -293,10 +445,21 @@ sap.ui.define([
 
                             aListaComponetes.forEach(element => {
                                 element.Valormedido = 0
+                                element.ValorMedidoValueState = 'None'
+                                element.ComponenteLado = element.IdComponente + element.IdLado
+                                if (element.Fabricante != "") {
+                                    element.ValorMedidoEnabled = true
+                                    element.ValorMedidoStatus = 'Indication05'
+                                } else {
+                                    element.ValorMedidoEnabled = false
+                                    element.Fabricante = "Não cadastrado"
+                                    element.ValorMedidoStatus = 'Indication02'
+                                }
+
+                                element.PercDesgasteValueState = 'Indication05'  //Azul                              
                             });
 
                             aListaComponentesCombo.forEach(element => {
-
                                 aComponentesCombo.push({
                                     key: element.key,
                                     text: element.key
@@ -322,7 +485,16 @@ sap.ui.define([
                                     text: "Lado Esquerdo"
                                 }]
 
+
+                            aListaCondicoes.forEach(element => {
+                                element.Nivel = "Não Informada"
+                            });
+
                             var aNiveisCombo = [
+                                {
+                                    key: "Não Informada",
+                                    text: "Não Informada"
+                                },
                                 {
                                     key: "Alta",
                                     text: "Alta"
@@ -340,13 +512,15 @@ sap.ui.define([
 
                             oFormulario.Uuid = ""
                             oFormulario.Data = new Date();
-                            try {
-                                oFormulario.UltMedEpto = oFormulario.UltMedEpto.trim();
-                            } catch (error) { }
-                            oFormulario.TagE = "";
-                            oFormulario.TagD = "";
-                            oFormulario.HorimetroE = "0";
-                            oFormulario.HorimetroD = "0";
+
+                            oFormulario.UltMedEqpto = oFormulario.UltMedEqpto
+                            oFormulario.DtHrEqpto = oFormulario.DtHrEqpto;
+                            oFormulario.TagE = oFormulario.TagEsquerda;
+                            oFormulario.TagD = oFormulario.TagDireita;
+                            oFormulario.HorimetroE = oFormulario.MedEsquerda;
+                            oFormulario.HorimetroD = oFormulario.MedDireita;
+                            oFormulario.DtHrDir = oFormulario.DtHrDir;
+                            oFormulario.DtHrEsq = oFormulario.DtHrEsq;
                             oFormulario.Componentes = aListaComponetes;
                             oFormulario.ComponentesCombo = aComponentesCombo
                             oFormulario.ComponenteSelecionado = "Todos"
@@ -363,6 +537,7 @@ sap.ui.define([
                             oFormulario.Status = "P";
                             oFormulario.Retorno = [];
                             oFormulario.VisibilidadeRetorno = false
+                            oFormulario.VisibilidadeInformacoes = true
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
 

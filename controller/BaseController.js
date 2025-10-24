@@ -11,7 +11,7 @@ sap.ui.define([
     var oController
     var oView
 
-    const BD_VERSION = 7;
+    const BD_VERSION = 8;
     var aFilters = ""
     var oExpand = ""
     var oPerfilChave = {};
@@ -642,11 +642,13 @@ sap.ui.define([
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
 
-                                var aForms = oController.agruparFormularios(aMaterialRodante)
+                                var aForms = oController.agruparPorCampo(aMaterialRodante, "IdForm")
+                                var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo")
                                 var aLeiturasForm = [
                                     oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
                                     oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
-                                    oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel"))
+                                    oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
+                                    oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))
                                 ];
 
                                 Promise.all(aLeiturasForm).then(
@@ -656,17 +658,20 @@ sap.ui.define([
                                         var aLimpezas = [
                                             oController.limparTabelaIndexDB("tb_componentes"),
                                             oController.limparTabelaIndexDB("tb_condicoes"),
-                                            oController.limparTabelaIndexDB("tb_inspecoes")
+                                            oController.limparTabelaIndexDB("tb_inspecoes"),
+                                            oController.limparTabelaIndexDB("tb_listadesgaste")
                                         ];
                                         Promise.all(aLimpezas).then(
                                             function () {
                                                 var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
                                                 var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
                                                 var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                                var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();
                                                 var aGravacoes = [
                                                     oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
                                                     oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
                                                     oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
+                                                    oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes),
                                                 ];
                                                 Promise.all(aGravacoes).then(
                                                     function (result) {
@@ -1428,12 +1433,12 @@ sap.ui.define([
                     }
                     oController.getOwnerComponent().getModel("listaFormularioModel").setData(aFormularios)
 
-                    var vDescricao = "Material Rodante sincronizado " + aFormularios.length
+                    var vDescricao = "Formulários sincronizados " + aFormularios.length
                     var oMensagem = {
                         "title": vDescricao,
-                        "description": "Material Rodante encaminhado para o dispositivo",
+                        "description": "Formulário encaminhado para o dispositivo",
                         "type": "Success",
-                        "subtitle": "Material Rodante download"
+                        "subtitle": "Formulário download"
                     }
                     oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
 
@@ -1749,6 +1754,52 @@ sap.ui.define([
             })
         },
 
+        carregarListaDesgaste: function (aModelos) {
+
+            return new Promise((resolve, reject) => {
+                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
+                var aDesgastes = {
+                    Chave: 'X',
+                    DesgastesSet: []
+                }
+                aModelos.forEach(oModelo => {
+                    if (oModelo.key != "") {
+                        var oDesgaste = {
+                            Chave: 'X',
+                            TipoEquipamento: oModelo.key
+                        }
+                        aDesgastes.DesgastesSet.push(oDesgaste);
+                    }
+                })
+
+                oController.enviarDados("ListaDesgastesSet", aDesgastes).then(function (result) {
+                    var aLista = []
+                    result.DesgastesSet.results.forEach(element => {
+                        delete element.__metadata
+                        delete element.ListaDesgastes
+                        aLista.push(element);
+                    });
+
+                    oController.getOwnerComponent().getModel("listaDesgastesModel").setData(aLista)
+
+                    var vDescricao = "Desgastes sincronizados " + aLista.length
+                    var oMensagem = {
+                        "title": vDescricao,
+                        "description": "Desgastes sincronizados para o dispositivo",
+                        "type": "Success",
+                        "subtitle": "Desgastes download"
+                    }
+                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+
+                    resolve()
+                }).catch(
+                    function (result) {
+                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                        reject(result)
+                    })
+            })
+        },
+
         carregarDadosIndexDB: function (pTabela, pModel) {
             oController = this;
 
@@ -1903,40 +1954,44 @@ sap.ui.define([
 
                             console.log("Testando conexão com:", oConexao.urlsemclient);
 
-                            fetch(oConexao.urlsemclient, {
-                                mode: 'no-cors',
-                                method: 'GET',
-                                cache: 'no-cache'
-                            }).then(r => {
-                                console.log("Fetch success:", r);
-                                oController.atualizarBusyDialog("Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
-
-                                var oMockMessage = {
-                                    type: 'Success',
-                                    title: oController.getView().getModel("i18n").getResourceBundle().getText("sucessoservidor"),
-                                    description: "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso",
-                                    subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosucesso"),
-                                    counter: 1
-                                };
-
-                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                                resolve()
-                            })
-                                .catch(e => {
-                                    console.error("Fetch error:", e);
-                                    oController.atualizarBusyDialog("Não foi possível alcançar o endereço " + oConexao.urlsemclient + " informado");
+                            try {
+                                fetch(oConexao.urlsemclient, {
+                                    mode: 'no-cors',
+                                    method: 'GET',
+                                    cache: 'no-cache'
+                                }).then(r => {
+                                    console.log("Fetch success:", r);
+                                    oController.atualizarBusyDialog("Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
 
                                     var oMockMessage = {
-                                        type: 'Error',
-                                        title: oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"),
-                                        description: "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient,
-                                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"),
+                                        type: 'Success',
+                                        title: oController.getView().getModel("i18n").getResourceBundle().getText("sucessoservidor"),
+                                        description: "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso",
+                                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosucesso"),
                                         counter: 1
                                     };
 
                                     oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                                    resolve() // Resolve para não quebrar o fluxo
-                                });
+                                    resolve()
+                                })
+                                    .catch(e => {
+                                        console.error("Fetch error:", e);
+                                        oController.atualizarBusyDialog("Não foi possível alcançar o endereço " + oConexao.urlsemclient + " informado");
+
+                                        var oMockMessage = {
+                                            type: 'Error',
+                                            title: oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"),
+                                            description: "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient,
+                                            subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"),
+                                            counter: 1
+                                        };
+
+                                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
+                                        resolve() // Resolve para não quebrar o fluxo
+                                    });
+                            } catch (error) {
+
+                            }
                         } else {
                             var oMockMessage = {
                                 type: 'Error',
@@ -2327,8 +2382,7 @@ sap.ui.define([
                         Eqktx: oMedicao.Eqktx,
                         Equnr: oMedicao.Equnr,
                         Formulario: oMedicao.IdForm,
-                        Horimetrod: String(oMedicao.HorimetroD),
-                        Horimetroe: String(oMedicao.HorimetroE),
+                        MedEqpto: oMedicao.MedEquipamento,
                         Mensagem: "",
                         Modelo: oMedicao.Modelo,
                         Objnr: oMedicao.Objnr,
@@ -2338,10 +2392,7 @@ sap.ui.define([
                         Roleteqtdele: oMedicao.RoleteQtdeLE,
                         Roletevazamento: oMedicao.RoleteVazamento,
                         Status: oMedicao.Status,
-                        Tagd: oMedicao.TagD,
-                        Tage: oMedicao.TagE,
                         Tplnr: oMedicao.Tplnr,
-                        Ultmedepto: oMedicao.UltMedEpto,
                         Usuario: oMedicao.Usuario,
                         Uuid: oMedicao.Uuid,
                         ComponentesSet: [],
@@ -2355,7 +2406,15 @@ sap.ui.define([
                     oMedicao.Componentes.forEach(oComponente => {
                         delete oComponente.ListaComponentes
                         if (oComponente.Valormedido != "" && oComponente.Valormedido != null && oComponente.Valormedido != undefined && oComponente.Valormedido != 0) {
-                            oMedicaoSet.ComponentesSet.push(oComponente)
+                            var oComp = {
+                                Chave: 'X',
+                                Valormedido: String(oComponente.Valormedido),
+                                IdComponente: oComponente.IdComponente,
+                                Posicao: oComponente.Posicao,
+                                IdLado: oComponente.IdLado
+                            }
+
+                            oMedicaoSet.ComponentesSet.push(oComp)
                         }
                     });
 
@@ -2471,6 +2530,31 @@ sap.ui.define([
             })
         },
 
+        agruparPorCampo: function (pData, campo) {
+            const resultArr = [];
+
+            const groupByField = pData.reduce((group, item) => {
+                const key = item[campo];
+                group[key] = (group[key] ?? 0) + 1; // contar quantas vezes aparece
+                return group;
+            }, {});
+
+            Object.keys(groupByField).forEach((key) => {
+                resultArr.push({
+                    key: key,
+                    Quantidade: groupByField[key]
+                });
+            });
+
+            resultArr.sort((a, b) => {
+                if (a.key < b.key) return -1;
+                if (a.key > b.key) return 1;
+                return 0;
+            });
+
+            return resultArr;
+        },
+
         agruparFormularios: function (pData) {
             // Input array
             const data = pData;
@@ -2503,6 +2587,23 @@ sap.ui.define([
             return resultArr;
 
         },
+
+        verificarDiferencaHoras: function (pDiferenca, pDataInformada) {
+            // 1. Criar objetos Date para a data atual e a data informada
+            const dataAtual = new Date();
+            //const dataInformada = new Date(pDataInformadaString);
+            const dataInformada = pDataInformada;
+
+            // 2. Calcular a diferença em milissegundos
+            const diferencaEmMilissegundos = Math.abs(dataInformada.getTime() - dataAtual.getTime());
+
+            // 3. Converter milissegundos para horas
+            const milissegundosPorHora = 1000 * 60 * 60;
+            const diferencaEmHoras = diferencaEmMilissegundos / milissegundosPorHora;
+
+            // 4. Verificar se a diferença é de pelo menos 70 horas
+            return diferencaEmHoras >= 70;
+        }
 
 
     });

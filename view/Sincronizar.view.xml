@@ -60,7 +60,16 @@
                         press="onDownloadEquipamento"
                         icon="sap-icon://download-from-cloud"
                         class="sapUiSmallMarginBottom"
-                    />
+                    />    
+                    <Button
+                        id="downloadFormularioButton"
+                        width="12rem"
+                        text="{i18n>formularios} ({= ${listaFormularioModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadFormulario"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />                                     
                     <Button
                         id="downloadPerfilButton"
                         width="12rem"

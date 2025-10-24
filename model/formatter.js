@@ -102,6 +102,8 @@ sap.ui.define(function () {
 					return "Warning"
 				case "E":
 					return "Error"
+				case "X":
+					return "Error"					
 				case "P":
 					return "Success"
 				default:
@@ -115,12 +117,24 @@ sap.ui.define(function () {
 					return "sap-icon://status-critical"
 				case "E":
 					return "sap-icon://status-error"
+				case "X":
+					return "sap-icon://message-error"					
 				case "P":
 					return "sap-icon://message-warning"
 				default:
 					return "sap-icon://status-inactive"
 			}
-		}					
+		},
+		getOrdencaoIcone: function (value) {
+			switch (value) {
+				case "D":
+					return "sap-icon://trend-down"
+				case "C":
+					return "sap-icon://trend-up"
+				default:
+					return "sap-icon://arrow-right"
+			}
+		},							
 
 	};
 

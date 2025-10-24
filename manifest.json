@@ -139,6 +139,9 @@
       "listaCentrosModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
+      "listaDesgastesModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },      
       "listaMedicoesModel": {
         "type": "sap.ui.model.json.JSONModel"
       },

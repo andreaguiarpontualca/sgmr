@@ -119,37 +119,37 @@
 		</dependents>
 
 		<columns>
-			<Column id="fileName" importance="High">
+			<Column id="fileName" importance="High"                     minScreenWidth="Phone">
 				<header>
 					<Label text="{i18n>arquivo}" />
 				</header>
 			</Column>
-			<Column id="id" visible="false">
+			<Column id="id" visible="false"  minScreenWidth="Tablet">
 				<header>
 					<Label text="ID" />
 				</header>
 			</Column>
-			<Column id="revision" visible="false">
+			<Column id="revision" visible="false"  minScreenWidth="Tablet">
 				<header>
 					<Label text="Revision" />
 				</header>
 			</Column>
-			<Column id="status" visible="false">
+			<Column id="status" visible="false"  minScreenWidth="Tablet">
 				<header>
 					<Label text="Status" />
 				</header>
 			</Column>
-			<Column id="fileSize">
+			<Column id="fileSize"  minScreenWidth="Tablet">
 				<header>
 					<Label text="{i18n>tamanho}" />
 				</header>
 			</Column>
-			<Column id="lastModified" visible="false">
+			<Column id="lastModified" visible="false"  minScreenWidth="Tablet">
 				<header>
 					<Label text="Last Modified" />
 				</header>
 			</Column>
-			<Column id="actionButton" importance="High" />
+			<Column id="actionButton" importance="High"  minScreenWidth="Tablet"/>
 		</columns>
 
 
