@@ -112,9 +112,21 @@
                                 />
                             </f:fields>
                         </f:FormElement>
+                        <f:FormElement
+                            id="idFEInformacoes"
+                            label="{i18n>exibirinformacoes}"
+                        >
+                            <f:fields>
+                                <CheckBox
+                                    valueState="Information"
+                                    enabled="true"
+                                    selected="{materialRodanteFormularioModel>VisibilidadeTAG}"
+                                />
+                            </f:fields>
+                        </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
-                <f:FormContainer title="{i18n>esteiraesquerda}">
+                <f:FormContainer title="{i18n>esteiraesquerda}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
                     <f:formElements>
                         <f:FormElement
                             id="idFETAGE"
@@ -157,7 +169,7 @@
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
-                <f:FormContainer title="{i18n>esteiradireita}">
+                <f:FormContainer title="{i18n>esteiradireita}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
                     <f:formElements>
                         <f:FormElement
                             id="idFETAGD"
@@ -200,6 +212,92 @@
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
+                <f:FormContainer title="{i18n>truckesquerda}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
+                    <f:formElements>
+                        <f:FormElement
+                            id="idFETAGTruckE"
+                            label="{i18n>tag}"
+                        >
+                            <f:fields>
+                                <ObjectStatus
+                                    class="sapMObjectStatusMedium"
+                                    text="{materialRodanteFormularioModel>TruckEsquerda}"
+                                    inverted="true"
+                                    state="Indication05"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement
+                            id="idFEMedTagTruckEsquerda"
+                            label="{i18n>ultimamedicao}"
+                        >
+                            <f:fields>
+                                <ObjectStatus
+                                    class="sapMObjectStatusMedium"
+                                    text="{materialRodanteFormularioModel>MedTruckEsquerda}"
+                                    inverted="true"
+                                    state="Indication05"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement
+                            id="idFEMedDataTruckEsquerda"
+                            label="{i18n>data}"
+                        >
+                            <f:fields>
+                                <ObjectStatus
+                                    class="sapMObjectStatusMedium"
+                                    text="{materialRodanteFormularioModel>DtHrTruckEsq}"
+                                    inverted="true"
+                                    state="Indication05"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                    </f:formElements>
+                </f:FormContainer>
+                <f:FormContainer title="{i18n>truckdireita}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
+                    <f:formElements>
+                        <f:FormElement
+                            id="idFETAGTruckD"
+                            label="{i18n>tag}"
+                        >
+                            <f:fields>
+                                <ObjectStatus
+                                    class="sapMObjectStatusMedium"
+                                    text="{materialRodanteFormularioModel>TruckDireita}"
+                                    inverted="true"
+                                    state="Indication05"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement
+                            id="idFEMedTagTruckDireita"
+                            label="{i18n>ultimamedicao}"
+                        >
+                            <f:fields>
+                                <ObjectStatus
+                                    class="sapMObjectStatusMedium"
+                                    text="{materialRodanteFormularioModel>MedTruckDireita}"
+                                    inverted="true"
+                                    state="Indication05"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                        <f:FormElement
+                            id="idFEMedDataTruckDireita"
+                            label="{i18n>data}"
+                        >
+                            <f:fields>
+                                <ObjectStatus
+                                    class="sapMObjectStatusMedium"
+                                    text="{materialRodanteFormularioModel>DtHrTruckDir}"
+                                    inverted="true"
+                                    state="Indication05"
+                                />
+                            </f:fields>
+                        </f:FormElement>
+                    </f:formElements>
+                </f:FormContainer>                
             </f:formContainers>
         </f:Form>
     </VBox>

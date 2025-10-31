@@ -1990,7 +1990,7 @@ sap.ui.define([
                                         resolve() // Resolve para não quebrar o fluxo
                                     });
                             } catch (error) {
-
+                                resolve()
                             }
                         } else {
                             var oMockMessage = {
@@ -2000,9 +2000,7 @@ sap.ui.define([
                                 subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"),
                                 counter: 1
                             };
-
                             oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-
                             reject()
                         }
 
@@ -2014,16 +2012,13 @@ sap.ui.define([
                             subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"),
                             counter: 1
                         };
-
                         oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-
                         reject()
                     }
                 } else {
                     resolve()
                 }
             })
-
         },
 
         carregarUsuario: function () {
@@ -2395,6 +2390,10 @@ sap.ui.define([
                         Tplnr: oMedicao.Tplnr,
                         Usuario: oMedicao.Usuario,
                         Uuid: oMedicao.Uuid,
+                        TagDireita: oMedicao.TagDireita,
+                        TagEsquerda: oMedicao.TagEsquerda,
+                        TruckDireita: oMedicao.TruckDireita,
+                        TruckEsquerda: oMedicao.TruckEsquerda,
                         ComponentesSet: [],
                         CondicoesSet: [],
                         InspecoesSet: [],
@@ -2411,6 +2410,8 @@ sap.ui.define([
                                 Valormedido: String(oComponente.Valormedido),
                                 IdComponente: oComponente.IdComponente,
                                 Posicao: oComponente.Posicao,
+                                PosicaoTec: oComponente.PosicaoTec,
+                                CodiFabr: oComponente.CodiFabr,
                                 IdLado: oComponente.IdLado
                             }
 

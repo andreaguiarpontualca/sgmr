@@ -23,7 +23,21 @@ sap.ui.define([
 
                 oView.bindElement("materialRodanteFormularioModel>/")
 
+                this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                this._oRouter.getRoute("Formulario").attachMatched(this._handleRouteMatched, this);
+
             },
+
+            _handleRouteMatched: function (oEvent) {
+                var oTable = this.byId("idComponentesTable"); // Get the table instance
+                var oBinding = oTable.getBinding("items"); // Get the items binding
+
+                // Clear all filters applied to the binding
+                if (oBinding) {
+                    oBinding.filter([]);
+                }
+            },
+
 
             onFiltroChange: function (oEvent) {
 
@@ -125,13 +139,13 @@ sap.ui.define([
                 if (oComponente.Ordenacao == "D" && vValorMedido > vUltValormedido) {
                     oEvent.getSource().setValueState("Error")
                     oEvent.getSource().setValueStateText("Valor informado maior que último valor médido")
-//                    MessageToast.show("Valor informado maior que último valor médido");
+                    //                    MessageToast.show("Valor informado maior que último valor médido");
                     vValido = false
                 }
                 if (oComponente.Ordenacao == "C" && vValorMedido < vUltValormedido) {
                     oEvent.getSource().setValueState("Error")
                     oEvent.getSource().setValueStateText("Valor informado menor que último valor médido")
-//                    MessageToast.show("Valor informado menor que último valor médido");
+                    //                    MessageToast.show("Valor informado menor que último valor médido");
                     vValido = false
                 }
                 if (vValido) {

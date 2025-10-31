@@ -192,9 +192,9 @@ sap.ui.define([
 
                         var oMockMessage = {
                             type: 'Error',
-                            title: oBundle.getText("valormenor"),
+                            title: oBundle.getText("ultimoponto"),
                             description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
-                            subtitle: oBundle.getText("medicao"),
+                            subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
                             counter: 1
                         };
                         aMockMessages.push(oMockMessage)
@@ -437,7 +437,7 @@ sap.ui.define([
                     Promise.all(aLeiturasForm).then(
                         function () {
                             var oEquipamento = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData()
-                            var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
                             var aComponentesCombo = []
                             var aListaInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
@@ -538,6 +538,7 @@ sap.ui.define([
                             oFormulario.Retorno = [];
                             oFormulario.VisibilidadeRetorno = false
                             oFormulario.VisibilidadeInformacoes = true
+                            oFormulario.VisibilidadeTAG = true
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
 
