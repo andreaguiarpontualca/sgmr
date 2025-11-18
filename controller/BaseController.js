@@ -35,6 +35,12 @@ sap.ui.define([
             }
         },
 
+		onNavBackCordova: function () {
+			MessageToast.show('Por favor utilize o botão voltar da aplicação', {
+				duration: 500
+			})
+		},
+
         onSairApp: function () {
             this.getRouter().navTo("Login", {}, true /*no history*/);
         },
@@ -629,6 +635,14 @@ sap.ui.define([
                             var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData() || [];
                             var aMaterialRodante = oController.getOwnerComponent().getModel("listaEquipamentoModel").getData() || [];
                             var aFormularios = oController.getOwnerComponent().getModel("listaFormularioModel").getData() || [];
+
+                            aPerfis.forEach(element => {
+                                element.AutorizacaoSet.forEach(auth => {
+                                    var oAutorizacao = aAutorizacoes.find((oElement) => auth.CodigoAutorizacao == oElement.CodigoAutorizacao);
+                                    auth.DescrAutorizacao = oAutorizacao ? oAutorizacao.DescrAutorizacao : ""
+                                })
+
+                            });
 
                             var aGravacoes = [
                                 oController.gravarTabelaIndexDB("tb_autorizacao", aAutorizacoes),
@@ -2374,6 +2388,7 @@ sap.ui.define([
                     var oMedicaoSet = {
                         Chave: 'X',
                         Data: oMedicao.Data,
+                        DataSt: oMedicao.Data.toLocaleString().replace(',',""),
                         Eqktx: oMedicao.Eqktx,
                         Equnr: oMedicao.Equnr,
                         Formulario: oMedicao.IdForm,
