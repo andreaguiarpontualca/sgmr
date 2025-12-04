@@ -8,6 +8,6 @@
 		confirm="_handlePerfilValueHelpClose"
 		cancel="_handlePerfilValueHelpClose">
 		<StandardListItem
-			title="{listaPerfilModel>DescrPerfil}"  />
+			title="{listaPerfilModel>CodigoPerfil} - {listaPerfilModel>DescrPerfil}"  />
 	</SelectDialog>
 </core:FragmentDefinition>

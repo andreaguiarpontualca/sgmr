@@ -41,7 +41,7 @@ sap.ui.define([
                 var oNomeInput = oView.byId("nomeInput")
                 var oSenhaInput = oView.byId("senhaInput")
                 var oConfirmarInput = oView.byId("confirmarSenhaInput")
-                var oCentroInput = oView.byId("centroInput")
+                //var oCentroInput = oView.byId("centroInput")
                 var oDepositoInput = oView.byId("depositoInput")
                 var oPerfilInput = oView.byId("perfilInput")
 
@@ -153,7 +153,7 @@ sap.ui.define([
                     var oPerfil = oSelectedItem.getModel("listaPerfilModel").getProperty(oSelectedItem.getBindingContext("listaPerfilModel").getPath())
 
 
-                    oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/Perfil", oSelectedItem.getTitle());
+                    oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/Perfil", oSelectedItem.getTitle().split("-")[1].trim());
                     oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/CodigoPerfil", oPerfil.CodigoPerfil);
                     oController.getOwnerComponent().getModel("criarUsuarioModel").setProperty("/Autorizacoes", oPerfil.AutorizacaoSet);
                     oController.getOwnerComponent().getModel("criarUsuarioModel").refresh()
@@ -180,7 +180,7 @@ sap.ui.define([
                 var oNomeInput = oView.byId("nomeInput")
                 var oSenhaInput = oView.byId("senhaInput")
                 var oConfirmarInput = oView.byId("confirmarSenhaInput")
-                var oCentroInput = oView.byId("centroInput")
+                //var oCentroInput = oView.byId("centroInput")
                 var oDepositoInput = oView.byId("depositoInput")
                 var oPerfilInput = oView.byId("perfilInput")
 
@@ -281,7 +281,7 @@ sap.ui.define([
                     vPodeGravar = false;
                 }
 
-                if (oUsuario.Centro == "") {
+                /* if (oUsuario.Centro == "") {
                     // oCentroInput.setValueState("Error");
                     // var oMockMessage = {
 
@@ -306,7 +306,7 @@ sap.ui.define([
                         aMockMessages.push(oMockMessage)
                         vPodeGravar = false;
                     }
-                }
+                } */
 
                 if (oUsuario.Deposito == "") {
                     // oDepositoInput.setValueState("Error");
@@ -359,7 +359,7 @@ sap.ui.define([
                     // oCentroInput.setValueState("None");
                     // oDepositoInput.setValueState("None");
                     oPerfilInput.setValueState("None");
-                    oUsuario.Centro = oUsuario.Centro.toUpperCase();
+                    //oUsuario.Centro = oUsuario.Centro.toUpperCase();
                     oUsuario.Deposito = oUsuario.Deposito.toUpperCase();
                     oUsuario.Senha = oController.criptografar(oUsuario.Senha)
                     oUsuario.ConfirmarSenha = oController.criptografar(oUsuario.ConfirmarSenha)

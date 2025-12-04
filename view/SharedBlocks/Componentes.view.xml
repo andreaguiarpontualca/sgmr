@@ -1,0 +1,211 @@
+<mvc:View
+    controllerName="com.pontual.sgmr.controller.Componentes"
+    height="100%"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    displayBlock="true"
+>
+    <VBox
+        id="idComponente"
+        class="sapUiSmallMargin"
+    >
+        <Table
+            id="idComponentesTable"
+            alternateRowColors="true"
+            autoPopinMode="false"
+            contextualWidth="Auto"
+            growing="true"
+            growingThreshold="100"
+            mode="None"
+            paste="onPaste"
+            items="{
+					path: 'materialRodanteFormularioModel>/Componentes',					
+					sorter: [{
+							path: 'Componente', 
+							descending: false
+						}, {
+							path: 'Lado', 
+							descending: false
+						}]
+				}"
+        >
+            <headerToolbar>
+                <OverflowToolbar id="otbSubheader">
+                    <ComboBox
+                        width="35%"
+                        selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}"
+                        change="onFiltroChange"
+                        items="{
+                            path: 'materialRodanteFormularioModel>/ComponentesCombo',
+                            sorter: { path: 'text' }
+                        }"
+                    >
+                        <core:Item
+                            key="{materialRodanteFormularioModel>key}"
+                            text="{materialRodanteFormularioModel>text}"
+                        />
+                    </ComboBox>
+                    <ComboBox
+                        width="35%"
+                        selectedKey="{materialRodanteFormularioModel>LadoSelecionado}"
+                        change="onFiltroChange"
+                        items="{
+                            path: 'materialRodanteFormularioModel>/LadoCombo',
+                            sorter: { path: 'text' }
+                        }"
+                    >
+                        <core:Item
+                            key="{materialRodanteFormularioModel>key}"
+                            text="{materialRodanteFormularioModel>text}"
+                        />
+                    </ComboBox>
+                    <CheckBox
+                        text="Informações"
+                        valueState="Information"
+                        enabled="true"
+                        selected="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
+                    />
+                </OverflowToolbar>
+            </headerToolbar>
+            <columns>
+                <Column
+                    hAlign="Begin"
+                    minScreenWidth="Phone"
+                    demandPopin="true"
+                >
+                    <Text text="Componente" />
+                </Column>
+                <Column
+                    hAlign="Begin"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
+                >
+                    <Text text="Fabricante" />
+                </Column>
+                <Column
+                    hAlign="Begin"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    width="20%"
+                >
+                    <Text text="Valor Medido" />
+                </Column>
+                <Column
+                    hAlign="End"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                >
+                    <Text text="% Desgaste" />
+                </Column>
+                <Column
+                    hAlign="Center"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
+                >
+                    <Text text="Ultima Medição" />
+                </Column>
+                <Column
+                    hAlign="Center"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
+                >
+                    <Text text="% Desgaste Ult. Med." />
+                </Column>
+                <Column
+                    hAlign="Center"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
+                >
+                    <Text text="Data Ultima Medição" />
+                </Column>
+                <Column
+                    hAlign="Center"
+                    minScreenWidth="Tablet"
+                    demandPopin="true"
+                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
+                >
+                    <Text text="Instrumento" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem vAlign="Middle">
+                    <cells>
+                        <ObjectStatus
+                            title="{materialRodanteFormularioModel>Componente}"
+                            text="{materialRodanteFormularioModel>Item}"
+                            active="true"
+                            press="onItemPress"
+                            state="{materialRodanteFormularioModel>Cor}"
+                            icon="{
+                                    path:'materialRodanteFormularioModel>Lado',
+                                    formatter:'com.pontual.sgmr.model.formatter.getLadoIcone'
+                                }"
+                        />
+                        <ObjectStatus
+                            class="sapMObjectStatusMedium"
+                            text="{materialRodanteFormularioModel>Fabricante}"
+                            inverted="false"
+                            state="{materialRodanteFormularioModel>ValorMedidoStatus}"
+                        />
+                        <HBox alignItems="Center">
+                            <StepInput
+                                value="{materialRodanteFormularioModel>Valormedido}"
+                                displayValuePrecision="2"
+                                step="0.50"
+                                valueState="{materialRodanteFormularioModel>ValorMedidoValueState}"
+                                enabled="{materialRodanteFormularioModel>ValorMedidoEnabled}"
+                                editable="true"
+                                change="onValidarMedicao"
+                            />
+                            <ObjectStatus
+                                class="sapUiTinyMarginBegin"
+                                active="false"
+                                icon="{
+                                    path:'materialRodanteFormularioModel>Ordenacao',
+                                    formatter:'com.pontual.sgmr.model.formatter.getOrdencaoIcone'
+                                }"
+                                inverted="true"
+                                state="Indication05"
+                            />
+                        </HBox>
+                        <ObjectStatus
+                            class="sapMObjectStatusMedium"
+                            text="{materialRodanteFormularioModel>PercDesgaste}"
+                            inverted="false"
+                            state="{materialRodanteFormularioModel>PercDesgasteValueState}"
+                        />
+                        <ObjectStatus
+                            class="sapMObjectStatusMedium"
+                            text="{materialRodanteFormularioModel>UltValormedido}"
+                            inverted="false"
+                            state="Indication05"
+                        />
+                        <ObjectStatus
+                            class="sapMObjectStatusMedium"
+                            text="{materialRodanteFormularioModel>UltPercDesgaste}%"
+                            inverted="false"
+                            state="Indication05"
+                        />
+                        <ObjectStatus
+                            class="sapMObjectStatusMedium"
+                            text="{materialRodanteFormularioModel>UltDataHora}"
+                            inverted="false"
+                            state="Indication05"
+                        />
+                        <ObjectStatus
+                            class="sapMObjectStatusMedium"
+                            text="{materialRodanteFormularioModel>InstrMedicao}"
+                            inverted="false"
+                            state="Indication05"
+                        />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
+</mvc:View>

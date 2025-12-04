@@ -1,21 +1,20 @@
-<mvc:View controllerName="com.pontual.sgmr.controller.Sincronizar"
+<mvc:View
+    controllerName="com.pontual.sgmr.controller.Sincronizar"
     height="100%"
-    xmlns:mvc="sap.ui.core.mvc" 
-	xmlns:core="sap.ui.core"       
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
     displayBlock="true"
-    xmlns="sap.m">
-    <Page id="pageInicio" 
-          title="{i18n>title}" 
-          titleAlignment="Center"
-          showNavButton="true"   
-          navButtonPress="onNavBack"       
-          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
+    xmlns="sap.m"
+>
+    <Page
+        id="pageInicio"
+        title="{i18n>title}"
+        titleAlignment="Center"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
+    >
         <headerContent>
-        <Button
-				tooltip="{i18n>sincronizar}"
-				icon="sap-icon://synchronize"
-				press="onSincronizar"
-                type="Emphasized"/>
             <ObjectStatus
                 id="networkStatus"
                 active="false"
@@ -25,52 +24,106 @@
                 state="{path: 'conexaoModel>statusConexao',
                         formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
             />
-        </headerContent>            
-		<content>               
-                    <Table id="idListaMaterialRodanteTable" 
-                            alternateRowColors="true"
-                            autoPopinMode="false" 
-                            contextualWidth="Auto"		
-                            growing="true" 
-                            growingThreshold="100" 
-                            paste="onPaste" 
-                    items="{sincronizarModel>/}">
-                        <headerToolbar>
-                            <OverflowToolbar id="otbSubheader">
-                                <Title text="Material Rodante" level="H2" />
-                                <ToolbarSpacer />
-                                <SearchField id="searchOrdem" search="onSearchOrdem" width="50%" placeholder="Pesquisa" />	   
-                            </OverflowToolbar>
-                        </headerToolbar>
-                        <columns>
-                            <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="50%">
-                                <Text text="Tabela" />
-                            </Column>
-                            <Column hAlign="Center" vAlign="Middle" minScreenWidth="Tablet" demandPopin="true" width="12.5%">
-                                <Text text="" />
-                            </Column>								
-                        </columns>
-                        <items>
-                            <ColumnListItem vAlign="Middle" navigated="false" type="Inactive" press="onMaterialRodantePress">
-                                <cells>
-                                    <ObjectIdentifier title="{sincronizarModel>Codigo}"/>
-                                    <Button id="sincronismoButton" width="12rem" text="Sincronizar" type="Emphasized" press="onSincronizar" icon="sap-icon://synchronize" class="sapUiSmallMarginBottom"	></Button>                                                	                                        
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-		</content>
-		<footer>
-			<OverflowToolbar>
-				<Button id="messagePopoverBtn"
-					visible="{=!!${message>/}.length}"
-					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-					text= "{path: '/', formatter: '.highestSeverityMessages' }"
-					press=".handleMessagePopoverPress"
-					ariaHasPopup="Dialog"/>                      
-				<ToolbarSpacer/>
-			</OverflowToolbar>
-		</footer>
+        </headerContent>
+        <content>
+            <VBox
+                id="sincronismoFormContainer"
+                fitContainer="true"
+                justifyContent="Center"
+                alignItems="Center"
+                alignContent="Center"
+            >
+                <items>
+                    <Button
+                        id="downloadAutorizacaoButton"
+                        width="12rem"
+                        text="{i18n>autorizacoes} ({= ${listaAutorizacaoModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadAutorizacao"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />
+                    <Button
+                        id="downloadCentrosButton"
+                        width="12rem"
+                        text="{i18n>centros} ({= ${listaCentrosModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadCentros"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />
+                    <Button
+                        id="downloadEquipamentoButton"
+                        width="12rem"
+                        text="{i18n>equipamentos} ({= ${listaEquipamentoModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadEquipamento"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />    
+                    <Button
+                        id="downloadFormularioButton"
+                        width="12rem"
+                        text="{i18n>formularios} ({= ${listaFormularioModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadFormulario"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />                                     
+                    <Button
+                        id="downloadPerfilButton"
+                        width="12rem"
+                        text="{i18n>perfis}  ({= ${listaPerfilModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadPerfil"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />
+                    <Button
+                        id="downloadUsuarioButton"
+                        width="12rem"
+                        text="{i18n>usuarios}  ({= ${listaUsuariosModel>/}.length})"
+                        type="Emphasized"
+                        press="onDownloadUsuario"
+                        icon="sap-icon://download-from-cloud"
+                        class="sapUiSmallMarginBottom"
+                    />
+                    <Button
+                        id="uploadMedicaoButton"
+                        width="12rem"
+                        text="{i18n>medicoes}  ({= ${listaMedicoesModel>/}.length})"
+                        type="Emphasized"
+                        press="onUploadMedicao"
+                        icon="sap-icon://upload-to-cloud"
+                        class="sapUiSmallMarginBottom"
+                        visible="true"
+                    />
+                    <Button
+                        id="sincronizarButton"
+                        width="12rem"
+                        text="{i18n>sincronizargeral}"
+                        type="Emphasized"
+                        press="onSincronizar"
+                        icon="sap-icon://synchronize"
+                        class="sapUiSmallMarginBottom"
+                        visible="true"
+                    />
+                </items>
+            </VBox>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${message>/}.length}"
+                    icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+                    text="{path: '/', formatter: '.highestSeverityMessages' }"
+                    press=".handleMessagePopoverPress"
+                    ariaHasPopup="Dialog"
+                />
+                <ToolbarSpacer />
+            </OverflowToolbar>
+        </footer>
     </Page>
 </mvc:View>

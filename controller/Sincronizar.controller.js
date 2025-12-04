@@ -19,51 +19,30 @@ sap.ui.define([
                 oView = oController.getView();
 
                 var omaterialRodante = [
-                    {Codigo: "Equipamento"},
-                    {Codigo: "Formulário"}
+                    { Codigo: "Equipamento" },
+                    { Codigo: "Formulário" }
                 ]
 
                 oController.getOwnerComponent().getModel("sincronizarModel").setData(omaterialRodante);
                 oController.getOwnerComponent().getModel("sincronizarModel").refresh()
 
-
-                oView.bindElement("sincronizarModel>/");
-                oView.bindElement("layoutTelaModel>/");
                 oView.bindElement("busyDialogModel>/")
-                oView.bindElement("objectPageModel>/")
-                oView.bindElement("condicaoOperacaoModel>/")
-                oView.bindElement("inspecaoModel>/")
-                oView.bindElement("condicaoModel>/")
-                oView.bindElement("formularioModel>/")
-                oView.bindElement("modeloEquipamentoModel>/")
-                
-                var aCondicoes = [{ key: "EX1200 - 6" }, { key: "EX2500 - 5" }, { key: "320" }, { key: "930" }]
-                oController.getOwnerComponent().getModel("formularioModel").setData(aCondicoes);
-                oController.getOwnerComponent().getModel("formularioModel").refresh();
 
-                var aModelosEquipamentos = [{ cod: "EX1200 - 5", desc: "HITACHI"}, 
-                                            { cod: "EX2500", desc: "HITACHI" }, 
-                                            { cod: "320", desc: "CAT" }, 
-                                            { cod: "930", desc: "KOMATSU" }]
-                oController.getOwnerComponent().getModel("modeloEquipamentoModel").setData(aModelosEquipamentos);
-                oController.getOwnerComponent().getModel("modeloEquipamentoModel").refresh();
+
+
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
                 this.getView().setModel(oModel);
 
                 this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                this._oRouter.getRoute("AssociarFormulario").attachMatched(this._handleRouteMatched, this);
+                this._oRouter.getRoute("Sincronizar").attachMatched(this._handleRouteMatched, this);
 
             },
 
 
             _handleRouteMatched: function (oEvent) {
 
-                var aFilters = []
-                var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
-                aFilters.push(filter);
-                this.getView().byId("idListaMaterialRodanteTable").getBinding("items").filter(aFilters, "Application");
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -108,104 +87,216 @@ sap.ui.define([
                 oModel.setData(aMockMessages);
                 this.getView().setModel(oModel);
                 this.byId("messagePopoverBtn").addDependent(oMessagePopover);
+
+                oView.byId("sincronismoFormContainer").setBusy(true);
+                var aLeituras = [
+                    oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
+                    oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
+                    oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel"),
+                    oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel"),
+                    oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel"),
+                    oController.carregarDadosIndexDB("tb_formulario", "listaFormularioModel"),
+                    oController.carregarDadosIndexDB("tb_medicao", "listaMedicoesModel")];
+
+                Promise.all(aLeituras).then(function (result) {
+                    oView.byId("sincronismoFormContainer").setBusy(false);
+                    var oAcessos = oController.getOwnerComponent().getModel("acessosModel").getData();
+                    oView.byId("downloadPerfilButton").setVisible(oAcessos.perfil);
+                    oView.byId("downloadCentrosButton").setVisible(oAcessos.perfil);
+                    oView.byId("downloadAutorizacaoButton").setVisible(oAcessos.perfil);
+                    oView.byId("downloadUsuarioButton").setVisible(oAcessos.usuario);
+                })
             },
 
 
             onNavBack: function () {
-                this.getRouter().navTo("Administrativo", {}, true /*no history*/);
-            },
-
-
-            onEliminarmaterialRodante: function (oEvent) {
-                var omaterialRodante = oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getPath());
-                var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData()
-                var oUsuario = aUsuarios.find(function (pUsuario) {
-                    return pUsuario.materialRodante === omaterialRodante.DescrmaterialRodante
-                })
-                if (oUsuario == undefined) {
-                    omaterialRodante.Sincronizado = "E"
-                    oController.getOwnerComponent().getModel("listaMaterialRodanteModel").refresh()
-                    oController.limparTabelaIndexDB("tb_materialRodante").then(
-                        function (result) {
-                            oController.gravarTabelaIndexDB("tb_materialRodante", oController.getOwnerComponent().getModel("listaMaterialRodanteModel").getData()).then(
-                                function (result) {
-                                    MessageToast.show("materialRodante marcado para eliminação.");
-                                    oController.materialRodanteUpdate().then(
-                                        function (result) {
-                                            MessageToast.show("materialRodante eliminado com sucesso");
-                                            var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                                            oController.getView().getModel().setData(aMensagens);
-                                            oController.getView().getModel().refresh()
-                                        }).catch(
-                                            function (result) {
-
-                                            })
-                                }).catch(
-                                    function (result) {
-
-                                    })
-                        }).catch(
-                            function (result) {
-
-                            })
-                } else {
-                    MessageToast.show("materialRodante associado a usuário. Remova antes de eliminar.");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'materialRodante em uso',
-                        description: 'materialRodante associado a usuário. Remova antes de eliminar.',
-                        subtitle: 'materialRodante',
-                        counter: 1
-                    };
-                    oController.getView().getModel().setData([oMockMessage]);
-                    oController.getView().getModel().refresh()
-                }
-            },
-
-            onMaterialRodantePress: function (oEvent) {
-                var omaterialRodante = oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaMaterialRodanteModel").getPath());
-                var oObjetoNovo = JSON.parse(JSON.stringify(omaterialRodante));
-                oObjetoNovo.HabilitarTelaCriarmaterialRodante = false
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").setData(oObjetoNovo);
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").refresh()
-                oController.getOwnerComponent().getRouter().navTo("ObjectPageSection", null, true);
-            },
-
-            onCriarmaterialRodante: function (oEvent) {
-
-                var omaterialRodante = {
-                    CodigomaterialRodante: 0,
-                    DescrmaterialRodante: "",
-                    Sincronizado: "N",
-                    HabilitarTelaCriarmaterialRodante: true,
-                    AutorizacaoSet: [
-                        {
-                            CodigoAutorizacao: "01",
-                            DescrAutorizacao: "INSPEÇÃO MATERIAL RODANTE",
-                            Selecionado: false
-                        }, {
-                            CodigoAutorizacao: "02",
-                            DescrAutorizacao: "MOVIMENTAÇÃO MATERIAL RODANTE",
-                            Selecionado: false
-                        }
-                        
-
-
-                    ]
-                }
-
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").setData(omaterialRodante);
-                oController.getOwnerComponent().getModel("materialRodanteCriarModel").refresh()
-                oController.getOwnerComponent().getRouter().navTo("CriarMaterialRodante", null, true);
+                this.getRouter().navTo("Inicio", {}, true /*no history*/);
             },
 
             onSincronizar: function (oEvent) {
                 oController.onSincronizarGeral(oController, false)
-
             },
 
             handleMessagePopoverPress: function (oEvent) {
                 oMessagePopover.toggle(oEvent.getSource());
+            },
+
+            onDownloadAutorizacao: function (oEvent) {
+                var vButton = "downloadAutorizacaoButton"
+                var vTabela = "tb_autorizacao"
+                var vModel = "listaAutorizacaoModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarAutorizacoes().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            oView.byId(vButton).setBusy(false);
+                            MessageToast.show("Download de Autorizações concluído");
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },
+
+            onDownloadPerfil: function (oEvent) {
+                var vButton = "downloadPerfilButton"
+                var vTabela = "tb_perfil"
+                var vModel = "listaPerfilModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarPerfil().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            oView.byId(vButton).setBusy(false);
+                            MessageToast.show("Download de Perfis concluído");
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },
+            onDownloadCentros: function (oEvent) {
+                var vButton = "downloadCentrosButton"
+                var vTabela = "tb_centros"
+                var vModel = "listaCentrosModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarCentro().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            oView.byId(vButton).setBusy(false);
+                            MessageToast.show("Download de Centros concluído");
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },
+            onDownloadEquipamento: function (oEvent) {
+                var vButton = "downloadEquipamentoButton"
+                var vTabela = "tb_equipamento"
+                var vModel = "listaEquipamentoModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarEquipamento().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            var aForms = oController.agruparFormularios(aDados)
+                            var aModelos = oController.agruparPorCampo(aDados, "Modelo")
+                            var aLeiturasForm = [
+                                oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
+                                oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
+                                oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
+                                oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))                                
+                            ];
+
+                            Promise.all(aLeiturasForm).then(
+                                function () {
+                                    //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                                    var aLimpezas = [
+                                        oController.limparTabelaIndexDB("tb_componentes"),
+                                        oController.limparTabelaIndexDB("tb_condicoes"),
+                                        oController.limparTabelaIndexDB("tb_inspecoes"),
+                                        oController.limparTabelaIndexDB("tb_listadesgaste")
+                                    ];
+                                    Promise.all(aLimpezas).then(
+                                        function () {
+                                            var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
+                                            var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
+                                            var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                            var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();                                            
+                                            var aGravacoes = [
+                                                oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
+                                                oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
+                                                oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
+                                                oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes)                                                
+                                            ];
+                                            Promise.all(aGravacoes).then(
+                                                function (result) {
+                                                    oView.byId(vButton).setBusy(false);
+                                                    MessageToast.show("Download de Equipamentos concluído");
+                                                })
+                                        }).catch(
+                                            function (result) {
+                                                oView.byId(vButton).setBusy(false);
+                                            })
+                                }).catch(
+                                    function (result) {
+                                        oView.byId(vButton).setBusy(false);
+                                    })
+
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },
+            onDownloadUsuario: function (oEvent) {
+                var vButton = "downloadUsuarioButton"
+                var vTabela = "tb_usuario"
+                var vModel = "listaUsuariosModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarUsuario().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            oView.byId(vButton).setBusy(false);
+                            MessageToast.show("Download de Usuários concluído");
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },
+            onDownloadFormulario: function (oEvent) {
+                var vButton = "downloadFormularioButton"
+                var vTabela = "tb_formulario"
+                var vModel = "listaFormularioModel"
+                oView.byId(vButton).setBusy(true);
+                oController.carregarFormulario().then(function () {
+                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
+                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
+                            oView.byId(vButton).setBusy(false);
+                            MessageToast.show("Download de Formulários concluído");
+                        }).catch(function () {
+                            oView.byId(vButton).setBusy(false);
+                        })
+                    }).catch(function () {
+                        oView.byId(vButton).setBusy(false);
+                    })
+                }).catch(function () {
+                    oView.byId(vButton).setBusy(false);
+                })
+            },            
+            onUploadMedicao: function (oEvent) {
+                oView.byId("uploadMedicaoButton").setBusy(true);
+                oController.medicaoUpdate(oController, true).then(function () {
+                    oView.byId("uploadMedicaoButton").setBusy(false);
+                    MessageToast.show("Upload de Medições concluído");
+                })
             }
 
         });

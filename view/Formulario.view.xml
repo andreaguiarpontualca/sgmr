@@ -1,0 +1,127 @@
+<mvc:View 
+	controllerName="com.pontual.sgmr.controller.Formulario"    
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.uxap"
+	xmlns:m="sap.m"
+	xmlns:blockcolor="com.pontual.sgmr.view.SharedBlocks"
+	height="100%">
+	 <m:Page id="idFormulario" 
+          title="{i18n>title}" 
+          titleAlignment="Center"
+          showNavButton="true" 
+          showSubHeader="true"
+          navButtonPress="onNavBack"  >
+		   <m:headerContent>
+				<m:ObjectStatus
+					id="IdNetworkStatus"
+					active="false"
+					inverted="true"
+					icon="{path: 'conexaoModel>statusConexao',
+						formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+					state="{path: 'conexaoModel>statusConexao',
+							formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+				/>
+        	</m:headerContent>   
+			<ObjectPageLayout id="ObjectPageLayout" upperCaseAnchorBar="false">
+				<headerTitle>
+					<ObjectPageHeader objectTitle="{materialRodanteFormularioModel>Equnr}">
+					</ObjectPageHeader>
+				</headerTitle>
+
+				<headerContent>
+					<m:ObjectAttribute title="{i18n>equipamento}" text="{materialRodanteFormularioModel>Eqktx}"/>
+					<m:ObjectAttribute title="{i18n>tituloformulario}" text="{materialRodanteFormularioModel>Formulario}"/>
+					<m:ObjectAttribute title="{i18n>local}" text="{materialRodanteFormularioModel>Tplnr} - {materialRodanteFormularioModel>Pltxt}"/>		
+					<m:ObjectAttribute title="{i18n>modelo}" text="{materialRodanteFormularioModel>Modelo}"/>											
+				</headerContent>
+
+				<sections>
+					<ObjectPageSection titleUppercase="false" title="Cabeçalho">
+						<subSections>
+							<ObjectPageSubSection title="Cabeçalho" titleUppercase="false">
+								<blocks>
+									<blockcolor:Cabecalho id="cabecalhoBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>
+
+					<ObjectPageSection titleUppercase="false" title="Componentes">
+						<subSections>
+							<ObjectPageSubSection title="Componentes" titleUppercase="false">
+								<blocks>
+									<blockcolor:Componentes id="componentesBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>
+
+					<ObjectPageSection titleUppercase="false" title="Condição de Operação">
+						<subSections>
+							<ObjectPageSubSection title="Condição de Operação" titleUppercase="false">
+								<blocks>
+									<blockcolor:Condicoes id="condicoesBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>					
+
+					<ObjectPageSection titleUppercase="false" title="Roletes">
+						<subSections>
+							<ObjectPageSubSection title="Roletes" titleUppercase="false">
+								<blocks>
+									<blockcolor:Roletes id="roletesBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>	
+
+					<ObjectPageSection titleUppercase="false" title="Inspeção">
+						<subSections>
+							<ObjectPageSubSection title="Inspeção" titleUppercase="false">
+								<blocks>
+									<blockcolor:Inspecao id="inspecaoBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>	
+
+					<ObjectPageSection titleUppercase="false" title="Anexos">
+						<subSections>
+							<ObjectPageSubSection title="Anexos" titleUppercase="false">
+								<blocks>
+									<blockcolor:Anexos id="anexosBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>		
+					
+
+					<ObjectPageSection titleUppercase="false" title="Retornos" visible="{materialRodanteFormularioModel>VisibilidadeRetorno}">
+						<subSections>
+							<ObjectPageSubSection title="Retornos" titleUppercase="false">
+								<blocks>
+									<blockcolor:Retornos id="retornosBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>						
+
+				</sections>
+
+			</ObjectPageLayout>
+			<m:footer>
+				<m:OverflowToolbar>
+					<m:Button id="messagePopoverBtn"
+						icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+						type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+						text= "{path: '/', formatter: '.highestSeverityMessages' }"
+						press=".handleMessagePopoverPress"
+						ariaHasPopup="Dialog"/>		 
+					<m:ToolbarSpacer/>
+					<m:Button id="confirmarButton" text="{i18n>confirmar}" type="Success" press="onConfirmar" icon="sap-icon://save" ></m:Button>
+					<m:Button id="cancelarButton" text="{i18n>cancelar}" type="Reject" press="onCancelar" icon="sap-icon://cancel" ></m:Button>                
+				</m:OverflowToolbar>
+			</m:footer>
+	</m:Page>
+</mvc:View>

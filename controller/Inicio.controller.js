@@ -107,9 +107,13 @@ sap.ui.define([
                 oController.getOwnerComponent().getRouter().navTo("ListaMaterialRodante", null, true);
             },
 
-            onSincronizar: function (oEvent) {
-                oController.onSincronizarGeral(oController, true)
+            onEntrarRelatorioInspecao: function (oEvent) {
+                oController.getOwnerComponent().getRouter().navTo("RelatorioInspecao", null, true);
+            },
 
+            onSincronizar: function (oEvent) {
+                //oController.onSincronizarGeral(oController, true)
+                oController.getOwnerComponent().getRouter().navTo("Sincronizar", null, true);
             },
 
             handleMessagePopoverPress: function (oEvent) {

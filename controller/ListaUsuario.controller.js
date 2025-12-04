@@ -148,14 +148,23 @@ sap.ui.define([
                 oUsuario.Sincronizado = "U"
                 oUsuario.Senha = oController.descriptografar(oUsuario.Senha)
                 oUsuario.ConfirmarSenha = oUsuario.Senha
-                
+
                 // Garantir que Bloqueado seja sempre boolean para o Switch
                 if (oUsuario.Bloqueado === "X" || oUsuario.Bloqueado === true) {
                     oUsuario.Bloqueado = true;
                 } else {
                     oUsuario.Bloqueado = false;
                 }
-                
+                var oPerfil = oController.getOwnerComponent().getModel("listaPerfilModel").getData().find((oElement) => oUsuario.CodigoPerfil == oElement.CodigoPerfil);
+                if (oPerfil != undefined) {
+                    oUsuario.Perfil = oPerfil.DescrPerfil;
+                    oUsuario.CodigoPerfil = oPerfil.CodigoPerfil
+                    oUsuario.Autorizacoes = oPerfil.AutorizacaoSet
+                    oUsuario.Autorizacoes.forEach(element => {
+                        var oAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData().find((oElement) => element.CodigoAutorizacao == oElement.CodigoAutorizacao);
+                        element.DescrAutorizacao = oAutorizacao?oAutorizacao.DescrAutorizacao:""
+                    });
+                }
                 oController.getOwnerComponent().getModel("criarUsuarioModel").setData(oUsuario);
                 oController.getOwnerComponent().getModel("layoutTelaModel").setProperty("/HabilitarEditarUsuario", false);
                 oController.getOwnerComponent().getModel("layoutTelaModel").setProperty("/HabilitarTelaCriarUsuario", true);
@@ -163,18 +172,27 @@ sap.ui.define([
             },
 
             onExibirUsuario: function (oEvent) {
-                var oUsuario = oEvent.getSource().getBindingContext("listaUsuariosModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaUsuariosModel").getPath());               
+                var oUsuario = oEvent.getSource().getBindingContext("listaUsuariosModel").getModel().getProperty(oEvent.getSource().getBindingContext("listaUsuariosModel").getPath());
                 var oUsuario = JSON.parse(JSON.stringify(oUsuario));
                 oUsuario.Senha = oController.descriptografar(oUsuario.Senha)
                 oUsuario.ConfirmarSenha = oUsuario.Senha
-                
+
                 // Garantir que Bloqueado seja sempre boolean para o Switch
                 if (oUsuario.Bloqueado === "X" || oUsuario.Bloqueado === true) {
                     oUsuario.Bloqueado = true;
                 } else {
                     oUsuario.Bloqueado = false;
                 }
-                
+                var oPerfil = oController.getOwnerComponent().getModel("listaPerfilModel").getData().find((oElement) => oUsuario.CodigoPerfil == oElement.CodigoPerfil);
+                if (oPerfil != undefined) {
+                    oUsuario.Perfil = oPerfil.DescrPerfil;
+                    oUsuario.CodigoPerfil = oPerfil.CodigoPerfil
+                    oUsuario.Autorizacoes = oPerfil.AutorizacaoSet
+                    oUsuario.Autorizacoes.forEach(element => {
+                        var oAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData().find((oElement) => element.CodigoAutorizacao == oElement.CodigoAutorizacao);
+                        element.DescrAutorizacao = oAutorizacao?oAutorizacao.DescrAutorizacao:""
+                    });
+                }
                 oController.getOwnerComponent().getModel("criarUsuarioModel").setData(oUsuario);
                 oController.getOwnerComponent().getModel("layoutTelaModel").setProperty("/HabilitarEditarUsuario", false);
                 oController.getOwnerComponent().getModel("layoutTelaModel").setProperty("/HabilitarTelaCriarUsuario", false);
@@ -199,7 +217,7 @@ sap.ui.define([
                     Autorizacoes: []
                 }
 
-                // var listaAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacao").getData()
+                // var listaAutorizacao = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData()
 
                 // listaAutorizacao.forEach(element => {
                 //     element.Selecionado = false

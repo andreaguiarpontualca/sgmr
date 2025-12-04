@@ -1,5 +1,4 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
     "com/pontual/sgmr/controller/BaseController",
     "com/pontual/sgmr/model/formatter"
 ],
@@ -41,9 +40,12 @@ sap.ui.define([
                     oController.getOwnerComponent().getModel("mensagensModel").setData([])
                     oController.getOwnerComponent().getRouter().navTo("Login", null, true);
                 }
+
             },
 
             onDeviceReady: function () {
+                console.log("Cordova está pronto.");
+                document.addEventListener("backbutton", oController.onBackKeyDown, false);
                 if (window.location.hash == "") {
                     oController.getOwnerComponent().getModel("mensagensModel").setData([])
 
@@ -74,6 +76,14 @@ sap.ui.define([
             },
             onOrientationChange: function () {
                 console.log(screen.orientation.type);
+            },
+
+            onBackKeyDown: function (oEvent) {
+                // e.preventDefault() é usado para prevenir o comportamento padrão (se aplicável)
+                oEvent.preventDefault();
+                console.log("Botão de voltar pressionado!");
+                oController.onNavBackCordova()
+
             },
 
             checkConnection: function () {

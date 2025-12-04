@@ -78,7 +78,7 @@
                        autoPopinMode="true" 
                        contextualWidth="Auto"		
                        mode="MultiSelect" 
-                       items="{listaMaterialRodanteModel>}"
+                       items="{listaEquipamentoModel>}"
                        selectionChange="onSelectionChange">
             <headerToolbar>
                 <OverflowToolbar id="idOvrflowToolbar">
@@ -96,10 +96,10 @@
                 </Column>								
             </columns>
             <items>
-                <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" press="onOrdemPress" id="idColumnListItem" selected="{listaMaterialRodanteModel>Selecionado}">	
+                <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" press="onOrdemPress" id="idColumnListItem" selected="{listaEquipamentoModel>Selecionado}">	
                     <cells>
-                        <ObjectIdentifier title="{listaMaterialRodanteModel>Modelo}" id="idObjectIdentifier1"/>
-                        <ObjectIdentifier title="{listaMaterialRodanteModel>DescricaoModelo}" id="idObjectIdentifier2"/>
+                        <ObjectIdentifier title="{listaEquipamentoModel>Modelo}" id="idObjectIdentifier1"/>
+                        <ObjectIdentifier title="{listaEquipamentoModel>DescricaoModelo}" id="idObjectIdentifier2"/>
                     </cells>
                 </ColumnListItem>
             </items>
