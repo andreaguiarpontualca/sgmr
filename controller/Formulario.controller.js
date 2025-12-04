@@ -20,6 +20,7 @@ sap.ui.define([
         var aMockMessages = []
 
         return Controller.extend("com.pontual.sgmr.controller.Formulario", {
+
             onInit: function () {
 
                 try {
@@ -511,8 +512,8 @@ sap.ui.define([
                                 element.ValorMedidoValueState = 'None'
                                 element.ComponenteLado = element.IdComponente + element.IdLado
                                 if (element.Fabricante != "") {
-                                    element.ValorMedidoEnabled = true
-                                    element.ValorMedidoStatus = 'Indication05'
+                                    element.ValorMedidoEnabled = !!element.Acao; 
+                                    element.ValorMedidoStatus  = 'Indication05'
                                 } else {
                                     element.ValorMedidoEnabled = false
                                     element.Fabricante = "Não cadastrado"
