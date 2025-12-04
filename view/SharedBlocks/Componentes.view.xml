@@ -152,7 +152,7 @@
                             inverted="false"
                             state="{materialRodanteFormularioModel>ValorMedidoStatus}"
                         />
-                        <HBox>
+                        <HBox alignItems="Center">
                             <StepInput
                                 value="{materialRodanteFormularioModel>Valormedido}"
                                 displayValuePrecision="2"
@@ -163,6 +163,7 @@
                                 change="onValidarMedicao"
                             />
                             <ObjectStatus
+                                class="sapUiTinyMarginBegin"
                                 active="false"
                                 icon="{
                                     path:'materialRodanteFormularioModel>Ordenacao',
