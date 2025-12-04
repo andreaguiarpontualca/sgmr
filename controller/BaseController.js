@@ -35,11 +35,11 @@ sap.ui.define([
             }
         },
 
-		onNavBackCordova: function () {
-			MessageToast.show('Por favor utilize o botão voltar da aplicação', {
-				duration: 500
-			})
-		},
+        onNavBackCordova: function () {
+            MessageToast.show('Por favor utilize o botão voltar da aplicação', {
+                duration: 500
+            })
+        },
 
         onSairApp: function () {
             this.getRouter().navTo("Login", {}, true /*no history*/);
@@ -599,7 +599,7 @@ sap.ui.define([
 
 
         //Revisar
-        sincronizarReceber: function (pCatalogo) {
+        sincronizarReceber: function () {
 
             oController = this;
             return new Promise((resolve, reject) => {
@@ -738,7 +738,7 @@ sap.ui.define([
 
         },
 
-        sincronizar: function (pCatalogo) {
+        sincronizar: function () {
             //oController.carregarPerfil();
             //oController.carregarAutorizacao()
             oController = this;
@@ -748,9 +748,9 @@ sap.ui.define([
                     oController.getOwnerComponent().getModel("mensagensModel").setData([])
                     oController.verificarDisponibilidadeServidor().then(
                         function (result) {
-                            oController.sincronizarEnviar(pCatalogo).then(
+                            oController.sincronizarEnviar().then(
                                 function (result) {
-                                    oController.sincronizarReceber(pCatalogo).then(
+                                    oController.sincronizarReceber().then(
                                         function (result) {
                                             var loginInProgress = false;
                                             try {
@@ -1021,12 +1021,12 @@ sap.ui.define([
             });
         },
 
-        onSincronizarGeral: function (pController, pCatalogo) {
+        onSincronizarGeral: function (pController) {
             var aMockMessages = []
             if (oController.checkConnection() == true) {
                 oController = pController
                 oController.openBusyDialog();
-                oController.sincronizar(pCatalogo).then(function (result) {
+                oController.sincronizar().then(function (result) {
                     oController.closeBusyDialog();
 
                     var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
@@ -1071,7 +1071,7 @@ sap.ui.define([
 
         },
 
-        sincronizarEnviar: function (pCatalogo) {
+        sincronizarEnviar: function () {
             oController = this;
             return new Promise((resolve, reject) => {
                 if (oController.checkConnection() == true) {
@@ -1331,7 +1331,7 @@ sap.ui.define([
             })
         },
 
-        carregarOffline: function (pCatalogo) {
+        carregarOffline: function () {
 
             oController = this;
             return new Promise((resolve, reject) => {
@@ -2388,7 +2388,7 @@ sap.ui.define([
                     var oMedicaoSet = {
                         Chave: 'X',
                         Data: oMedicao.Data,
-                        DataSt: oMedicao.Data.toLocaleString().replace(',',""),
+                        DataSt: oMedicao.Data.toLocaleString().replace(',', ""),
                         Eqktx: oMedicao.Eqktx,
                         Equnr: oMedicao.Equnr,
                         Formulario: oMedicao.IdForm,
@@ -2505,7 +2505,13 @@ sap.ui.define([
 
                                     });
 
-                                    resolve()
+                                    oController.sincronizarReceber().then(function () {
+                                        resolve()
+                                    }).catch(
+                                        function () {
+                                            resolve()
+                                        })
+
                                 }).catch(
                                     function () {
                                         // Não fechar o busy dialog aqui - será fechado no método sincronizar principal

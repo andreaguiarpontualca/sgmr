@@ -12,6 +12,7 @@
 			path: 'medicaoAcoesModel>/'
 		}">
 		<StandardListItem
+			id="idStandardListItem"
 			title="{medicaoAcoesModel>acao}"
 			icon="{medicaoAcoesModel>icone}"
 			iconDensityAware="false"
