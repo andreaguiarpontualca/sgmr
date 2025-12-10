@@ -157,16 +157,6 @@ sap.ui.define([
                 }
             },
 
-            // corPercentualDesgaste: function (pPercentual) {
-            //     if (pPercentual > 0 && pPercentual < 33) {
-            //         return 'Indication04' //Verde
-            //     } else if (pPercentual >= 33 && pPercentual < 66) {
-            //         return 'Indication03' //Amarelo
-            //     } else if (pPercentual >= 66) {
-            //         return 'Indication02'//Vermelho
-            //     }
-            // },
-
             corPercentualDesgaste: function (oComponente) {
                 var aListaDesgaste = oController.getOwnerComponent().getModel("listaDesgastesModel").getData()
                 var vValorMedido = oController.arredondarPara05(oComponente.Valormedido)
@@ -194,21 +184,48 @@ sap.ui.define([
                 return Math.round(numero * 2) / 2;
             },
 
-
             calcularPercentualDesgaste: function (oComponente) {
-                var aListaDesgaste = oController.getOwnerComponent().getModel("listaDesgastesModel").getData()
-                var vValorMedido = oController.arredondarPara05(oComponente.Valormedido)
-                var oDesgaste = aListaDesgaste.find(c => c.CodiFabr == oComponente.CodiFabr &&
-                    c.Componente == oComponente.IdComponente &&
-                    c.TipoEquipamento == oComponente.ModEquip &&
-                    c.MedidaMm == vValorMedido);
+                const oDesgaste      = oController.obtemLimites(oComponente);
                 if (oDesgaste == undefined) {
                     return "Não cadastrado"
                 } else {
-                    return oDesgaste.PercDesgaste + " %"
+                    return oDesgaste + "%"
+                }
+            },
+
+            obtemLimites: function(componente) {
+                const tabela     = oController.getOwnerComponent().getModel("listaDesgastesModel").getData() || [];
+                const limitesSup = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+                const limitesInf = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+
+                if (!limiteSup || !limiteInf) {
+                    return;
                 }
 
+                limitesSup.sort((a, b) => Number(a.MedidaMm) - Number(b.MedidaMm));
 
+                console.clear();
+                
+                console.log("Tabela Sup: ==================================================");
+                limitesSup.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
+                console.log("==============================================================");
+
+                limitesInf.sort((a, b) => Number(b.MedidaMm) - Number(a.MedidaMm));
+
+                console.log("Tabela Inf: ==================================================");
+                limitesInf.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
+                console.log("==============================================================");
+
+                const medidaAtual = componente.Valormedido;
+                const limiteSup   = limitesSup.filter( l => Number(l.MedidaMm) >= medidaAtual )[0];
+                const limiteInf   = limitesInf.filter( l => Number(l.MedidaMm) <= medidaAtual )[0];
+
+                console.log("medidaAdual: ", medidaAtual);
+                console.log("LimiteSup: ", limiteSup && limiteSup.MedidaMm);
+                console.log("LimiteInf: ", limiteInf && limiteInf.MedidaMm);
+
+                let   desgaste    = componente.Ordenacao === "C" ? limiteSup?.PercDesgaste : limiteInf?.PercDesgaste ;
+                return desgaste;
             }
 
         });

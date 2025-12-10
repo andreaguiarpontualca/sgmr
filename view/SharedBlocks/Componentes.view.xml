@@ -136,21 +136,15 @@
                 <ColumnListItem vAlign="Middle">
                     <cells>
                         <ObjectStatus
-                            title="{materialRodanteFormularioModel>Componente}"
-                            text="{materialRodanteFormularioModel>Item}"
+                            text="{materialRodanteFormularioModel>Componente} {materialRodanteFormularioModel>Item}"
                             active="true"
                             press="onItemPress"
                             state="{materialRodanteFormularioModel>Cor}"
-                            icon="{
-                                    path:'materialRodanteFormularioModel>Lado',
-                                    formatter:'com.pontual.sgmr.model.formatter.getLadoIcone'
-                                }"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>Fabricante}"
                             inverted="false"
-                            state="{materialRodanteFormularioModel>ValorMedidoStatus}"
                         />
                         <HBox alignItems="Center">
                             <StepInput
@@ -169,7 +163,7 @@
                                     path:'materialRodanteFormularioModel>Ordenacao',
                                     formatter:'com.pontual.sgmr.model.formatter.getOrdencaoIcone'
                                 }"
-                                inverted="true"
+                                inverted="false"
                                 state="Indication05"
                             />
                         </HBox>
@@ -183,25 +177,21 @@
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>UltValormedido}"
                             inverted="false"
-                            state="Indication05"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>UltPercDesgaste}%"
                             inverted="false"
-                            state="Indication05"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>UltDataHora}"
                             inverted="false"
-                            state="Indication05"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>InstrMedicao}"
                             inverted="false"
-                            state="Indication05"
                         />
                     </cells>
                 </ColumnListItem>
