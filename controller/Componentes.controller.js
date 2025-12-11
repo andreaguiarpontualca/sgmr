@@ -1,23 +1,28 @@
 sap.ui.define([
     "com/pontual/sgmr/controller/BaseController",
-    "com/pontual/sgmr/model/formatter",
     'sap/ui/model/json/JSONModel',
     'sap/ui/model/Filter',
-    "sap/ui/model/FilterOperator",
-    'sap/m/MessageToast'
+    "sap/ui/model/FilterOperator"
 ],
-    function (Controller, formatter, JSONModel, Filter, FilterOperator, MessageToast) {
+    function (Controller, JSONModel, Filter, FilterOperator) {
         "use strict";
         var oView
         var oController
 
         return Controller.extend("com.pontual.sgmr.controller.Componentes", {
+
+            COR_LIMITE : {
+                BAIXO : "Indication04",
+                MEDIO : "Indication03",
+                ALTO  : "Indication02"
+            },
+
             onInit: function () {
                 oController = this;
                 oController.oController = this;
                 oView = oController.getView();
 
-                var oModel = new JSONModel();
+                const oModel = new JSONModel();
                 oModel.setData([]);
                 this.getView().setModel(oModel);
 
@@ -25,22 +30,17 @@ sap.ui.define([
 
                 this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this._oRouter.getRoute("Formulario").attachMatched(this._handleRouteMatched, this);
-
             },
 
             _handleRouteMatched: function (oEvent) {
-                var oTable = this.byId("idComponentesTable"); // Get the table instance
-                var oBinding = oTable.getBinding("items"); // Get the items binding
-
-                // Clear all filters applied to the binding
+                const oTable   = this.byId("idComponentesTable");
+                const oBinding = oTable.getBinding("items");
                 if (oBinding) {
                     oBinding.filter([]);
                 }
             },
 
-
             onFiltroChange: function (oEvent) {
-
                 var vCS = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getObject().ComponenteSelecionado;
                 var vLS = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getObject().LadoSelecionado;
                 var aFilter;
@@ -82,12 +82,9 @@ sap.ui.define([
             onItemPress: function (oEvent) {
                 var oComponenteSelecionado = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getObject()
                 oController._handleExibirImagem(oComponenteSelecionado.Imagem, oComponenteSelecionado.Componente)
-                //Teste
             },
 
             _handleExibirImagem: function (sImagem, sTitulo) {
-
-                // Fallback caso não venha data
                 if (!sImagem) {
                     sImagem = "imagem_nao_encontrada";
                 }
@@ -131,100 +128,112 @@ sap.ui.define([
             },
 
             onValidarMedicao: function (oEvent) {
-                var vPath = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getPath()
-                var oComponente = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getProperty(vPath)
-                var vValorMedido = parseFloat(oComponente.Valormedido)
-                var vUltValormedido = parseFloat(oComponente.UltValormedido)
-                var vValido = true
+                var vPath           = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getPath();
+                var oComponente     = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getProperty(vPath);
+                var vValorMedido    = parseFloat(oComponente.Valormedido);
+                var vUltValormedido = parseFloat(oComponente.UltValormedido);
+
                 if (oComponente.Ordenacao == "D" && vValorMedido > vUltValormedido) {
-                    oEvent.getSource().setValueState("Error")
-                    oEvent.getSource().setValueStateText("Valor informado maior que último valor médido")
-                    //                    MessageToast.show("Valor informado maior que último valor médido");
-                    vValido = false
+                    oEvent.getSource().setValueState("Error");
+                    oEvent.getSource().setValueStateText("Valor informado maior que último valor medido");
                 }
                 if (oComponente.Ordenacao == "C" && vValorMedido < vUltValormedido) {
-                    oEvent.getSource().setValueState("Error")
-                    oEvent.getSource().setValueStateText("Valor informado menor que último valor médido")
-                    //                    MessageToast.show("Valor informado menor que último valor médido");
-                    vValido = false
+                    oEvent.getSource().setValueState("Error");
+                    oEvent.getSource().setValueStateText("Valor informado menor que último valor medido");
                 }
-                if (vValido) {
-                    var vCorPercentualDesgaste = oController.corPercentualDesgaste(oComponente)
-                    oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty(vPath + '/PercDesgasteValueState', vCorPercentualDesgaste)
-                    var vPercentualDesgaste = oController.calcularPercentualDesgaste(oComponente)
-                    oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty(vPath + '/PercDesgaste', vPercentualDesgaste)
-                    oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
-                }
-            },
 
-            corPercentualDesgaste: function (oComponente) {
-                var aListaDesgaste = oController.getOwnerComponent().getModel("listaDesgastesModel").getData()
-                var vValorMedido = oController.arredondarPara05(oComponente.Valormedido)
-                var oDesgaste = aListaDesgaste.find(c => c.CodiFabr == oComponente.CodiFabr &&
-                    c.Componente == oComponente.IdComponente &&
-                    c.TipoEquipamento == oComponente.ModEquip &&
-                    c.MedidaMm == vValorMedido);
-                if (oDesgaste == undefined) {
-                    return "Indication05"
-                } else {
-                    switch (oDesgaste.Alerta) {
-                        case 'BAIXO':
-                            return 'Indication04' //Verde
-                        case 'MEDIO':
-                            return 'Indication03' //Amarelo           
-                        case 'ALTO':
-                            return 'Indication02'//Vermelho                 
-                        default:
-                            return "Indication05"
-                    }
-                }
-            },
-
-            arredondarPara05: function (numero) {
-                return Math.round(numero * 2) / 2;
+                const vCorPercentualDesgaste = oController.obtemCorLimite(oComponente);
+                oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty(vPath + '/PercDesgasteValueState', vCorPercentualDesgaste);
+                const vPercentualDesgaste = oController.calcularPercentualDesgaste(oComponente);
+                oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty(vPath + '/PercDesgaste', vPercentualDesgaste);
+                oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh();
             },
 
             calcularPercentualDesgaste: function (oComponente) {
-                const oDesgaste      = oController.obtemLimites(oComponente);
-                if (oDesgaste == undefined) {
-                    return "Não cadastrado"
-                } else {
-                    return oDesgaste + "%"
+                const oDesgaste    = oController.obtemLimites(oComponente);
+                return (oDesgaste == undefined) ? "Não cadastrado": oDesgaste + "%";
+            },
+
+            obtemCorLimite: function(componente) {
+                const tabela    = oController.getOwnerComponent().getModel("listaDesgastesModel").getData() || [];
+                const tabelaCre = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+                const tabelaDec = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+
+                if (!tabelaCre || tabelaCre.length < 1 || !tabelaDec || tabelaDec.length < 1) {
+                    return "Indication05";
                 }
+
+                tabelaCre.sort((a, b) => Number(a.MedidaMm) - Number(b.MedidaMm));
+                tabelaDec.sort((a, b) => Number(b.MedidaMm) - Number(a.MedidaMm));
+
+                const medidaAtual = componente.Valormedido;
+                const limiteSup   = tabelaCre.filter( l => Number(l.MedidaMm) >= medidaAtual )[0];
+                const limiteInf   = tabelaDec.filter( l => Number(l.MedidaMm) <= medidaAtual )[0];
+
+                if (componente.Ordenacao === "C") {
+                    return oController.COR_LIMITE[limiteInf?.Alerta] || "Indication05";
+                }
+                return oController.COR_LIMITE[limiteSup?.Alerta] || "Indication05";
             },
 
             obtemLimites: function(componente) {
-                const tabela     = oController.getOwnerComponent().getModel("listaDesgastesModel").getData() || [];
-                const limitesSup = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
-                const limitesInf = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+                const tabela    = oController.getOwnerComponent().getModel("listaDesgastesModel").getData() || [];
+                const tabelaCre = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+                const tabelaDec = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
 
-                if (!limiteSup || !limiteInf) {
+                if (!tabelaCre || tabelaCre.length < 1 || !tabelaDec || tabelaDec.length < 1) {
                     return;
                 }
 
-                limitesSup.sort((a, b) => Number(a.MedidaMm) - Number(b.MedidaMm));
-
+                //TODO : REMOVER COMENTÁRIO ANTES DO APK.
                 console.clear();
-                
+
+                tabelaCre.sort((a, b) => Number(a.MedidaMm) - Number(b.MedidaMm));
+               
                 console.log("Tabela Sup: ==================================================");
-                limitesSup.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
+                tabelaCre.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
                 console.log("==============================================================");
 
-                limitesInf.sort((a, b) => Number(b.MedidaMm) - Number(a.MedidaMm));
+                tabelaDec.sort((a, b) => Number(b.MedidaMm) - Number(a.MedidaMm));
 
                 console.log("Tabela Inf: ==================================================");
-                limitesInf.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
+                tabelaDec.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
                 console.log("==============================================================");
 
                 const medidaAtual = componente.Valormedido;
-                const limiteSup   = limitesSup.filter( l => Number(l.MedidaMm) >= medidaAtual )[0];
-                const limiteInf   = limitesInf.filter( l => Number(l.MedidaMm) <= medidaAtual )[0];
+                const limiteSup   = tabelaCre.filter( l => Number(l.MedidaMm) >= medidaAtual )[0];
+                const limiteInf   = tabelaDec.filter( l => Number(l.MedidaMm) <= medidaAtual )[0];
+                const medidaSup   = (!!limiteSup && !!limiteSup.MedidaMm) ? Number(limiteSup.MedidaMm) : 0.0;
 
-                console.log("medidaAdual: ", medidaAtual);
-                console.log("LimiteSup: ", limiteSup && limiteSup.MedidaMm);
-                console.log("LimiteInf: ", limiteInf && limiteInf.MedidaMm);
+                const desgVsRefAnt  = medidaSup - medidaAtual;
+                const percRefAnt    = Number(limiteSup && limiteSup.PercDesgaste) || 0.0;
+                const percRefPos    = Number(limiteInf && limiteInf.PercDesgaste) || 0.0;
+                const percIntervalo = desgVsRefAnt / 5;
+                const desgaste      = ((percRefPos - percRefAnt) * percIntervalo + percRefAnt).toFixed(2);
 
-                let   desgaste    = componente.Ordenacao === "C" ? limiteSup?.PercDesgaste : limiteInf?.PercDesgaste ;
+                console.log("Medida Atual.........: ", medidaAtual);
+                console.log("Desgaste vs Ref. Ant.: ", desgVsRefAnt);
+                console.log("Desgaste Ref. Ant....: ", percRefAnt, "%");
+                console.log("Desgaste Ref. Pos....: ", percRefPos, "%");
+                console.log("Perc. do Intervalo...: ", percIntervalo, "%");
+                console.log("Desgaste.............: ", desgaste, "%");
+
+                const limiteIni = tabelaCre[0];
+                const medidaIni = Number(limiteIni.MedidaMm)      || 0.0;
+                const percIni   = (Number(limiteIni.PercDesgaste) || 0.0).toFixed(2);
+
+                const limiteFim = tabelaCre[tabelaCre.length - 1];
+                const medidaFim = Number(limiteFim.MedidaMm)      || 0.0;
+                const percFim   = (Number(limiteFim.PercDesgaste) || 0.0).toFixed(2);
+                
+                if (medidaAtual < medidaIni) {
+                    return percIni;
+                }
+
+                if (medidaAtual > medidaFim) {
+                    return percFim;
+                }
+                
                 return desgaste;
             }
 
