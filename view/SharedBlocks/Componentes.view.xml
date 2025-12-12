@@ -113,14 +113,6 @@
                     demandPopin="true"
                     visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
                 >
-                    <Text text="{i18n>componente.percentual.ultima.medicao}" />
-                </Column>
-                <Column
-                    hAlign="Center"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
-                >
                     <Text text="{i18n>componente.data.ultima.medicao}" />
                 </Column>
                 <Column
@@ -173,11 +165,6 @@
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>UltValormedido}"
-                            inverted="false"
-                        />
-                        <ObjectStatus
-                            class="sapMObjectStatusMedium"
-                            text="{materialRodanteFormularioModel>UltPercDesgaste}%"
                             inverted="false"
                         />
                         <ObjectStatus
