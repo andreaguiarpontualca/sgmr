@@ -23,29 +23,33 @@
                 <VBox fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center">
                     <items>
                         <Image src="{loginModel>imgLogo}"/>
-                        <Label text="{i18n>usuario}" required="true" labelFor="loginInput"></Label>					
-                        <Input id="usuarioInput" 
+                        <Label text="{i18n>usuario}" required="true" labelFor="loginInput" visible="false"></Label>
+                        <Input
+                            id="usuarioInput" 
                             placeholder="{i18n>usuario}"
                             showClearIcon="true"
                             required="true"
                             value="{loginModel>CodUsuario}"					   
                             submit="onLogin"						   					   
-                            class="sapUiSmallMarginBottom"></Input>
-                        <Label text="{i18n>senha}" required="true" labelFor="loginInput"></Label>					
-                        <Input id="senhaInput" 
-                                placeholder="{i18n>senha}"
-                                showClearIcon="true"
-                                type="Password"
-                                required="true"
-                                value="{loginModel>Senha}"					   
-                                submit="onLogin"	
-                                class="sapUiSmallMarginBottom"></Input>                       
-                        <Button id="entrarButton" width="12rem" text="{i18n>entrar}" type="Emphasized" press="onLogin" icon="sap-icon://visits" class="sapUiSmallMarginBottom"	></Button>
-                        <Button id="configurarButton" width="12rem" text="{i18n>conexao}" type="Emphasized" press="onConfigurar" icon="sap-icon://action-settings" class="sapUiSmallMarginBottom"	></Button>                
+                            class="sapUiSmallMarginBottom"
+                            width="12rem"></Input>
+                        <Label text="{i18n>senha}" required="true" labelFor="loginInput" visible="false"></Label>
+                        <Input
+                            id="senhaInput" 
+                            placeholder="{i18n>senha}"
+                            showClearIcon="true"
+                            type="Password"
+                            required="true"
+                            value="{loginModel>Senha}"					   
+                            submit="onLogin"	
+                            class="sapUiMediumMarginBottom"
+                            width="12rem"></Input>
+                        <Button id="entrarButton" width="12rem" text="{i18n>entrar}"  type="Emphasized" press="onLogin" icon="sap-icon://visits" class="sapUiSmallMarginTop sapUiSmallMarginBottom"	></Button>
+                        <Button id="configurarButton" width="12rem" text="{i18n>conexao}" type="Neutral" press="onConfigurar" icon="sap-icon://action-settings" class="sapUiSmallMarginBottom"	></Button>
                         <ObjectStatus
-                                class="sapUiSmallMarginBottom"
+                                class="sapUiSmallMarginTop"
                                 text="{i18n>versao}"
-                                inverted="true"
+                                inverted="false"
                                 active="false"
                                 state="Indication03" />
                     </items>
