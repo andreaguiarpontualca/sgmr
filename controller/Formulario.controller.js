@@ -30,6 +30,7 @@ sap.ui.define([
                 }
 
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -214,10 +215,10 @@ sap.ui.define([
                         if (vMedEpto < vUltMedEqpto) {
                             try {
                                 sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
+                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
                             } catch (error) {
                                 sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
+                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
                             }
                             var oMockMessage = {
                                 type: 'Error',
@@ -234,10 +235,10 @@ sap.ui.define([
                         if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
                             try {
                                 sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
+                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
                             } catch (error) {
                                 sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
+                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
                             }
                             var oMockMessage = {
                                 type: 'Error',
@@ -607,6 +608,7 @@ sap.ui.define([
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
 
                             resolve();
+                            
                         }
                     );
                 })
@@ -643,7 +645,8 @@ sap.ui.define([
 
                 return resultArr;
 
-            }
+            },
+
 
         });
     });

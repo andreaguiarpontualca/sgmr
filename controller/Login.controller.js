@@ -17,7 +17,7 @@ sap.ui.define([
             onInit: function () {
                 oController = this;
                 oView = oController.getView();
-
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 oView.bindElement("conexaoModel>/");
                 oView.bindElement("loginModel>/");

@@ -16,6 +16,7 @@ sap.ui.define([
                 oController = this;
                 oController.oController = this;
                 oView = oController.getView();
+                 this.getView().addStyleClass("sapUiSizeCozy");
 
                 oView.bindElement("conexaoModel>/");
                 oView.bindElement("loginModel>/");
@@ -32,6 +33,8 @@ sap.ui.define([
 
                 this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this._oRouter.getRoute("Inicio").attachMatched(this._handleRouteMatched, this);
+
+                this.byId("pageMenuInicio").addStyleClass("sapUiSizeCozy");
 
             },
 

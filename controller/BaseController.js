@@ -2625,6 +2625,22 @@ sap.ui.define([
 
             // 4. Verificar se a diferença é de pelo menos 70 horas
             return diferencaEmHoras >= 70;
+        },
+
+        limpaZerosNoFoco: function(input) {
+            if (input.__zerosLimpos) {
+                return;
+            }
+            input.__zerosLimpos = true;
+            input.addEventDelegate({
+                onfocusin: function(oEvent) {
+                    const domInput = oEvent.target?.tagName === "INPUT" ? oEvent.target : input.getDomRef()?.querySelector("input");
+                    if (!domInput) {
+                        return;
+                    }
+                    setTimeout(() => domInput.select(), 10);
+                }
+            });
         }
 
 

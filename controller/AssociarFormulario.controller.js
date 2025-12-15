@@ -20,6 +20,7 @@ sap.ui.define([
 
                 oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 var oFormularioSet = { Codigo: "" };
 

@@ -21,6 +21,7 @@ sap.ui.define([
                 oController = this;
                 oController.oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 const oModel = new JSONModel();
                 oModel.setData([]);
@@ -235,7 +236,19 @@ sap.ui.define([
                 }
                 
                 return desgaste;
-            }
+            },
+
+            onAfterRendering: function() {
+				const input = oController.byId("idValorMedicaoComponente");
+
+				if (!input) {
+					return;
+				};
+
+                oController.limpaZerosNoFoco(input);
+
+			}
+
 
         });
     });

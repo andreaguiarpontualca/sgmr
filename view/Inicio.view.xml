@@ -6,7 +6,7 @@
     xmlns="sap.m"
 >
     <Page
-        id="pageInicio"
+        id="pageMenuInicio"
         title="{i18n>title}"
         titleAlignment="Center"
         showNavButton="false"
@@ -14,7 +14,7 @@
         navButtonText="Sair"
         icon="sap-icon://visits"
         navButtonPress="onNavBack"
-        class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
+        class="sapUiSizeCozy sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
     >
         <headerContent>
             <ObjectStatus
