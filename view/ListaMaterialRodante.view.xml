@@ -18,7 +18,7 @@
                 tooltip="{i18n>sincronizar}"
                 icon="sap-icon://synchronize"
                 press="onSincronizar"
-                type="Emphasized"
+                type="Neutral"
             />
             <ObjectStatus
                 id="networkStatus"

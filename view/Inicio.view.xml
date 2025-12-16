@@ -17,6 +17,12 @@
         class="sapUiSizeCozy sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
     >
         <headerContent>
+            <Button
+                tooltip="{i18n>sair}"
+                icon="sap-icon://log"
+                press="onSairApp"
+                type="Transparent"
+            />
             <ObjectStatus
                 id="networkStatus"
                 active="false"
@@ -25,12 +31,6 @@
                     formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
                 state="{path: 'conexaoModel>statusConexao',
                         formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
-            />
-            <Button
-                tooltip="{i18n>sair}"
-                icon="sap-icon://visits"
-                press="onSairApp"
-                type="Attention"
             />
         </headerContent>
         <content>
