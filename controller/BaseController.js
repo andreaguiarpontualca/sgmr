@@ -2641,8 +2641,160 @@ sap.ui.define([
                     setTimeout(() => domInput.select(), 10);
                 }
             });
-        }
+        },
 
+        validaMedicao: function(parametro) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            var aMockMessages = parametro;
+            if (!Array.isArray(parametro)) {
+                aMockMessages = [];
+            }
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("None");
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText("");
+            
+            const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            if (oMedicao.MedEquipamento == null || oMedicao.MedEquipamento == "") {
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                aMockMessages.push({
+                    type: 'Error',
+                    title: oBundle.getText("campoobrigatorio"),
+                    description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
+                    subtitle: oBundle.getText("ultimoponto"),
+                    counter: 1
+                });
+            } else {
+                oMedicao.MedEquipamento = parseInt(oMedicao.MedEquipamento).toFixed(0);
+                var vMedEpto        = parseInt(oMedicao.MedEquipamento);
+                var vUltMedEqpto    = parseInt(oMedicao.UltMedEqpto);
+                var vDifMaxMedicoes = parseInt(oMedicao.DifMaxMedicoes);
+                if (vMedEpto < vUltMedEqpto) {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    aMockMessages.push({
+                        type: 'Error',
+                        title: oBundle.getText("ultimoponto"),
+                        description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
+                        subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
+                        counter: 1
+                    });
+                }
+
+                if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    aMockMessages.push({
+                        type: 'Error',
+                        title: oBundle.getText("diferencaomedicao"),
+                        description: oBundle.getText("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
+                        subtitle: oBundle.getText("medicao"),
+                        counter: 1
+                    });
+                }
+            }
+        },
+
+        validaDataMedicao: function(aMockMessages) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("None");
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText("");
+            
+            const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            if (oMedicao.Data == null || oMedicao.Data == "") {
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("Error");
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                aMockMessages.push({
+                    type: 'Error',
+                    title: oBundle.getText("campoobrigatorio"),
+                    description: oBundle.getText("preenchimentoobrigatorio", ["Data"]),
+                    subtitle: oBundle.getText("data"),
+                    counter: 1
+                });
+            } else {
+                var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
+                if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                    aMockMessages.push({
+                        type: 'Error',
+                        title: oBundle.getText("limiteretroativo"),
+                        description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
+                        subtitle: oBundle.getText("limiteretroativo"),
+                        counter: 1
+                    });
+                }
+            }
+        },
+
+        validaVazamentoRoleteDireito: function(mensagens) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+            if (!blocoRoletes || blocoRoletes.length < 1) {
+                return;
+            }
+
+            const viewRoletes = blocoRoletes[0];
+            viewRoletes.byId("inputRoletesVazandoLD").setValueState("None");
+            viewRoletes.byId("inputRoletesVazandoLD").setValueStateText("");
+
+            const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            const valor  = Number(dados.RoleteQtdeLD);
+            const maximo = Number(dados.MaxRoleteQtdeLD);
+            const minimo = 0;
+
+            const limite         = valor > maximo ? maximo : minimo;
+            const mensagemLimite = valor > maximo ? "roletes.limite.maximo" : ( valor < minimo ? "roletes.limite.minimo" : "" );
+
+            if (!mensagemLimite) {
+                return
+            }
+
+            viewRoletes.byId("inputRoletesVazandoLD").setValueState("Error");
+            viewRoletes.byId("inputRoletesVazandoLD").setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+
+            mensagens.push({
+                type        : 'Error',
+                title       : oBundle.getText(mensagemLimite, [limite]),
+                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
+                subtitle    : oBundle.getText("roletes.lado.direito"),
+                counter     : 1
+            });
+        },
+
+        validaVazamentoRoleteEsquerdo: function(mensagens) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+            if (!blocoRoletes || blocoRoletes.length < 1) {
+                return;
+            }
+
+            const viewRoletes = blocoRoletes[0];
+            viewRoletes.byId("inputRoletesVazandoLE").setValueState("None");
+            viewRoletes.byId("inputRoletesVazandoLE").setValueStateText("");
+
+            const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            const valor  = Number(dados.RoleteQtdeLE);
+            const maximo = Number(dados.MaxRoleteQtdeLE);
+            const minimo = 0;
+
+            const limite         = valor > maximo ? maximo : minimo;
+            const mensagemLimite = valor > maximo ? "roletes.limite.maximo" : ( valor < minimo ? "roletes.limite.minimo" : "" );
+
+            if (!mensagemLimite) {
+                return
+            }
+
+            viewRoletes.byId("inputRoletesVazandoLE").setValueState("Error");
+            viewRoletes.byId("inputRoletesVazandoLE").setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+
+            mensagens.push({
+                type        : 'Error',
+                title       : oBundle.getText(mensagemLimite, [limite]),
+                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
+                subtitle    : oBundle.getText("roletes.lado.esquerdo"),
+                counter     : 1
+            });
+        }
 
     });
 });

@@ -96,7 +96,7 @@
                     hAlign="End"
                     minScreenWidth="Tablet"
                     demandPopin="true"
-                    width="6rem"
+                    width="8rem"
                 >
                     <Text text="{i18n>componente.percentual.desgaste}" />
                 </Column>

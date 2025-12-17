@@ -19,31 +19,17 @@
             <f:layout>
                 <f:ResponsiveGridLayout
                     id="idResponsiveGridLayout_R220LC-9"
-                    labelSpanXL="4"
-                    labelSpanL="4"
-                    labelSpanM="12"
-                    labelSpanS="12"
                     adjustLabelSpan="false"
-                    emptySpanXL="0"
-                    emptySpanL="0"
-                    emptySpanM="0"
-                    emptySpanS="0"
-                    columnsXL="2"
-                    columnsL="2"
-                    columnsM="2"
                     singleContainerFullSize="false"
+                    labelSpanXL="4" labelSpanL="4" labelSpanM="12" labelSpanS="12"
+                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"  emptySpanS="0"
+                    columnsXL="2"   columnsL="2"   columnsM="2"
                 />
             </f:layout>
             <f:formContainers>
-                <f:FormContainer
-                    id="idFormUltimaMedicao"
-                    title="{i18n>ultimamedicao}"
-                >
+                <f:FormContainer id="idFormUltimaMedicao" title="{i18n>ultimamedicao}" >
                     <f:formElements>
-                        <f:FormElement
-                            id="idFormElementOper"
-                            label="{i18n>ultimamedicao}"
-                        >
+                        <f:FormElement id="idFormElementOper" label="{i18n>ultimamedicao}" >
                             <f:fields>
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
@@ -53,10 +39,7 @@
                                 />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFormElementUltimaMedData"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFormElementUltimaMedData" label="{i18n>data}" >
                             <f:fields>
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
@@ -68,15 +51,10 @@
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
-                <f:FormContainer
-                    id="idFormMedicaoAtual"
-                    title="{i18n>dadosinspecao}"
-                >
+
+                <f:FormContainer id="idFormMedicaoAtual" title="{i18n>dadosinspecao}" >
                     <f:formElements>
-                        <f:FormElement
-                            id="idFEMedAtual"
-                            label="{i18n>ultimoponto}"
-                        >
+                        <f:FormElement id="idFEMedAtual" label="{i18n>ultimoponto}" >
                             <f:fields>
                                 <Input
                                     id="idInputMedEqpto"
@@ -86,6 +64,7 @@
                                     required="true"
                                     showClearIcon="true"
                                     width="100%"
+                                    change="validaMedicao"
                                 />
                             </f:fields>
                         </f:FormElement>
