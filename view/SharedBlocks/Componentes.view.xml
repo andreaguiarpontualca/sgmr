@@ -7,7 +7,7 @@
     displayBlock="true"
 >
     <VBox
-        id="idComponente"
+        id="idTabelaComponentes"
         class="sapUiSmallMargin"
     >
         <Table
@@ -31,7 +31,7 @@
 				}"
         >
             <headerToolbar>
-                <OverflowToolbar id="otbSubheader" class="pontualSGMRNoPadding">
+                <OverflowToolbar class="pontualSGMRNoPadding">
                     <ComboBox
                         width="30%"
                         selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}"

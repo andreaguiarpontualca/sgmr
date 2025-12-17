@@ -116,8 +116,8 @@
 					press=".handleMessagePopoverPress"
 					ariaHasPopup="Dialog"/>                      
 				<ToolbarSpacer id="idToolbarSpacerFooter"/>
-                <Button id="idConfirmarFormularioButton" text="{i18n>confirmar}" type="Success" press="onConfirmarFormulario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"></Button>
-                <Button id="idCancelarFormularioButton" text="{i18n>cancelar}" type="Reject" press="onCancelarFormulario" icon="sap-icon://cancel" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"></Button>   
+                <Button id="idConfirmarFormularioButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmarFormulario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}" />
+                <Button id="idCancelarFormularioButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelarFormulario"  icon="sap-icon://undo" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}" />
 			</OverflowToolbar>
 		</footer>
     </Page>

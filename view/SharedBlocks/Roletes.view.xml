@@ -9,8 +9,8 @@
     xmlns="sap.m">
 
 		    <VBox class="sapUiSmallMargin">     
-				<f:Form id="criarUsuarioForm"
-				editable="true">
+				<f:Form id="idFormRoletes"
+				editable="false">
 				<f:layout>
 					<f:ResponsiveGridLayout
 						labelSpanXL="4"
@@ -28,39 +28,27 @@
 						singleContainerFullSize="false" />
 				</f:layout>
 				<f:formContainers>
-					<f:FormContainer title="Roletes com Vazamentos?">
+					<f:FormContainer>
 						<f:formElements>
-							<f:FormElement >
-								<f:fields>							
-									<Switch state="{materialRodanteFormularioModel>RoleteVazamento}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" >
+							<f:FormElement label="Roletes com Vazamentos" >
+								<f:fields>
+									<ObjectStatus class="sapMObjectStatusMedium" text="{= ${materialRodanteFormularioModel>RoleteVazamento} ? 'Sim' : 'Não' }" inverted="true" state="{= ${materialRodanteFormularioModel>RoleteVazamento} ? 'Indication03' : 'Indication05' }"/>
+
+									<!-- <Switch state="{materialRodanteFormularioModel>RoleteVazamento}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" change="atualizaTotalRoletes" >
 										<layoutData>
 											<FlexItemData growFactor="1" />
 										</layoutData>
-									</Switch>				
+									</Switch>				 -->
 								</f:fields>
 							</f:FormElement>    							
 							<f:FormElement label="Qtde Lado Direito">
 								<f:fields>							
-									<Input 
-										value="{materialRodanteFormularioModel>RoleteQtdeLD}"																						
-										type="Number"
-										enabled="true"
-										required="false"
-										showClearIcon="true"
-										textDirection="RTL"								
-										/> 						
+		                            <StepInput id="inputRoletesVazandoLD" value="{materialRodanteFormularioModel>RoleteQtdeLD}" displayValuePrecision="0" step="1" min="0" max="{materialRodanteFormularioModel>MaxRoleteQtdeLD}" editable="true" change="controlaIndicadorVazamento"/>
 								</f:fields>
 							</f:FormElement>
 							<f:FormElement label=" Qtde Lado Esquerdo">
 								<f:fields>							
-									<Input 
-										value="{materialRodanteFormularioModel>RoleteQtdeLE}"												
-										type="Number"
-										enabled="true"
-										required="false"
-										showClearIcon="true"
-										textDirection="RTL"								
-										/> 															
+		                            <StepInput id="inputRoletesVazandoLE" value="{materialRodanteFormularioModel>RoleteQtdeLE}" displayValuePrecision="0" step="1" min="0" max="{materialRodanteFormularioModel>MaxRoleteQtdeLE}" editable="true" change="controlaIndicadorVazamento"/>
 								</f:fields>
 							</f:FormElement>                                                                                      
 						</f:formElements>

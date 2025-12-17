@@ -119,8 +119,8 @@
 						press=".handleMessagePopoverPress"
 						ariaHasPopup="Dialog"/>		 
 					<m:ToolbarSpacer/>
-					<m:Button id="confirmarButton" text="{i18n>confirmar}" type="Success" press="onConfirmar" icon="sap-icon://save" ></m:Button>
-					<m:Button id="cancelarButton" text="{i18n>cancelar}" type="Reject" press="onCancelar" icon="sap-icon://cancel" ></m:Button>                
+					<m:Button id="confirmarButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmar" icon="sap-icon://save" />
+					<m:Button id="cancelarButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelar"  icon="sap-icon://undo" />
 				</m:OverflowToolbar>
 			</m:footer>
 	</m:Page>

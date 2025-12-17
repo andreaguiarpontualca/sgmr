@@ -138,6 +138,21 @@ sap.ui.define([
                 oMessagePopover.toggle(oEvent.getSource());
             },
 
+            atualizaTotalRoletes: function(oEvent) {
+                const valor = oEvent.getParameter('state');
+                if (!valor) {
+                    const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+                    dados.RoleteQtdeLD = "0";
+                    dados.RoleteQtdeLE = "0";
+                }
+            },
+
+            controlaIndicadorVazamento: function(oEvent) {
+                const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+                const valorDireito  = Number(dados.RoleteQtdeLD);
+                const valorEsquerdo = Number(dados.RoleteQtdeLE);
+                dados.RoleteVazamento = valorDireito > 0 || valorEsquerdo > 0;
+            },
 
             validarFormulario: function (pMedicao) {
                 return new Promise((resolve, reject) => {
@@ -491,6 +506,11 @@ sap.ui.define([
 
             },
 
+            somaRoletes: function(componente, total) {
+                total.direito  += ((componente.IdComponente === "RIN" || componente.IdComponente === "RSU") && componente.IdLado === "LD") ? 1 : 0;
+                total.esquerdo += ((componente.IdComponente === "RIN" || componente.IdComponente === "RSU") && componente.IdLado === "LD") ? 1 : 0;
+            },
+
             carregarElementosFormularios: function (aFormularios) {
                 return new Promise((resolve, reject) => {
                     var aLeiturasForm = [
@@ -505,8 +525,12 @@ sap.ui.define([
                             var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
                             var aComponentesCombo = []
-                            var aListaInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
-                            var aListaCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            var aListaInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            var aListaCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            const totalRoletes = {
+                                direito  : 0,
+                                esquerdo : 0
+                            }
 
                             aListaComponetes.forEach(element => {
                                 element.Valormedido = 0
@@ -521,7 +545,8 @@ sap.ui.define([
                                     element.ValorMedidoStatus = 'Indication02'
                                 }
 
-                                element.PercDesgasteValueState = 'Indication05'  //Azul                              
+                                element.PercDesgasteValueState = 'Indication05'  //Azul
+                                oController.somaRoletes(element, totalRoletes);
                             });
 
                             aListaComponentesCombo.forEach(element => {
@@ -596,6 +621,8 @@ sap.ui.define([
                             oFormulario.RoleteVazamento = false;
                             oFormulario.RoleteQtdeLD = "0";
                             oFormulario.RoleteQtdeLE = "0";
+                            oFormulario.MaxRoleteQtdeLD = totalRoletes.direito;
+                            oFormulario.MaxRoleteQtdeLE = totalRoletes.esquerdo;
                             oFormulario.Inspecoes = aListaInspecoes;
                             oFormulario.Observacoes = "";
                             oFormulario.items = [];
@@ -606,12 +633,36 @@ sap.ui.define([
                             oFormulario.VisibilidadeTAG = true
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
+                            oController.inicializaCamposNumericos();
 
                             resolve();
                             
                         }
                     );
                 })
+            },
+
+            onAfterRendering: function(oEvent) {
+                oController.inicializaCamposNumericos();
+            },
+
+            inicializaCamposNumericos: function() {
+                const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+
+                if (!blocoRoletes) {
+                    return;
+                }
+
+				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLD");
+				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLE");
+			},
+
+            inicializaLimpezaFoco: function(bloco, id) {
+				const input = bloco.byId(id);
+				if (!input) {
+					return;
+				};
+                oController.limpaZerosNoFoco(input);
             },
 
             agruparComponentes: function (pData) {

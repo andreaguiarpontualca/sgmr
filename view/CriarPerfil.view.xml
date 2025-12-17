@@ -157,8 +157,8 @@
 					press=".handleMessagePopoverPress"
 					ariaHasPopup="Dialog"/>		                
 				<ToolbarSpacer/>
-                <Button id="confirmarPerfilButton" text="{i18n>confirmar}" type="Success" press="onConfirmarPerfil" icon="sap-icon://save" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"></Button>
-                <Button id="cancelarPerfilButton" text="{i18n>cancelar}" type="Reject" press="onCancelarPerfil" icon="sap-icon://cancel" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"></Button>   
+                <Button id="confirmarPerfilButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmarPerfil" icon="sap-icon://save" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}" />
+                <Button id="cancelarPerfilButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelarPerfil"  icon="sap-icon://undo" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}" />
 			</OverflowToolbar>
 		</footer>
     </Page>
