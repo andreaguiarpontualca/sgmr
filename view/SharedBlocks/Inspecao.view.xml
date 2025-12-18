@@ -9,8 +9,10 @@
     <VBox
         id="idVBoxInspecao"
         class="sapUiSmallMargin"
-    >
-			<Table id="idInspecoesTable" 
+        >
+			<Table
+                id="idInspecoesTable" 
+                class="sapUiMediumMarginBottom"
 				alternateRowColors="true"
 				autoPopinMode="false" 
 				contextualWidth="Auto"		
@@ -37,17 +39,17 @@
             <items>
                 <ColumnListItem vAlign="Middle">
                     <cells>
-                        <ObjectStatus text="{materialRodanteFormularioModel>Inspecao}" />                        
+                        <ObjectStatus text="{materialRodanteFormularioModel>Inspecao}" />
                         <Switch state="{materialRodanteFormularioModel>Selecionada}" customTextOn="{i18n>sim}" customTextOff="{i18n>nao}" >
                             <layoutData>
                                 <FlexItemData growFactor="1" />
                             </layoutData>
-                        </Switch>	                        
+                        </Switch>
                     </cells>
                 </ColumnListItem>
             </items>
         </Table>
         <Text text="Observações" />        
-        <TextArea value="{materialRodanteFormularioModel>Observacoes}" rows="8" width="100%"/>
+        <TextArea value="{materialRodanteFormularioModel>Observacoes}" rows="2" growing="true" growingMaxLines="10" width="100%" maxLength="255"/>
     </VBox>
 </mvc:View>

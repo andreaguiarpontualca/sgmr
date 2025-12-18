@@ -2505,17 +2505,20 @@ sap.ui.define([
 
                                     });
 
-                                    oController.sincronizarReceber().then(function () {
-                                        resolve()
+                                    oController.sincronizarReceber().then(function (result) {
+                                        resolve(result)
                                     }).catch(
-                                        function () {
-                                            resolve()
+                                        function (result) {
+                                            resolve(result)
                                         })
 
                                 }).catch(
-                                    function () {
+                                    function (result) {
                                         // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                                        reject()
+                                        console.log("ERRO: ===================");
+                                        console.log(result);
+                                        console.log("ERRO: ===================");
+                                        reject(result)
                                     })
                         } else {
                             resolve()
