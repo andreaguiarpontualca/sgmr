@@ -114,9 +114,9 @@ sap.ui.define([
             ajustarTela: function () {
                 oController.determinarOrigemArquivos();
 
-                const exibeIcone = !(
-                    oController.getOwnerComponent().getModel("device").getProperty("/system/phone") &&
-                    oController.getOwnerComponent().getModel("device").getProperty("/orientation/landscape"));
+                const celular    = oController.getOwnerComponent().getModel("device").getProperty("/system/phone");
+                const paisagem   = oController.getOwnerComponent().getModel("device").getProperty("/orientation/landscape");
+                const exibeIcone = !celular || (celular && !paisagem);
 
                 oController.getOwnerComponent().getModel("loginModel").setProperty("/exibeIcone", exibeIcone);
             },
