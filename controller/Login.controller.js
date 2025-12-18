@@ -12,11 +12,23 @@ sap.ui.define([
         var oController
         var oView
         var oMessagePopover;
+        
+        const desktopLandscapeFile = "tela_desktop_clean_1920x1080px.png";
+        const desktopPortraitFile  = "tela_desktop_1080x1920px.png";
+        const mobileLandscapeFile  = "tela_tablet_clean_960x540px.png";
+        const mobilePortraitFile   = "tela_tablet_540x960px.png";
 
         return Controller.extend("com.pontual.sgmr.controller.Login", {
+
+
             onInit: function () {
                 oController = this;
-                oView = oController.getView();
+                oView       = oController.getView();
+
+                sap.ui.Device.orientation.attachHandler(function (oEvt) {
+                    oController.ajustarTela();
+                });
+
                 this.getView().addStyleClass("sapUiSizeCozy");
 
                 oView.bindElement("conexaoModel>/");
@@ -31,7 +43,6 @@ sap.ui.define([
                 this._oRouter.getRoute("Login").attachMatched(this._handleRouteMatched, this);
 
             },
-
 
             _handleRouteMatched: function (oEvent) {
                 //var urlLogo = oController.obterArquivo("logo.png")
@@ -87,8 +98,35 @@ sap.ui.define([
                 this.getView().setModel(oModel);
                 this.byId("messagePopoverBtn").addDependent(oMessagePopover);
 
-                oController.prepararLogin()
+                oController.ajustarTela();
+                oController.prepararLogin();
 
+            },
+
+            determinarOrigemArquivos: function () {
+                var background = "img/login/" + (sap.ui.Device.orientation.landscape ? desktopLandscapeFile : desktopPortraitFile);
+                if (window.location.protocol == "file:") {
+                    background = "file:///android_asset/www/img/login/" + (screen.orientation.type == "landscape-primary" ? mobileLandscapeFile : mobilePortraitFile);
+                }
+                oController.getOwnerComponent().getModel("loginModel").setProperty("/backgroundLoginImg", background);
+            },
+            
+            ajustarTela: function () {
+                oController.determinarOrigemArquivos();
+
+                const exibeIcone = !(
+                    oController.getOwnerComponent().getModel("device").getProperty("/system/phone") &&
+                    oController.getOwnerComponent().getModel("device").getProperty("/orientation/landscape"));
+
+                oController.getOwnerComponent().getModel("loginModel").setProperty("/exibeIcone", exibeIcone);
+            },
+
+            exibeSenha: function (oEvent) {
+                const tipo  = oEvent.getSource().getType() == "Password" ? "Text" : "Password";
+                const icone = oEvent.getSource().getType() == "Password" ? "sap-icon://hide" : "sap-icon://show";
+                oEvent.getSource().setType(tipo);
+                oEvent.getSource().setValueHelpIconSrc(icone);
+                oEvent.getSource().setValue(oEvent.getSource().getValue());
             },
 
             prepararLogin: function () {

@@ -3,70 +3,82 @@
     xmlns:mvc="sap.ui.core.mvc" 
     displayBlock="true"
     xmlns="sap.m">
-    <Page id="pageLogin" 
-          title="{i18n>title}" 
-          titleAlignment="Center"
-          showNavButton="false"          
-          class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer">
-            <headerContent>
-                <ObjectStatus
-                    id="networkStatus2"
-                    active="false"
-                    inverted="true"
-                    icon="{path: 'conexaoModel>statusConexao',
-                        formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
-                    state="{path: 'conexaoModel>statusConexao',
-                            formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
-                />
-            </headerContent>
-            <content>
-                <VBox fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center">
-                    <items>
-                        <Image src="{loginModel>imgLogo}"/>
-                        <Label text="{i18n>usuario}" required="true" labelFor="loginInput" visible="false"></Label>
-                        <Input
-                            id="usuarioInput" 
-                            placeholder="{i18n>usuario}"
-                            showClearIcon="true"
-                            required="true"
-                            value="{loginModel>CodUsuario}"					   
-                            submit="onLogin"						   					   
-                            class="sapUiSmallMarginBottom"
-                            width="12rem"></Input>
-                        <Label text="{i18n>senha}" required="true" labelFor="loginInput" visible="false"></Label>
-                        <Input
-                            id="senhaInput" 
-                            placeholder="{i18n>senha}"
-                            showClearIcon="true"
-                            type="Password"
-                            required="true"
-                            value="{loginModel>Senha}"					   
-                            submit="onLogin"	
-                            class="sapUiMediumMarginBottom"
-                            width="12rem"></Input>
-                        <Button id="entrarButton" width="12rem" text="{i18n>entrar}"  type="Emphasized" press="onLogin" icon="sap-icon://visits" class="sapUiSmallMarginTop sapUiSmallMarginBottom"	></Button>
-                        <Button id="configurarButton" width="12rem" text="{i18n>conexao}" type="Neutral" press="onConfigurar" icon="sap-icon://action-settings" class="sapUiSmallMarginBottom"	></Button>
-                        <ObjectStatus
-                                class="sapUiSmallMarginTop"
-                                text="{i18n>versao}"
-                                inverted="false"
-                                active="false"
-                                state="Indication03" />
-                    </items>
-                </VBox>
-            </content>
-            <footer>
-			    <OverflowToolbar>
-                    <Button id="messagePopoverBtn"
-                        visible="{=!!${message>/}.length}"
-                        icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-                        type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-                        text= "{path: '/', formatter: '.highestSeverityMessages' }"
-                        press=".handleMessagePopoverPress"
-                        ariaHasPopup="Dialog"/>                       
-				    <ToolbarSpacer/>
-			    </OverflowToolbar>
-		    </footer>
-
-    </Page>
+    <App backgroundImage="{loginModel>backgroundLoginImg}" backgroundOpacity="1" class="ptlgmr" height="100%">
+        <pages>
+            <Page
+                id="pageLogin"
+                title="{i18n>title}"
+                titleAlignment="Center"
+                showNavButton="false"
+                backgroundDesign="Transparent"
+                showHeader="false"
+                showFooter="false"
+                class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer pontualBGLogin"
+                >
+                <headerContent>
+                    <ObjectStatus
+                        id="networkStatus2"
+                        active="false"
+                        inverted="true"
+                        icon="{path: 'conexaoModel>statusConexao',
+                            formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                        state="{path: 'conexaoModel>statusConexao',
+                                formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+                    />
+                </headerContent>
+                <content>
+					<FlexBox height="85%" alignItems="Center" justifyContent="Center" >
+                        <VBox fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center" class="formLogin">
+                            <items>
+                                <Image src="img/favicon/trator-circulo.svg" width="6rem" visible="{loginModel>/exibeIcone}"/>
+                                <Title text="On.UC.Components" class="titulo sapUiSmallMarginTop sapUiMediumMarginBottom"/>
+                                <Label text="{i18n>usuario}" required="true" labelFor="loginInput" visible="false"></Label>
+                                <Input
+                                    id="usuarioInput" 
+                                    placeholder="{i18n>usuario}"
+                                    showClearIcon="true"
+                                    required="true"
+                                    value="{loginModel>CodUsuario}"					   
+                                    submit="onLogin"						   					   
+                                    class="myCustomInput myCustomButton"
+                                    />
+                                <Label text="{i18n>senha}" required="true" labelFor="loginInput" visible="false"></Label>
+                                <Input
+                                    id="senhaInput" 
+                                    placeholder="{i18n>senha}"
+                                    type="Password"
+                                    required="true"
+                                    value="{loginModel>Senha}"					   
+									valueHelpIconSrc="sap-icon://show"      
+									valueHelpRequest="exibeSenha"
+									showValueHelp="true"
+                                    submit="onLogin"	
+                                    class="sapUiSmallMarginBottom myCustomInput myCustomButton"
+                                    />
+                                <Button id="entrarButton"     text="{i18n>entrar}"  type="Neutral"    press="onLogin"      icon="sap-icon://visits"          class="myCustomButton" />
+                                <Button id="configurarButton" text="{i18n>conexao}" type="Emphasized" press="onConfigurar" icon="sap-icon://action-settings" class="myCustomButton sapUiSmallMarginBottom" />
+                                <ObjectStatus
+                                        text="{i18n>versao}"
+                                        inverted="true"
+                                        active="false"
+                                        state="Indication03" />
+                            </items>
+                        </VBox>
+                    </FlexBox>
+                </content>
+                <footer>
+                    <OverflowToolbar>
+                        <Button id="messagePopoverBtn"
+                            visible="{=!!${message>/}.length}"
+                            icon="{ path: '/', formatter: '.buttonIconFormatter' }"
+                            type="{ path: '/', formatter: '.buttonTypeFormatter' }"
+                            text= "{path: '/', formatter: '.highestSeverityMessages' }"
+                            press=".handleMessagePopoverPress"
+                            ariaHasPopup="Dialog"/>                       
+                        <ToolbarSpacer/>
+                    </OverflowToolbar>
+                </footer>
+            </Page>
+        </pages>
+    </App>
 </mvc:View>

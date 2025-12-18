@@ -2398,8 +2398,8 @@ sap.ui.define([
                         Objnr: oMedicao.Objnr,
                         Observacoes: oMedicao.Observacoes,
                         Pltxt: oMedicao.Pltxt,
-                        Roleteqtdeld: oMedicao.RoleteQtdeLD,
-                        Roleteqtdele: oMedicao.RoleteQtdeLE,
+                        Roleteqtdeld: oMedicao.RoleteQtdeLD?.toString() || "0",
+                        Roleteqtdele: oMedicao.RoleteQtdeLE?.toString() || "0",
                         Roletevazamento: oMedicao.RoleteVazamento,
                         Status: oMedicao.Status,
                         Tplnr: oMedicao.Tplnr,
@@ -2520,16 +2520,12 @@ sap.ui.define([
                         } else {
                             resolve()
                         }
-                    }).catch(
-                        function (result) {
-                        })
-
+                    });
             })
         },
 
 
         prepararAnexo: function (pAnexo) {
-
             return new Promise((resolve, reject) => {
                 if (pAnexo.file) {
                     if (pAnexo.documentType == 'Arquivo Câmera') {
@@ -2542,13 +2538,10 @@ sap.ui.define([
                             var vContent = e.target.result.replace("data:" + pAnexo.mediaType + ";base64,", "")
                             pAnexo.ImString = vContent
                             resolve(pAnexo)
-
                         }.bind(this);
                         oReader.readAsDataURL(pAnexo.file);
                     }
-
                 }
-
             })
         },
 
