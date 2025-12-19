@@ -2458,75 +2458,62 @@ sap.ui.define([
 
                 })
 
-                Promise.all(aAnexos).then(
-                    function (result) {
-                        aListaMedicaoes.MedicaoSet.forEach(oAnexo => {
-                            oAnexo.AnexosSet.forEach(element => {
-                                delete element.file
-                                element.ImString = result.find(oElement => oElement.id === element.id).ImString
+                Promise.all(aAnexos)
+                .then(result => {
+                    aListaMedicaoes.MedicaoSet.forEach(oAnexo => {
+                        oAnexo.AnexosSet.forEach(element => {
+                            delete element.file
+                            element.ImString = result.find(oElement => oElement.id === element.id).ImString
+                        });
+                    })
+                    aMedicoesSet.push(oController.enviarDados("ListaMedicaoSet", aListaMedicaoes))
+                    if (aListaMedicaoes.MedicaoSet.length > 0) {
+                        Promise.all(aMedicoesSet)
+                        .then(result => {
+                            const tipoStatus = {"S" : "Success", "E" : "Error"};
+                            result[0].MedicaoSet.results.forEach(element => {
+                                const aListaMedicoesRetorno = element.RetornoSet.results;
+                                const vInspecao             = element;
+                                const vStatus               = vInspecao.Status;
+                                aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
+                                    const vTipo     = tipoStatus[oMedicaoRetorno.Type] || "None";
+                                    const oMensagem = {
+                                        "title"       : "Medição",
+                                        "description" : oMedicaoRetorno.Message,
+                                        "type"        : vTipo,
+                                        "subtitle"    : oMedicaoRetorno.MessageV1
+                                    }
+                                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+                                    oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
+                                    oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
+                                    if (vStatus == 'E') {
+                                        oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao)
+                                    }
+                                });
                             });
 
-                        })
-                        aMedicoesSet.push(oController.enviarDados("ListaMedicaoSet", aListaMedicaoes))
-                        if (aListaMedicaoes.MedicaoSet.length > 0) {
-                            Promise.all(aMedicoesSet).then(
-                                function (result) {
-                                    result[0].MedicaoSet.results.forEach(element => {
-                                        var aListaMedicoesRetorno = element.RetornoSet.results
-                                        var vInspecao = element
-                                        var vStatus = vInspecao.Status
-                                        var vEquipamento = vInspecao.Equnr
-                                        aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
-                                            var vTipo
-                                            switch (oMedicaoRetorno.Type) {
-                                                case "S":
-                                                    vTipo = "Success"
-                                                    break;
-                                                case "E":
-                                                    vTipo = "Error"
-                                                    break;
-                                                default:
-                                                    vTipo = "None"
-                                                    break;
-                                            }
-                                            var oMensagem = {
-                                                "title": "Medição",
-                                                "description": oMedicaoRetorno.Message,
-                                                "type": vTipo,
-                                                "subtitle": oMedicaoRetorno.MessageV1
-                                            }
-                                            oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-                                            oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
-                                            oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
-                                            if (vStatus == 'E') {
-                                                oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao)
-                                            }
-                                        });
-
-                                    });
-
-                                    oController.sincronizarReceber().then(function (result) {
-                                        resolve(result)
-                                    }).catch(
-                                        function (result) {
-                                            resolve(result)
-                                        })
-
-                                }).catch(
-                                    function (result) {
-                                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                                        console.log("ERRO: ===================");
-                                        console.log(result);
-                                        console.log("ERRO: ===================");
-                                        reject(result)
-                                    })
-                        } else {
-                            resolve()
-                        }
-                    });
+                            oController.sincronizarReceber()
+                            .then(result => {
+                                resolve(result);
+                            }).catch(result => {
+                                console.log("ERRO: sincronizarReceber() ===================");
+                                console.error(result);
+                                resolve(result);
+                            })
+                        }).catch(result => {
+                            // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                            console.log("ERRO: ===================");
+                            console.error(result);
+                            reject(result);
+                        });
+                    } else {
+                        console.log("ERRO: Lista de Medições vazia ===================");
+                        console.error(aListaMedicaoes);
+                        resolve();
+                    }
+                });
             })
         },
-
 
         prepararAnexo: function (pAnexo) {
             return new Promise((resolve, reject) => {
