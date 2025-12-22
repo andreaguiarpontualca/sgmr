@@ -21,10 +21,7 @@
 				noDataText="{i18n>dadosnaoencontrados}"
 				items="{
 					path: 'materialRodanteFormularioModel>/Condicoes',					
-					sorter: [{
-							path: 'Condicao', 
-							descending: false
-						}]
+					sorter: [{ path: 'IdCondicao',  descending: false }]
 				}"	>        
             <columns>
                 <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="30%">
