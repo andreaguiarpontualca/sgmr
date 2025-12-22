@@ -19,6 +19,7 @@ sap.ui.define([
             onInit: function () {
                 oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 oView.bindElement("layoutTelaModel>/");
                 oView.bindElement("criarUsuarioModel>/");

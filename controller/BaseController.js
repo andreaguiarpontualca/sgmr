@@ -2398,8 +2398,8 @@ sap.ui.define([
                         Objnr: oMedicao.Objnr,
                         Observacoes: oMedicao.Observacoes,
                         Pltxt: oMedicao.Pltxt,
-                        Roleteqtdeld: oMedicao.RoleteQtdeLD,
-                        Roleteqtdele: oMedicao.RoleteQtdeLE,
+                        Roleteqtdeld: oMedicao.RoleteQtdeLD?.toString() || "0",
+                        Roleteqtdele: oMedicao.RoleteQtdeLE?.toString() || "0",
                         Roletevazamento: oMedicao.RoleteVazamento,
                         Status: oMedicao.Status,
                         Tplnr: oMedicao.Tplnr,
@@ -2458,78 +2458,64 @@ sap.ui.define([
 
                 })
 
-                Promise.all(aAnexos).then(
-                    function (result) {
-                        aListaMedicaoes.MedicaoSet.forEach(oAnexo => {
-                            oAnexo.AnexosSet.forEach(element => {
-                                delete element.file
-                                element.ImString = result.find(oElement => oElement.id === element.id).ImString
+                Promise.all(aAnexos)
+                .then(result => {
+                    aListaMedicaoes.MedicaoSet.forEach(oAnexo => {
+                        oAnexo.AnexosSet.forEach(element => {
+                            delete element.file
+                            element.ImString = result.find(oElement => oElement.id === element.id).ImString
+                        });
+                    })
+                    aMedicoesSet.push(oController.enviarDados("ListaMedicaoSet", aListaMedicaoes))
+                    if (aListaMedicaoes.MedicaoSet.length > 0) {
+                        Promise.all(aMedicoesSet)
+                        .then(result => {
+                            const tipoStatus = {"S" : "Success", "E" : "Error"};
+                            result[0].MedicaoSet.results.forEach(element => {
+                                const aListaMedicoesRetorno = element.RetornoSet.results;
+                                const vInspecao             = element;
+                                const vStatus               = vInspecao.Status;
+                                aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
+                                    const vTipo     = tipoStatus[oMedicaoRetorno.Type] || "None";
+                                    const oMensagem = {
+                                        "title"       : "Medição",
+                                        "description" : oMedicaoRetorno.Message,
+                                        "type"        : vTipo,
+                                        "subtitle"    : oMedicaoRetorno.MessageV1
+                                    }
+                                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+                                    oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
+                                    oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
+                                    if (vStatus == 'E') {
+                                        oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao)
+                                    }
+                                });
                             });
 
-                        })
-                        aMedicoesSet.push(oController.enviarDados("ListaMedicaoSet", aListaMedicaoes))
-                        if (aListaMedicaoes.MedicaoSet.length > 0) {
-                            Promise.all(aMedicoesSet).then(
-                                function (result) {
-                                    result[0].MedicaoSet.results.forEach(element => {
-                                        var aListaMedicoesRetorno = element.RetornoSet.results
-                                        var vInspecao = element
-                                        var vStatus = vInspecao.Status
-                                        var vEquipamento = vInspecao.Equnr
-                                        aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
-                                            var vTipo
-                                            switch (oMedicaoRetorno.Type) {
-                                                case "S":
-                                                    vTipo = "Success"
-                                                    break;
-                                                case "E":
-                                                    vTipo = "Error"
-                                                    break;
-                                                default:
-                                                    vTipo = "None"
-                                                    break;
-                                            }
-                                            var oMensagem = {
-                                                "title": "Medição",
-                                                "description": oMedicaoRetorno.Message,
-                                                "type": vTipo,
-                                                "subtitle": oMedicaoRetorno.MessageV1
-                                            }
-                                            oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-                                            oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
-                                            oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
-                                            if (vStatus == 'E') {
-                                                oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao)
-                                            }
-                                        });
-
-                                    });
-
-                                    oController.sincronizarReceber().then(function () {
-                                        resolve()
-                                    }).catch(
-                                        function () {
-                                            resolve()
-                                        })
-
-                                }).catch(
-                                    function () {
-                                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                                        reject()
-                                    })
-                        } else {
-                            resolve()
-                        }
-                    }).catch(
-                        function (result) {
-                        })
-
+                            oController.sincronizarReceber()
+                            .then(result => {
+                                resolve(result);
+                            }).catch(result => {
+                                console.log("ERRO: sincronizarReceber() ===================");
+                                console.error(result);
+                                resolve(result);
+                            })
+                        }).catch(result => {
+                            // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
+                            console.log("ERRO: ===================");
+                            console.error(result);
+                            reject(result);
+                        });
+                    } else {
+                        console.log("ERRO: Lista de Medições vazia ===================");
+                        console.error(aListaMedicaoes);
+                        resolve();
+                    }
+                });
             })
         },
 
-
         prepararAnexo: function (pAnexo) {
-
             return new Promise((resolve, reject) => {
                 if (pAnexo.file) {
                     if (pAnexo.documentType == 'Arquivo Câmera') {
@@ -2542,13 +2528,10 @@ sap.ui.define([
                             var vContent = e.target.result.replace("data:" + pAnexo.mediaType + ";base64,", "")
                             pAnexo.ImString = vContent
                             resolve(pAnexo)
-
                         }.bind(this);
                         oReader.readAsDataURL(pAnexo.file);
                     }
-
                 }
-
             })
         },
 
@@ -2625,8 +2608,176 @@ sap.ui.define([
 
             // 4. Verificar se a diferença é de pelo menos 70 horas
             return diferencaEmHoras >= 70;
-        }
+        },
 
+        limpaZerosNoFoco: function(input) {
+            if (input.__zerosLimpos) {
+                return;
+            }
+            input.__zerosLimpos = true;
+            input.addEventDelegate({
+                onfocusin: function(oEvent) {
+                    const domInput = oEvent.target?.tagName === "INPUT" ? oEvent.target : input.getDomRef()?.querySelector("input");
+                    if (!domInput) {
+                        return;
+                    }
+                    setTimeout(() => domInput.select(), 10);
+                }
+            });
+        },
+
+        validaMedicao: function(parametro) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            var aMockMessages = parametro;
+            if (!Array.isArray(parametro)) {
+                aMockMessages = [];
+            }
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("None");
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText("");
+            
+            const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            if (oMedicao.MedEquipamento == null || oMedicao.MedEquipamento == "") {
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                aMockMessages.push({
+                    type: 'Error',
+                    title: oBundle.getText("campoobrigatorio"),
+                    description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
+                    subtitle: oBundle.getText("ultimoponto"),
+                    counter: 1
+                });
+            } else {
+                oMedicao.MedEquipamento = parseInt(oMedicao.MedEquipamento).toFixed(0);
+                var vMedEpto        = parseInt(oMedicao.MedEquipamento);
+                var vUltMedEqpto    = parseInt(oMedicao.UltMedEqpto);
+                var vDifMaxMedicoes = parseInt(oMedicao.DifMaxMedicoes);
+                if (vMedEpto < vUltMedEqpto) {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    aMockMessages.push({
+                        type: 'Error',
+                        title: oBundle.getText("ultimoponto"),
+                        description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
+                        subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
+                        counter: 1
+                    });
+                }
+
+                if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    aMockMessages.push({
+                        type: 'Error',
+                        title: oBundle.getText("diferencaomedicao"),
+                        description: oBundle.getText("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
+                        subtitle: oBundle.getText("medicao"),
+                        counter: 1
+                    });
+                }
+            }
+        },
+
+        validaDataMedicao: function(aMockMessages) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("None");
+            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText("");
+            
+            const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            if (oMedicao.Data == null || oMedicao.Data == "") {
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("Error");
+                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                aMockMessages.push({
+                    type: 'Error',
+                    title: oBundle.getText("campoobrigatorio"),
+                    description: oBundle.getText("preenchimentoobrigatorio", ["Data"]),
+                    subtitle: oBundle.getText("data"),
+                    counter: 1
+                });
+            } else {
+                var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
+                if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("Error");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                    aMockMessages.push({
+                        type: 'Error',
+                        title: oBundle.getText("limiteretroativo"),
+                        description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
+                        subtitle: oBundle.getText("limiteretroativo"),
+                        counter: 1
+                    });
+                }
+            }
+        },
+
+        validaVazamentoRoleteDireito: function(mensagens) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+            if (!blocoRoletes || blocoRoletes.length < 1) {
+                return;
+            }
+
+            const viewRoletes = blocoRoletes[0];
+            viewRoletes.byId("inputRoletesVazandoLD").setValueState("None");
+            viewRoletes.byId("inputRoletesVazandoLD").setValueStateText("");
+
+            const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            const valor  = Number(dados.RoleteQtdeLD);
+            const maximo = Number(dados.MaxRoleteQtdeLD);
+            const minimo = 0;
+
+            const limite         = valor > maximo ? maximo : minimo;
+            const mensagemLimite = valor > maximo ? "roletes.limite.maximo" : ( valor < minimo ? "roletes.limite.minimo" : "" );
+
+            if (!mensagemLimite) {
+                return
+            }
+
+            viewRoletes.byId("inputRoletesVazandoLD").setValueState("Error");
+            viewRoletes.byId("inputRoletesVazandoLD").setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+
+            mensagens.push({
+                type        : 'Error',
+                title       : oBundle.getText(mensagemLimite, [limite]),
+                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
+                subtitle    : oBundle.getText("roletes.lado.direito"),
+                counter     : 1
+            });
+        },
+
+        validaVazamentoRoleteEsquerdo: function(mensagens) {
+            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+            if (!blocoRoletes || blocoRoletes.length < 1) {
+                return;
+            }
+
+            const viewRoletes = blocoRoletes[0];
+            viewRoletes.byId("inputRoletesVazandoLE").setValueState("None");
+            viewRoletes.byId("inputRoletesVazandoLE").setValueStateText("");
+
+            const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            const valor  = Number(dados.RoleteQtdeLE);
+            const maximo = Number(dados.MaxRoleteQtdeLE);
+            const minimo = 0;
+
+            const limite         = valor > maximo ? maximo : minimo;
+            const mensagemLimite = valor > maximo ? "roletes.limite.maximo" : ( valor < minimo ? "roletes.limite.minimo" : "" );
+
+            if (!mensagemLimite) {
+                return
+            }
+
+            viewRoletes.byId("inputRoletesVazandoLE").setValueState("Error");
+            viewRoletes.byId("inputRoletesVazandoLE").setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+
+            mensagens.push({
+                type        : 'Error',
+                title       : oBundle.getText(mensagemLimite, [limite]),
+                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
+                subtitle    : oBundle.getText("roletes.lado.esquerdo"),
+                counter     : 1
+            });
+        }
 
     });
 });

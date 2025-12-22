@@ -19,64 +19,42 @@
             <f:layout>
                 <f:ResponsiveGridLayout
                     id="idResponsiveGridLayout_R220LC-9"
-                    labelSpanXL="4"
-                    labelSpanL="4"
-                    labelSpanM="12"
-                    labelSpanS="12"
                     adjustLabelSpan="false"
-                    emptySpanXL="0"
-                    emptySpanL="0"
-                    emptySpanM="0"
-                    emptySpanS="0"
-                    columnsXL="2"
-                    columnsL="2"
-                    columnsM="2"
                     singleContainerFullSize="false"
+                    labelSpanXL="4" labelSpanL="4" labelSpanM="12" labelSpanS="12"
+                    emptySpanXL="0" emptySpanL="0" emptySpanM="0"  emptySpanS="0"
+                    columnsXL="2"   columnsL="2"   columnsM="2"
                 />
             </f:layout>
             <f:formContainers>
-                <f:FormContainer
-                    id="idFormUltimaMedicao"
-                    title="{i18n>ultimamedicao}"
-                >
+                <f:FormContainer id="idFormUltimaMedicao" title="{i18n>ultimamedicao}" >
                     <f:formElements>
-                        <f:FormElement
-                            id="idFormElementOper"
-                            label="{i18n>ultimamedicao}"
-                        >
+                        <f:FormElement id="idFormElementOper" label="{i18n>ultimamedicao}" >
                             <f:fields>
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>UltMedEqpto}"
-                                    inverted="true"
+                                    inverted="false"
                                     state="Indication05"
                                 />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFormElementUltimaMedData"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFormElementUltimaMedData" label="{i18n>data}" >
                             <f:fields>
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>DtHrEqpto}"
-                                    inverted="true"
+                                    inverted="false"
                                     state="Indication05"
                                 />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
-                <f:FormContainer
-                    id="idFormMedicaoAtual"
-                    title="{i18n>dadosinspecao}"
-                >
+
+                <f:FormContainer id="idFormMedicaoAtual" title="{i18n>dadosinspecao}" >
                     <f:formElements>
-                        <f:FormElement
-                            id="idFEMedAtual"
-                            label="{i18n>ultimoponto}"
-                        >
+                        <f:FormElement id="idFEMedAtual" label="{i18n>ultimoponto}" >
                             <f:fields>
                                 <Input
                                     id="idInputMedEqpto"
@@ -86,6 +64,7 @@
                                     required="true"
                                     showClearIcon="true"
                                     width="100%"
+                                    change="validaMedicao"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -136,8 +115,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>TagE}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -149,8 +128,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>MedEsquerda}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -162,8 +141,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>DtHrEsq}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -179,8 +158,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>TagD}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -192,8 +171,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>MedDireita}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -205,14 +184,14 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>DtHrDir}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
-                <f:FormContainer title="{i18n>truckesquerda}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
+                <f:FormContainer title="{i18n>truckesquerda}" visible="{= !!${materialRodanteFormularioModel>TruckDireita} &amp;&amp; !!${materialRodanteFormularioModel>TruckEsquerda} &amp;&amp;  ${materialRodanteFormularioModel>VisibilidadeTAG} }">
                     <f:formElements>
                         <f:FormElement
                             id="idFETAGTruckE"
@@ -222,8 +201,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>TruckEsquerda}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -235,8 +214,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>MedTruckEsquerda}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -248,14 +227,14 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>DtHrTruckEsq}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
-                <f:FormContainer title="{i18n>truckdireita}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
+                <f:FormContainer title="{i18n>truckdireita}" visible="{= !!${materialRodanteFormularioModel>TruckDireita} &amp;&amp; !!${materialRodanteFormularioModel>TruckEsquerda} &amp;&amp;  ${materialRodanteFormularioModel>VisibilidadeTAG}}">
                     <f:formElements>
                         <f:FormElement
                             id="idFETAGTruckD"
@@ -265,8 +244,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>TruckDireita}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -278,8 +257,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>MedTruckDireita}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>
@@ -291,8 +270,8 @@
                                 <ObjectStatus
                                     class="sapMObjectStatusMedium"
                                     text="{materialRodanteFormularioModel>DtHrTruckDir}"
-                                    inverted="true"
-                                    state="Indication05"
+                                    inverted="false"
+                                    state="None"
                                 />
                             </f:fields>
                         </f:FormElement>

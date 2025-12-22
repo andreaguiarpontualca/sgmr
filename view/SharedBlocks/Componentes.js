@@ -2,7 +2,7 @@ sap.ui.define(['sap/uxap/BlockBase'],
 	function (BlockBase) {
 		"use strict";
 
-		var BlockBlueT1 = BlockBase.extend("com.pontual.sgmr.view.SharedBlocks.Componentes", {
+		return BlockBase.extend("com.pontual.sgmr.view.SharedBlocks.Componentes", {
 			metadata: {
 				views: {
 					Collapsed: {
@@ -16,7 +16,5 @@ sap.ui.define(['sap/uxap/BlockBase'],
 				}
 			}
 		});
-
-		return BlockBlueT1;
 
 	});

@@ -6,7 +6,7 @@
     xmlns="sap.m"
 >
     <Page
-        id="pageInicio"
+        id="pageMenuInicio"
         title="{i18n>title}"
         titleAlignment="Center"
         showNavButton="false"
@@ -14,23 +14,21 @@
         navButtonText="Sair"
         icon="sap-icon://visits"
         navButtonPress="onNavBack"
-        class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
+        class="sapUiSizeCozy sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
     >
         <headerContent>
+            <Button
+                tooltip="{i18n>sair}"
+                icon="sap-icon://log"
+                press="onSairApp"
+                type="Transparent"
+            />
             <ObjectStatus
                 id="networkStatus"
                 active="false"
                 inverted="true"
-                icon="{path: 'conexaoModel>statusConexao',
-                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
-                state="{path: 'conexaoModel>statusConexao',
-                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
-            />
-            <Button
-                tooltip="{i18n>sair}"
-                icon="sap-icon://visits"
-                press="onSairApp"
-                type="Attention"
+                icon="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
             />
         </headerContent>
         <content>
@@ -52,36 +50,9 @@
                 alignContent="Center"
             >
                 <items>
-                    <Button
-                        id="entrarMaterialRodanteButton"
-                        width="12rem"
-                        text="{i18n>inspecionar}"
-                        type="Emphasized"
-                        press="onEntrarMaterialRodante"
-                        icon="sap-icon://cargo-train"
-                        class="sapUiSmallMarginBottom"
-                        visible="{acessosModel>materialrodante}"
-                    />
-                    <Button
-                        id="entrarAdministrativoButton"
-                        width="12rem"
-                        text="{i18n>administrativo}"
-                        type="Emphasized"
-                        press="onEntrarAdministrativo"
-                        icon="sap-icon://account"
-                        class="sapUiSmallMarginBottom"
-                        visible="{acessosModel>administrativo}"
-                    />
-                    <Button
-                        id="inicioSincronismoButton"
-                        width="12rem"
-                        text="Sincronizar"
-                        type="Emphasized"
-                        press="onSincronizar"
-                        icon="sap-icon://synchronize"
-                        class="sapUiSmallMarginBottom"
-                        visible="true"
-                    />
+                    <Button id="entrarMaterialRodanteButton" width="12rem" text="{i18n>inspecionar}"    type="Default" press="onEntrarMaterialRodante" icon="sap-icon://inspection"  visible="{acessosModel>materialrodante}" />
+                    <Button id="entrarAdministrativoButton"  width="12rem" text="{i18n>administrativo}" type="Default" press="onEntrarAdministrativo"  icon="sap-icon://account"     visible="{acessosModel>administrativo}" class="sapUiSmallMarginBottom"/>
+                    <Button id="inicioSincronismoButton"     width="12rem" text="Sincronizar"           type="Neutral" press="onSincronizar"           icon="sap-icon://synchronize" visible="true" class="sapUiSmallMarginBottom"/>
                 </items>
             </VBox>
         </content>

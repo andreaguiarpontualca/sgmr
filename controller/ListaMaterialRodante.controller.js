@@ -23,6 +23,7 @@ sap.ui.define([
 
                 oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 oView.bindElement("listaEquipamentoModel>/");
                 oView.bindElement("layoutTelaModel>/");

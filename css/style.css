@@ -1,1 +1,100 @@
 /* Enter your custom styles here */
+
+.pontualSGMRNoPadding {
+    padding: 0 !important;
+}
+
+.ptlgmr {
+    background-image: url("img/login/tela_desktop_clean_1920x1080px.png");
+}
+
+.ptlgmr .formLogin {
+    padding-right: 20rem;
+}
+
+.ptlgmr .myCustomInput .sapMInputBabseContentWrapper {
+    border: .0625rem solid rgb(5, 2, 26);
+    background: #fff;
+}
+
+.ptlgmr .titulo.sapMTitle  {
+    color: rgb(250, 181, 40);
+    font-size: 2rem;
+}
+
+.ptlgmr .myCustomInput .sapMInputBaseInner {
+    background: white;
+    border: none;
+    font-style: normal;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    font-size: .875rem;
+    font-family: "72","72full",Arial,Helvetica,sans-serif;
+    line-height: normal;
+    padding: 0 .625rem;
+    height: 100%;
+    box-sizing: border-box;
+    min-width: 2.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: inherit;
+    border: 0px solid rgb(5, 2, 26);
+    border-bottom: 5px solid;
+    border-color: rgb(250, 181, 49);
+    text-transform: none; 
+}
+
+.ptlgmr .myCustomButton {
+    width: 20rem !important;
+}
+
+.ptlgmr .myCustomLabel .sapMLabel .sapMLabelTextWrapper {
+    text-overflow: ellipsis;
+    color: rgb(250, 181, 49);
+    overflow: hidden;
+}
+
+.ptlgmr .myCustomButton .sapMBtnInner{
+    border: 0px solid #ababab;
+    border-bottom: 5px solid;
+    border-top: 5px solid;
+    border-left: 5px solid;
+    border-right: 5px solid;        
+    border-color: rgb(250, 181, 49);
+    vertical-align: middle;
+    font-size: 14px;
+    align-items: center;
+    background-color: rgb(250, 181, 49);
+    color: white;
+    
+}
+
+.ptlgmr .myCustomButton .sapMBtnInner:hover{
+    background-color: white;
+    color: white;
+    
+}
+
+.ptlgmr .myCustomButton .sapMInputBaseIconContainer {
+    border-bottom: 5px rgb(250, 181, 49) solid;
+    height: auto;
+}
+
+.ptlgmr .sapMInputBaseInner:not(.sapMInputBaseReadonlyWrapper):not(.sapMInputBaseContentWrapperState):focus+.sapMInputBaseIconContainer {
+    border-color: #89919a;
+}
+
+@media ((max-width:879px) and (orientation: portrait)) or 
+       ((max-width:665px) and (orientation: landscape)) {
+    .ptlgmr .formLogin {
+        padding-right: 0;
+    }
+
+    .ptlgmr .myCustomButton {
+        width: 12rem !important;
+    }
+
+    .ptlgmr .titulo.sapMTitle  {
+        font-size: 1.2rem;
+    }
+}

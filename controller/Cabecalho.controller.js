@@ -30,7 +30,5 @@ sap.ui.define([
                 this.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
             },
 
-
-
         });
     });

@@ -22,7 +22,6 @@ sap.ui.define([
         return Controller.extend("com.pontual.sgmr.controller.Formulario", {
 
             onInit: function () {
-
                 try {
                     oController = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario").getController();
                 } catch (error) {
@@ -30,6 +29,7 @@ sap.ui.define([
                 }
 
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -40,7 +40,6 @@ sap.ui.define([
 
                 this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this._oRouter.getRoute("Formulario").attachMatched(this._handleRouteMatched, this);
-
             },
 
             _handleRouteMatched: function (oEvent) {
@@ -57,29 +56,21 @@ sap.ui.define([
                 if (oEquipamento.FormularioCarregado != true) {
                     oEquipamento.FormularioCarregado = true
                     oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").setData(oEquipamento)
-                    oController.lerTabelaIndexDB("tb_medicao").then(
-                        function (result) {
-                            var aMedicoes = result.tb_medicao
-                            var oMedicaoEncontrada = aMedicoes.find((oElement) => oEquipamento.Equnr == oElement.Equnr);
+                    oController.lerTabelaIndexDB("tb_medicao")
+                    .then(result => {
+                        var aMedicoes = result.tb_medicao
+                        var oMedicaoEncontrada = aMedicoes.find((oElement) => oEquipamento.Equnr == oElement.Equnr);
 
-                            if (oMedicaoEncontrada != undefined) {
-                                oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oMedicaoEncontrada);
-                            } else {
+                        if (oMedicaoEncontrada != undefined) {
+                            oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oMedicaoEncontrada);
+                        } else {
 
-                                oController.carregarElementosFormularios()
-                            }
+                            oController.carregarElementosFormularios()
+                        }
 
-                        }).catch(function (result) {
-
-                        })
-                    try {
-                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("None");
-                        sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText("");
-                    } catch (error) {
-                        sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("None");
-                        sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText("");
-                    }
-
+                    });
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("None");
+                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText("");
                 }
             },
 
@@ -137,122 +128,39 @@ sap.ui.define([
                 oMessagePopover.toggle(oEvent.getSource());
             },
 
+            atualizaTotalRoletes: function(oEvent) {
+                const valor = oEvent.getParameter('state');
+                if (!valor) {
+                    const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+                    dados.RoleteQtdeLD = "0";
+                    dados.RoleteQtdeLE = "0";
+                }
+            },
 
-            validarFormulario: function (pMedicao) {
+            controlaIndicadorVazamento: function(oEvent) {
+                const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+                const valorDireito  = Number(dados.RoleteQtdeLD);
+                const valorEsquerdo = Number(dados.RoleteQtdeLE);
+                dados.RoleteVazamento = valorDireito > 0 || valorEsquerdo > 0;
+            },
+
+
+            validarFormulario: function () {
                 return new Promise((resolve, reject) => {
-                    aMockMessages = []
-                    var vValido = true;
-                    var vAlerta = false;
+                    const pMedicao      = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+                    aMockMessages       = [];
+                    var vValido         = true;
+                    var vAlerta         = false;
                     var vMensagemAlerta = "";
-                    if (pMedicao.Data == null || pMedicao.Data == "") {
-                        try {
-                            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("Error");
-                            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText(oBundle.getText("campoobrigatorio"));
-                        } catch (error) {
-                            sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("Error");
-                            sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText(oBundle.getText("campoobrigatorio"));
-                        }
+                    
+                    //-- Validações no BaseController par acompartilhar com os blocos do form --//
+                    oController.validaMedicao(aMockMessages);
+                    oController.validaDataMedicao(aMockMessages);
+                    oController.validaVazamentoRoleteDireito(aMockMessages);
+                    oController.validaVazamentoRoleteEsquerdo(aMockMessages);
 
-
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oBundle.getText("campoobrigatorio"),
-                            description: oBundle.getText("preenchimentoobrigatorio", ["Data"]),
-                            subtitle: oBundle.getText("data"),
-                            counter: 1
-                        };
-                        aMockMessages.push(oMockMessage)
-
-                        vValido = false;
-                    } else {
-                        var vLimiteRetroativo = parseInt(pMedicao.LimiteRetroativo)
-                        if (oController.verificarDiferencaHoras(vLimiteRetroativo, pMedicao.Data)) {
-                            try {
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText(oBundle.getText("campoobrigatorio"));
-                            } catch (error) {
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputData").setValueStateText(oBundle.getText("campoobrigatorio"));
-                            }
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oBundle.getText("limiteretroativo"),
-                                description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
-                                subtitle: oBundle.getText("limiteretroativo"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
-
-                            vValido = false;
-                        }
-
-                    }
-
-                    if (pMedicao.MedEquipamento == null || pMedicao.MedEquipamento == "") {
-                        try {
-                            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("campoobrigatorio"));
-                        } catch (error) {
-                            sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                            sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("campoobrigatorio"));
-                        }
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oBundle.getText("campoobrigatorio"),
-                            description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
-                            subtitle: oBundle.getText("ultimoponto"),
-                            counter: 1
-                        };
-                        aMockMessages.push(oMockMessage)
-
-                        vValido = false;
-                    } else {
-                        var vMedEpto = parseInt(pMedicao.MedEquipamento)
-                        var vUltMedEqpto = parseInt(pMedicao.UltMedEqpto)
-                        var vDifMaxMedicoes = parseInt(pMedicao.DifMaxMedicoes)
-
-                        if (vMedEpto < vUltMedEqpto) {
-                            try {
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
-                            } catch (error) {
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
-                            }
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oBundle.getText("ultimoponto"),
-                                description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
-                                subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
-
-                            vValido = false;
-                        }
-
-                        if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
-                            try {
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
-                            } catch (error) {
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueState("Error");
-                                sap.ui.getCore().byId("container-com.pontual.SGMR---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto").setValueStateText(oBundle.getText("valormenor"));
-                            }
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oBundle.getText("diferencaomedicao"),
-                                description: oBundle.getText("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
-                                subtitle: oBundle.getText("medicao"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
-
-                            vValido = false;
-                        }
-
-                    }
-
+                    vValido = aMockMessages.length < 1;
+                  
                     var aComponentes = oController.agruparPorCampo(pMedicao.Componentes, "ComponenteLado")
                     aComponentes.forEach(oComponente => {
                         var aCompMedNaoInformada = pMedicao.Componentes.filter(c => c.ComponenteLado == oComponente.key && c.Valormedido == 0);
@@ -277,15 +185,12 @@ sap.ui.define([
                                 if (element.ComponenteLado == oComp.ComponenteLado) {
                                     element.ValorMedidoValueState = 'Warning'
                                 }
-
                             });
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty("/Componentes", pMedicao.Componentes)
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
 
                             vAlerta = true;
-                        } else {
-
                         }
                     });
 
@@ -295,34 +200,27 @@ sap.ui.define([
                         switch (oComponente.Ordenacao) {
                             case "D":
                                 if (vValorMedido != 0 && vValorMedido > vUltimoValorMedido) {
-                                    var oMockMessage = {
+                                    aMockMessages.push({
                                         type: 'Error',
                                         title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
                                         description: oBundle.getText("valormaiormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
                                         subtitle: oBundle.getText("medicao"),
                                         counter: 1
-                                    };
-                                    aMockMessages.push(oMockMessage)
-
+                                    });
                                     oComponente.ValorMedidoValueState = 'Error'
-
                                     vValido = false;
                                 }
-
                                 break;
                             case "C":
                                 if (vValorMedido != 0 && vValorMedido < vUltimoValorMedido) {
-                                    var oMockMessage = {
+                                    aMockMessages.push({
                                         type: 'Error',
                                         title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
                                         description: oBundle.getText("valormenormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
                                         subtitle: oBundle.getText("medicao"),
                                         counter: 1
-                                    };
-                                    aMockMessages.push(oMockMessage)
-
+                                    })
                                     oComponente.ValorMedidoValueState = 'Error'
-
                                     vValido = false;
                                 }
                                 break;
@@ -345,70 +243,50 @@ sap.ui.define([
 
                     if (vValido) {
                         if (vAlerta) {
-
                             MessageBox.warning(vMensagemAlerta, {
-                                title: oBundle.getText("confirmacao"),               // default
-                                styleClass: "",                                      // default
-                                actions: [sap.m.MessageBox.Action.OK],         // default
-                                emphasizedAction: sap.m.MessageBox.Action.OK,        // default
-                                initialFocus: null,                                  // default
-                                textDirection: sap.ui.core.TextDirection.Inherit,    // default
+                                title: oBundle.getText("confirmacao"),
+                                actions: [sap.m.MessageBox.Action.OK],
                                 onClose: function (sAction) {
                                     if (sAction == 'OK') {
-                                        resolve()
+                                        resolve();
                                     }
                                 }
                             });
-
                         } else {
-                            return resolve()
+                            return resolve();
                         }
-
                     } else {
-                        reject()
+                        reject();
                     }
-                })
+                });
             },
 
-            onCancelar: function (oEvent) {
+            onCancelar: function () {
                 MessageBox.confirm(oBundle.getText("cancelargravacao"), {
-                    title: oBundle.getText("cancelar"),               // default
-                    styleClass: "",                                      // default
-                    actions: [sap.m.MessageBox.Action.OK,
-                    sap.m.MessageBox.Action.CANCEL],         // default
-                    emphasizedAction: sap.m.MessageBox.Action.OK,        // default
-                    initialFocus: null,                                  // default
-                    textDirection: sap.ui.core.TextDirection.Inherit,    // default
-                    onClose: function (sAction) {
+                    title            : oBundle.getText("cancelar"),
+                    actions          : [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                    emphasizedAction : sap.m.MessageBox.Action.OK,
+                    onClose          : function (sAction) {
                         if (sAction == 'OK') {
-                            oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
-
-                        } else if (sAction == "CANCEL") {
-
-                            return;
+                            oController.getRouter().navTo("ListaMaterialRodante", {}, true);
                         }
                     }
                 });
             },
 
             onConfirmar: function (oEvent) {
-                MessageBox.confirm(oBundle.getText("confirmagravacao"), {
-                    title: oBundle.getText("confirmacao"),               // default
-                    styleClass: "",                                      // default
-                    actions: [sap.m.MessageBox.Action.OK,
-                    sap.m.MessageBox.Action.CANCEL],         // default
-                    emphasizedAction: sap.m.MessageBox.Action.OK,        // default
-                    initialFocus: null,                                  // default
-                    textDirection: sap.ui.core.TextDirection.Inherit,    // default
-                    onClose: function (sAction) {
-                        if (sAction == 'OK') {
-                            oController.confirmar(oEvent)
-
-                        } else if (sAction == "CANCEL") {
-
-                            return;
+                oController.validarFormulario()
+                .then(() => {
+                    MessageBox.confirm(oBundle.getText("confirmagravacao"), {
+                        title            : oBundle.getText("confirmacao"),
+                        actions          : [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                        emphasizedAction : sap.m.MessageBox.Action.OK,
+                        onClose          : sAction => {
+                            if (sAction == 'OK') {
+                                oController.confirmar(oEvent);
+                            }
                         }
-                    }
+                    });
                 });
             },
 
@@ -418,76 +296,54 @@ sap.ui.define([
                 oView.byId("cancelarButton").setEnabled(false);
                 oView.byId("cancelarButton").setBusy(true);
 
-                oMedicao = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getObject();
+                var oMedicao = oEvent.getSource().getBindingContext("materialRodanteFormularioModel").getObject();
+                oController.lerTabelaIndexDB("tb_medicao")
+                .then(result => {
+                    var aMedicoes = result.tb_medicao;
+                    if (oMedicao.Uuid == "") {
+                        oMedicao.Uuid = uid();
+                        oMedicao.VisibilidadeRetorno = true;
+                        aMedicoes.push(oMedicao);
+                    } else {
+                        var vIdx = aMedicoes.findIndex((oElement) => oMedicao.Uuid == oElement.Uuid);
+                        aMedicoes[vIdx] = oMedicao
+                    }
+                    oController.limparTabelaIndexDB("tb_medicao")
+                    .then(() => {
+                        oController.gravarTabelaIndexDB("tb_medicao", aMedicoes)
+                        .then(() => {
+                            if (oController.checkConnection() == true) {
+                                oController.medicaoUpdate()
+                                .then(() => {
+                                    oController.closeBusyDialog();
+                                    oView.byId("confirmarButton").setEnabled(true);
+                                    oView.byId("confirmarButton").setBusy(false);
+                                    oView.byId("cancelarButton").setEnabled(true);
+                                    oView.byId("cancelarButton").setBusy(false);
+                                    oController.getRouter().navTo("ListaMaterialRodante", {}, true);
+                                }).catch(() => {
+                                    oView.byId("confirmarButton").setEnabled(true);
+                                    oView.byId("confirmarButton").setBusy(false);
+                                    oView.byId("cancelarButton").setEnabled(true);
+                                    oView.byId("cancelarButton").setBusy(false);
+                                    oController.getRouter().navTo("ListaMaterialRodante", {}, true);
+                                });
+                            } else {
+                                oController.closeBusyDialog();
+                                oView.byId("confirmarButton").setEnabled(true);
+                                oView.byId("confirmarButton").setBusy(false);
+                                oView.byId("cancelarButton").setEnabled(true);
+                                oView.byId("cancelarButton").setBusy(false);
+                                oController.getRouter().navTo("ListaMaterialRodante", {}, true);
+                            }
+                        });
+                    });
+                });
+            },
 
-                oController.validarFormulario(oMedicao).then(
-                    function () {
-                        oController.lerTabelaIndexDB("tb_medicao").then(
-                            function (result) {
-                                var aMedicoes = result.tb_medicao
-                                if (oMedicao.Uuid == "") {
-                                    oMedicao.Uuid = uid()
-                                    oMedicao.VisibilidadeRetorno = true
-                                    aMedicoes.push(oMedicao)
-                                } else {
-                                    var vIdx = aMedicoes.findIndex((oElement) => oMedicao.Uuid == oElement.Uuid);
-                                    aMedicoes[vIdx] = oMedicao
-                                }
-                                oController.limparTabelaIndexDB("tb_medicao").then(
-                                    function (result) {
-                                        oController.gravarTabelaIndexDB("tb_medicao", aMedicoes).then(
-                                            function (result) {
-                                                MessageToast.show(oController.getView().getModel("i18n").getResourceBundle().getText("dadossucesso"), {
-                                                    duration: 500,                  // default
-                                                    onClose: function () {
-                                                        if (oController.checkConnection() == true) {
-                                                            oController.medicaoUpdate().then(
-                                                                function (result) {
-                                                                    oController.closeBusyDialog();
-                                                                    oView.byId("confirmarButton").setEnabled(true);
-                                                                    oView.byId("confirmarButton").setBusy(false);
-                                                                    oView.byId("cancelarButton").setEnabled(true);
-                                                                    oView.byId("cancelarButton").setBusy(false);
-                                                                    oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
-                                                                }).catch(
-                                                                    function (result) {
-                                                                        oView.byId("confirmarButton").setEnabled(true);
-                                                                        oView.byId("confirmarButton").setBusy(false);
-                                                                        oView.byId("cancelarButton").setEnabled(true);
-                                                                        oView.byId("cancelarButton").setBusy(false);
-                                                                        oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
-                                                                    })
-
-                                                        } else {
-                                                            oController.closeBusyDialog();
-                                                            oView.byId("confirmarButton").setEnabled(true);
-                                                            oView.byId("confirmarButton").setBusy(false);
-                                                            oView.byId("cancelarButton").setEnabled(true);
-                                                            oView.byId("cancelarButton").setBusy(false);
-                                                            oController.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
-
-                                                        }
-                                                    }
-                                                });
-                                            }).catch(
-                                                function (result) {
-                                                })
-                                    }).catch(
-                                        function (result) {
-                                        })
-
-                            }).catch(
-                                function (result) {
-
-                                })
-                    }).catch(
-                        function () {
-                            oView.byId("confirmarButton").setEnabled(true);
-                            oView.byId("confirmarButton").setBusy(false);
-                            oView.byId("cancelarButton").setEnabled(true);
-                            oView.byId("cancelarButton").setBusy(false);
-                        })
-
+            somaRoletes: function(componente, total) {
+                total.direito  += ((componente.IdComponente === "RIN" || componente.IdComponente === "RSU") && componente.IdLado === "LD") ? 1 : 0;
+                total.esquerdo += ((componente.IdComponente === "RIN" || componente.IdComponente === "RSU") && componente.IdLado === "LD") ? 1 : 0;
             },
 
             carregarElementosFormularios: function (aFormularios) {
@@ -504,8 +360,12 @@ sap.ui.define([
                             var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
                             var aComponentesCombo = []
-                            var aListaInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
-                            var aListaCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            var aListaInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            var aListaCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm);
+                            const totalRoletes = {
+                                direito  : 0,
+                                esquerdo : 0
+                            }
 
                             aListaComponetes.forEach(element => {
                                 element.Valormedido = 0
@@ -520,7 +380,8 @@ sap.ui.define([
                                     element.ValorMedidoStatus = 'Indication02'
                                 }
 
-                                element.PercDesgasteValueState = 'Indication05'  //Azul                              
+                                element.PercDesgasteValueState = 'Indication05'  //Azul
+                                oController.somaRoletes(element, totalRoletes);
                             });
 
                             aListaComponentesCombo.forEach(element => {
@@ -530,24 +391,13 @@ sap.ui.define([
                                 })
                             })
 
-                            aComponentesCombo.push({
-                                key: 'Todos',
-                                text: 'Todos'
-                            })
+                            aComponentesCombo.push({ key: 'Todos', text: 'Todos' });
 
                             var aLadosCombo = [
-                                {
-                                    key: "Ambos",
-                                    text: "Ambos"
-                                },
-                                {
-                                    key: "Lado Direito",
-                                    text: "Lado Direito"
-                                },
-                                {
-                                    key: "Lado Esquerdo",
-                                    text: "Lado Esquerdo"
-                                }]
+                                { key: "Ambos",         text: "Ambos" },
+                                { key: "Lado Direito",  text: "Lado Direito" },
+                                { key: "Lado Esquerdo", text: "Lado Esquerdo" }
+                            ];
 
 
                             aListaCondicoes.forEach(element => {
@@ -555,56 +405,47 @@ sap.ui.define([
                             });
 
                             var aNiveisCombo = [
-                                {
-                                    key: "Não Informada",
-                                    text: "Não Informada"
-                                },
-                                {
-                                    key: "Alta",
-                                    text: "Alta"
-                                },
-                                {
-                                    key: "Moderada",
-                                    text: "Moderada"
-                                },
-                                {
-                                    key: "Baixa",
-                                    text: "Baixa"
-                                }]
+                                { key: "Não Informada", text: "Não Informada" },
+                                { key: "Alta",          text: "Alta" },
+                                { key: "Moderada",      text: "Moderada" },
+                                { key: "Baixa",         text: "Baixa" }
+                            ];
 
-                            var oFormulario = JSON.parse(JSON.stringify(oEquipamento));
+                            const oFormulario = JSON.parse(JSON.stringify(oEquipamento));
+                            oFormulario.Uuid  = "";
+                            oFormulario.Data  = new Date();
 
-                            oFormulario.Uuid = ""
-                            oFormulario.Data = new Date();
-
-                            oFormulario.UltMedEqpto = oFormulario.UltMedEqpto
-                            oFormulario.DtHrEqpto = oFormulario.DtHrEqpto;
-                            oFormulario.TagE = oFormulario.TagEsquerda;
-                            oFormulario.TagD = oFormulario.TagDireita;
-                            oFormulario.HorimetroE = oFormulario.MedEsquerda;
-                            oFormulario.HorimetroD = oFormulario.MedDireita;
-                            oFormulario.DtHrDir = oFormulario.DtHrDir;
-                            oFormulario.DtHrEsq = oFormulario.DtHrEsq;
-                            oFormulario.Componentes = aListaComponetes;
-                            oFormulario.ComponentesCombo = aComponentesCombo
-                            oFormulario.ComponenteSelecionado = "Todos"
-                            oFormulario.LadoCombo = aLadosCombo
-                            oFormulario.LadoSelecionado = "Ambos"
-                            oFormulario.Condicoes = aListaCondicoes;
-                            oFormulario.NivelCombo = aNiveisCombo;
-                            oFormulario.RoleteVazamento = false;
-                            oFormulario.RoleteQtdeLD = "0";
-                            oFormulario.RoleteQtdeLE = "0";
-                            oFormulario.Inspecoes = aListaInspecoes;
-                            oFormulario.Observacoes = "";
-                            oFormulario.items = [];
-                            oFormulario.Status = "P";
-                            oFormulario.Retorno = [];
-                            oFormulario.VisibilidadeRetorno = false
-                            oFormulario.VisibilidadeInformacoes = true
-                            oFormulario.VisibilidadeTAG = true
+                            oFormulario.UltMedEqpto             = oFormulario.UltMedEqpto;
+                            oFormulario.DtHrEqpto               = oFormulario.DtHrEqpto;
+                            oFormulario.TagE                    = oFormulario.TagEsquerda;
+                            oFormulario.TagD                    = oFormulario.TagDireita;
+                            oFormulario.HorimetroE              = oFormulario.MedEsquerda;
+                            oFormulario.HorimetroD              = oFormulario.MedDireita;
+                            oFormulario.DtHrDir                 = oFormulario.DtHrDir;
+                            oFormulario.DtHrEsq                 = oFormulario.DtHrEsq;
+                            oFormulario.Componentes             = aListaComponetes;
+                            oFormulario.ComponentesCombo        = aComponentesCombo;
+                            oFormulario.ComponenteSelecionado   = "Todos";
+                            oFormulario.LadoCombo               = aLadosCombo;
+                            oFormulario.LadoSelecionado         = "Ambos";
+                            oFormulario.Condicoes               = aListaCondicoes;
+                            oFormulario.NivelCombo              = aNiveisCombo;
+                            oFormulario.RoleteVazamento         = false;
+                            oFormulario.RoleteQtdeLD            = "0";
+                            oFormulario.RoleteQtdeLE            = "0";
+                            oFormulario.MaxRoleteQtdeLD         = totalRoletes.direito;
+                            oFormulario.MaxRoleteQtdeLE         = totalRoletes.esquerdo;
+                            oFormulario.Inspecoes               = aListaInspecoes;
+                            oFormulario.Observacoes             = "";
+                            oFormulario.items                   = [];
+                            oFormulario.Status                  = "P";
+                            oFormulario.Retorno                 = [];
+                            oFormulario.VisibilidadeRetorno     = false;
+                            oFormulario.VisibilidadeInformacoes = true;
+                            oFormulario.VisibilidadeTAG         = true;
 
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oFormulario);
+                            oController.inicializaCamposNumericos();
 
                             resolve();
                         }
@@ -612,14 +453,30 @@ sap.ui.define([
                 })
             },
 
+            onAfterRendering: function(oEvent) {
+                oController.inicializaCamposNumericos();
+            },
+
+            inicializaCamposNumericos: function() {
+                const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+                if (!blocoRoletes || blocoRoletes.length < 1) {
+                    return;
+                }
+				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLD");
+				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLE");
+			},
+
+            inicializaLimpezaFoco: function(bloco, id) {
+				const input = bloco.byId(id);
+				if (!input) {
+					return;
+				};
+                oController.limpaZerosNoFoco(input);
+            },
+
             agruparComponentes: function (pData) {
-                // Input array
-                const data = pData;
-
-                // result array
+                const data      = pData;
                 const resultArr = [];
-
-                // grouping by location and resulting with an object using Array.reduce() method
                 const groupByLocation = data.reduce((group, item) => {
                     const { Componente } = item;
                     group[Componente] = group[Componente] ?? [];
@@ -642,8 +499,6 @@ sap.ui.define([
                 });
 
                 return resultArr;
-
             }
-
         });
     });

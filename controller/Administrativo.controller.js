@@ -16,6 +16,7 @@ sap.ui.define([
                 oController = this;
                 oController.oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCozy");
 
                 oView.bindElement("conexaoModel>/");
                 oView.bindElement("busyDialogModel>/");

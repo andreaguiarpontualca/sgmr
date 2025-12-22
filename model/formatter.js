@@ -128,11 +128,11 @@ sap.ui.define(function () {
 		getOrdencaoIcone: function (value) {
 			switch (value) {
 				case "D":
-					return "sap-icon://trend-down"
+					return "sap-icon://arrow-bottom"
 				case "C":
-					return "sap-icon://trend-up"
+					return "sap-icon://arrow-top"
 				default:
-					return "sap-icon://arrow-right"
+					return "sap-icon://sort"
 			}
 		},							
 

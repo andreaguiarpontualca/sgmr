@@ -17,6 +17,7 @@ sap.ui.define([
 
                 oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 // var oPerfil = [{
                 //     CodigoPerfil: 0,

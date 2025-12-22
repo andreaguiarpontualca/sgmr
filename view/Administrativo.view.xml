@@ -14,7 +14,7 @@
 				tooltip="{i18n>sincronizar}"
 				icon="sap-icon://synchronize"
 				press="onSincronizar"
-                type="Emphasized"/>	
+                type="Neutral"/>	
             <ObjectStatus
                 id="networkStatus"
                 active="false"
@@ -28,8 +28,8 @@
 		<content>
             <VBox fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center">
                 <items>                    
-                <Button id="entrarPerfilButton" width="12rem" text="{i18n>perfil}" type="Emphasized" press="onEntrarPerfil" icon="sap-icon://business-card" class="sapUiSmallMarginBottom" visible="{acessosModel>perfil}"></Button>
-                <Button id="entrarUsuarioButton" width="12rem" text="{i18n>usuario}" type="Emphasized" press="onEntrarUsuario" icon="sap-icon://person-placeholder" class="sapUiSmallMarginBottom" visible="{acessosModel>usuario}"></Button>                
+                <Button id="entrarPerfilButton" width="12rem" text="{i18n>perfil}" type="Default" press="onEntrarPerfil" icon="sap-icon://business-card" class="sapUiSmallMarginBottom" visible="{acessosModel>perfil}" />
+                <Button id="entrarUsuarioButton" width="12rem" text="{i18n>usuario}" type="Default" press="onEntrarUsuario" icon="sap-icon://person-placeholder" class="sapUiSmallMarginBottom" visible="{acessosModel>usuario}" />
                 <!-- <Button id="associarButton" width="12rem" text="{i18n>associarformulariotitle}" type="Emphasized" press="onAssociarFormulario" icon="sap-icon://form" class="sapUiSmallMarginBottom" visible="{acessosModel>associar}"></Button>   -->                                      
                 <!-- <Button id="sincronismoButton" width="12rem" text="Sincronizar" type="Emphasized" press="onSincronizar" icon="sap-icon://synchronize" class="sapUiSmallMarginBottom" visible="{acessosModel>sincronizar}"></Button>   -->                                              
                 </items>

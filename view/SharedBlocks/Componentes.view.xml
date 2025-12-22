@@ -7,7 +7,7 @@
     displayBlock="true"
 >
     <VBox
-        id="idComponente"
+        id="idTabelaComponentes"
         class="sapUiSmallMargin"
     >
         <Table
@@ -31,9 +31,9 @@
 				}"
         >
             <headerToolbar>
-                <OverflowToolbar id="otbSubheader">
+                <OverflowToolbar class="pontualSGMRNoPadding">
                     <ComboBox
-                        width="35%"
+                        width="30%"
                         selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}"
                         change="onFiltroChange"
                         items="{
@@ -47,7 +47,7 @@
                         />
                     </ComboBox>
                     <ComboBox
-                        width="35%"
+                        width="30%"
                         selectedKey="{materialRodanteFormularioModel>LadoSelecionado}"
                         change="onFiltroChange"
                         items="{
@@ -61,7 +61,7 @@
                         />
                     </ComboBox>
                     <CheckBox
-                        text="Informações"
+                        text="{= !!${device>/system/phone} ? 'Info.' : 'Informações' }"
                         valueState="Information"
                         enabled="true"
                         selected="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
@@ -74,7 +74,7 @@
                     minScreenWidth="Phone"
                     demandPopin="true"
                 >
-                    <Text text="Componente" />
+                    <Text text="{i18n>componente.componente}" />
                 </Column>
                 <Column
                     hAlign="Begin"
@@ -82,78 +82,68 @@
                     demandPopin="true"
                     visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
                 >
-                    <Text text="Fabricante" />
+                    <Text text="{i18n>componente.fabricante}" />
                 </Column>
                 <Column
                     hAlign="Begin"
                     minScreenWidth="Tablet"
                     demandPopin="true"
-                    width="20%"
+                    width="12rem"
                 >
-                    <Text text="Valor Medido" />
+                    <Text text="{i18n>componente.valor.medido}" />
                 </Column>
                 <Column
                     hAlign="End"
                     minScreenWidth="Tablet"
                     demandPopin="true"
+                    width="8rem"
                 >
-                    <Text text="% Desgaste" />
+                    <Text text="{i18n>componente.percentual.desgaste}" />
                 </Column>
                 <Column
                     hAlign="Center"
                     minScreenWidth="Tablet"
                     demandPopin="true"
+                    width="9rem"
                     visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
                 >
-                    <Text text="Ultima Medição" />
+                    <Text text="{i18n>componente.ultima.medicao}" />
                 </Column>
                 <Column
                     hAlign="Center"
                     minScreenWidth="Tablet"
                     demandPopin="true"
+                    width="10rem"
                     visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
                 >
-                    <Text text="% Desgaste Ult. Med." />
+                    <Text text="{i18n>componente.data.ultima.medicao}" />
                 </Column>
                 <Column
-                    hAlign="Center"
+                    hAlign="Begin"
                     minScreenWidth="Tablet"
                     demandPopin="true"
                     visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
                 >
-                    <Text text="Data Ultima Medição" />
-                </Column>
-                <Column
-                    hAlign="Center"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
-                >
-                    <Text text="Instrumento" />
+                    <Text text="{i18n>componente.instrumento}" />
                 </Column>
             </columns>
             <items>
                 <ColumnListItem vAlign="Middle">
                     <cells>
                         <ObjectStatus
-                            title="{materialRodanteFormularioModel>Componente}"
-                            text="{materialRodanteFormularioModel>Item}"
+                            text="{materialRodanteFormularioModel>Componente} {materialRodanteFormularioModel>Item}"
                             active="true"
                             press="onItemPress"
                             state="{materialRodanteFormularioModel>Cor}"
-                            icon="{
-                                    path:'materialRodanteFormularioModel>Lado',
-                                    formatter:'com.pontual.sgmr.model.formatter.getLadoIcone'
-                                }"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>Fabricante}"
                             inverted="false"
-                            state="{materialRodanteFormularioModel>ValorMedidoStatus}"
                         />
                         <HBox alignItems="Center">
                             <StepInput
+                                id="idValorMedicaoComponente"
                                 value="{materialRodanteFormularioModel>Valormedido}"
                                 displayValuePrecision="2"
                                 step="0.50"
@@ -165,11 +155,8 @@
                             <ObjectStatus
                                 class="sapUiTinyMarginBegin"
                                 active="false"
-                                icon="{
-                                    path:'materialRodanteFormularioModel>Ordenacao',
-                                    formatter:'com.pontual.sgmr.model.formatter.getOrdencaoIcone'
-                                }"
-                                inverted="true"
+                                icon="{ path:'materialRodanteFormularioModel>Ordenacao', formatter:'com.pontual.sgmr.model.formatter.getOrdencaoIcone' }"
+                                inverted="false"
                                 state="Indication05"
                             />
                         </HBox>
@@ -183,25 +170,16 @@
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>UltValormedido}"
                             inverted="false"
-                            state="Indication05"
-                        />
-                        <ObjectStatus
-                            class="sapMObjectStatusMedium"
-                            text="{materialRodanteFormularioModel>UltPercDesgaste}%"
-                            inverted="false"
-                            state="Indication05"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>UltDataHora}"
                             inverted="false"
-                            state="Indication05"
                         />
                         <ObjectStatus
                             class="sapMObjectStatusMedium"
                             text="{materialRodanteFormularioModel>InstrMedicao}"
                             inverted="false"
-                            state="Indication05"
                         />
                     </cells>
                 </ColumnListItem>
