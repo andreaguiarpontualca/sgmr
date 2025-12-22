@@ -23,10 +23,7 @@
 				noDataText="{i18n>dadosnaoencontrados}"
 				items="{
 					path: 'materialRodanteFormularioModel>/Inspecoes',					
-					sorter: [{
-							path: 'Inspecao', 
-							descending: false
-						}]
+					sorter: [{ path: 'Sequencial',  descending: false }]
 				}"	>        
             <columns>
                 <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="85%">

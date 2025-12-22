@@ -1990,17 +1990,17 @@ sap.ui.define([
                                 })
                                     .catch(e => {
                                         console.error("Fetch error:", e);
-                                        oController.atualizarBusyDialog("Não foi possível alcançar o endereço " + oConexao.urlsemclient + " informado");
+                                        // oController.atualizarBusyDialog("Não foi possível alcançar o endereço " + oConexao.urlsemclient + " informado");
 
-                                        var oMockMessage = {
-                                            type: 'Error',
-                                            title: oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"),
-                                            description: "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient,
-                                            subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"),
-                                            counter: 1
-                                        };
+                                        // var oMockMessage = {
+                                        //     type: 'Error',
+                                        //     title: oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"),
+                                        //     description: "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient,
+                                        //     subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"),
+                                        //     counter: 1
+                                        // };
 
-                                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
+                                        // oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
                                         resolve() // Resolve para não quebrar o fluxo
                                     });
                             } catch (error) {
@@ -2632,13 +2632,15 @@ sap.ui.define([
             if (!Array.isArray(parametro)) {
                 aMockMessages = [];
             }
-            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("None");
-            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText("");
+            const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto");
+            input.setValueState("None");
+            input.setValueStateText("");
             
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.MedEquipamento == null || oMedicao.MedEquipamento == "") {
-                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
-                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.setValueState("Error");
+                input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.focus();
                 aMockMessages.push({
                     type: 'Error',
                     title: oBundle.getText("campoobrigatorio"),
@@ -2652,8 +2654,9 @@ sap.ui.define([
                 var vUltMedEqpto    = parseInt(oMedicao.UltMedEqpto);
                 var vDifMaxMedicoes = parseInt(oMedicao.DifMaxMedicoes);
                 if (vMedEpto < vUltMedEqpto) {
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.setValueState("Error");
+                    input.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.focus();
                     aMockMessages.push({
                         type: 'Error',
                         title: oBundle.getText("ultimoponto"),
@@ -2664,8 +2667,9 @@ sap.ui.define([
                 }
 
                 if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueState("Error");
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto")?.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.setValueState("Error");
+                    input.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.focus();
                     aMockMessages.push({
                         type: 'Error',
                         title: oBundle.getText("diferencaomedicao"),
@@ -2679,13 +2683,15 @@ sap.ui.define([
 
         validaDataMedicao: function(aMockMessages) {
             var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("None");
-            sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText("");
+            const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")
+            input.setValueState("None");
+            input.setValueStateText("");
             
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.Data == null || oMedicao.Data == "") {
-                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("Error");
-                sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.setValueState("Error");
+                input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.focus();
                 aMockMessages.push({
                     type: 'Error',
                     title: oBundle.getText("campoobrigatorio"),
@@ -2696,8 +2702,9 @@ sap.ui.define([
             } else {
                 var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
                 if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("Error");
-                    sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText(oBundle.getText("campoobrigatorio"));
+                    input.setValueState("Error");
+                    input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                    input.focus();
                     aMockMessages.push({
                         type: 'Error',
                         title: oBundle.getText("limiteretroativo"),
@@ -2717,8 +2724,9 @@ sap.ui.define([
             }
 
             const viewRoletes = blocoRoletes[0];
-            viewRoletes.byId("inputRoletesVazandoLD").setValueState("None");
-            viewRoletes.byId("inputRoletesVazandoLD").setValueStateText("");
+            const input       = viewRoletes.byId("inputRoletesVazandoLD");
+            input.setValueState("None");
+            input.setValueStateText("");
 
             const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             const valor  = Number(dados.RoleteQtdeLD);
@@ -2732,8 +2740,9 @@ sap.ui.define([
                 return
             }
 
-            viewRoletes.byId("inputRoletesVazandoLD").setValueState("Error");
-            viewRoletes.byId("inputRoletesVazandoLD").setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.setValueState("Error");
+            input.setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.focus();
 
             mensagens.push({
                 type        : 'Error',
@@ -2752,8 +2761,9 @@ sap.ui.define([
             }
 
             const viewRoletes = blocoRoletes[0];
-            viewRoletes.byId("inputRoletesVazandoLE").setValueState("None");
-            viewRoletes.byId("inputRoletesVazandoLE").setValueStateText("");
+            const input       = viewRoletes.byId("inputRoletesVazandoLE");
+            input.setValueState("None");
+            input.setValueStateText("");
 
             const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             const valor  = Number(dados.RoleteQtdeLE);
@@ -2767,8 +2777,9 @@ sap.ui.define([
                 return
             }
 
-            viewRoletes.byId("inputRoletesVazandoLE").setValueState("Error");
-            viewRoletes.byId("inputRoletesVazandoLE").setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.setValueState("Error");
+            input.setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.focus();
 
             mensagens.push({
                 type        : 'Error',
@@ -2778,6 +2789,5 @@ sap.ui.define([
                 counter     : 1
             });
         }
-
     });
 });
