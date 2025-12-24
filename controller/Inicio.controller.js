@@ -16,7 +16,7 @@ sap.ui.define([
                 oController = this;
                 oController.oController = this;
                 oView = oController.getView();
-                 this.getView().addStyleClass("sapUiSizeCozy");
+                this.getView().addStyleClass("sapUiSizeCozy");
 
                 oView.bindElement("conexaoModel>/");
                 oView.bindElement("loginModel>/");
@@ -90,8 +90,24 @@ sap.ui.define([
                 setTimeout(function() {
                     oController.getOwnerComponent().getModel("busyDialogModel").setProperty("/loginInProgress", false);
                     oController.forceCloseBusyDialog();
+                    oController.sincronizaDadosOffline();
                 }, 100);
                 
+            },
+
+            sincronizaDadosOffline: function() {
+                oView.setBusy(true);
+                const aLeituras = [
+                    oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
+                    oController.carregarDadosIndexDB("tb_perfil",      "listaPerfilModel"),
+                    oController.carregarDadosIndexDB("tb_centros",     "listaCentrosModel"),
+                    oController.carregarDadosIndexDB("tb_usuario",     "listaUsuariosModel"),
+                    oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel"),
+                    oController.carregarDadosIndexDB("tb_formulario",  "listaFormularioModel"),
+                    oController.carregarDadosIndexDB("tb_medicao",     "listaMedicoesModel")];
+
+                Promise.all(aLeituras).then(() => oView.setBusy(false));
+
             },
 
             onEntrarOrdem: function (oEvent) {
