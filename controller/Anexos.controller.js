@@ -67,12 +67,7 @@ sap.ui.define([
                 this.oMockServer.oModel = oController.getOwnerComponent().getModel("materialRodanteFormularioModel");
                 oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty("/items", [])
 
-                if (typeof cordova != "undefined") {
-                    oView.byId("cameraSelectedButton").setEnabled(true)
-                } else {
-                    oView.byId("cameraSelectedButton").setEnabled(false)
-                }
-
+                oView.byId("cameraSelectedButton").setVisible(!!cordova);
             },
 
             onNavBack: function () {

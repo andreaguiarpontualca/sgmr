@@ -2615,16 +2615,68 @@ sap.ui.define([
             });
         },
 
+        removeMensagemEstadoCampo: function(input) {
+            if (input && input._oValueStateMessage && typeof input._oValueStateMessage.close === 'function') {
+                input._oValueStateMessage.close();
+            }
+        },
+
+        limpaEstadoCampoMedicao: function() {
+            const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto");
+            input.setValueState("None");
+            input.setValueStateText("");
+            this.removeMensagemEstadoCampo(input);
+        },
+
+        limpaEstadoCampoDataMedicao: function() {
+            const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData");
+            input.setValueState("None");
+            input.setValueStateText("");
+            this.removeMensagemEstadoCampo(input);
+        },
+
+        limpaEstadoCampoRoleteDireito: function() {
+            const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+            if (!blocoRoletes || blocoRoletes.length < 1) {
+                return;
+            }
+
+            const viewRoletes = blocoRoletes[0];
+            const input       = viewRoletes.byId("inputRoletesVazandoLD");
+            input.setValueState("None");
+            input.setValueStateText("");
+            this.removeMensagemEstadoCampo(input);
+        },
+
+        limpaEstadoCampoRoleteEsquerdo: function() {
+            const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+            if (!blocoRoletes || blocoRoletes.length < 1) {
+                return;
+            }
+
+            const viewRoletes = blocoRoletes[0];
+            const input       = viewRoletes.byId("inputRoletesVazandoLE");
+            input.setValueState("None");
+            input.setValueStateText("");
+            this.removeMensagemEstadoCampo(input);
+        },
+
+        limpaEstadoCampos: function() {
+            this.limpaEstadoCampoMedicao();
+            this.limpaEstadoCampoDataMedicao();
+            this.limpaEstadoCampoRoleteDireito();
+            this.limpaEstadoCampoRoleteEsquerdo();
+        },
+
         validaMedicao: function(parametro) {
             var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             var aMockMessages = parametro;
             if (!Array.isArray(parametro)) {
                 aMockMessages = [];
             }
+            this.limpaEstadoCampoMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto");
-            input.setValueState("None");
-            input.setValueStateText("");
-            
+           
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.MedEquipamento == null || oMedicao.MedEquipamento == "") {
                 input.setValueState("Error");
@@ -2672,9 +2724,8 @@ sap.ui.define([
 
         validaDataMedicao: function(aMockMessages) {
             var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
+            this.limpaEstadoCampoDataMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")
-            input.setValueState("None");
-            input.setValueStateText("");
             
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.Data == null || oMedicao.Data == "") {
@@ -2706,6 +2757,7 @@ sap.ui.define([
         },
 
         validaVazamentoRoleteDireito: function(mensagens) {
+            this.limpaEstadoCampoRoleteDireito();
             var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
             if (!blocoRoletes || blocoRoletes.length < 1) {
@@ -2714,13 +2766,10 @@ sap.ui.define([
 
             const viewRoletes = blocoRoletes[0];
             const input       = viewRoletes.byId("inputRoletesVazandoLD");
-            input.setValueState("None");
-            input.setValueStateText("");
-
-            const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
-            const valor  = Number(dados.RoleteQtdeLD);
-            const maximo = Number(dados.MaxRoleteQtdeLD);
-            const minimo = 0;
+            const dados       = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            const valor       = Number(dados.RoleteQtdeLD);
+            const maximo      = Number(dados.MaxRoleteQtdeLD);
+            const minimo      = 0;
 
             const limite         = valor > maximo ? maximo : minimo;
             const mensagemLimite = valor > maximo ? "roletes.limite.maximo" : ( valor < minimo ? "roletes.limite.minimo" : "" );
@@ -2743,6 +2792,7 @@ sap.ui.define([
         },
 
         validaVazamentoRoleteEsquerdo: function(mensagens) {
+            this.limpaEstadoCampoRoleteEsquerdo();
             var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
             if (!blocoRoletes || blocoRoletes.length < 1) {
@@ -2751,13 +2801,10 @@ sap.ui.define([
 
             const viewRoletes = blocoRoletes[0];
             const input       = viewRoletes.byId("inputRoletesVazandoLE");
-            input.setValueState("None");
-            input.setValueStateText("");
-
-            const dados = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
-            const valor  = Number(dados.RoleteQtdeLE);
-            const maximo = Number(dados.MaxRoleteQtdeLE);
-            const minimo = 0;
+            const dados       = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
+            const valor       = Number(dados.RoleteQtdeLE);
+            const maximo      = Number(dados.MaxRoleteQtdeLE);
+            const minimo      = 0;
 
             const limite         = valor > maximo ? maximo : minimo;
             const mensagemLimite = valor > maximo ? "roletes.limite.maximo" : ( valor < minimo ? "roletes.limite.minimo" : "" );
