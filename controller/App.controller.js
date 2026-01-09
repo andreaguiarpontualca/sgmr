@@ -34,13 +34,11 @@ sap.ui.define([
                 window.addEventListener("orientationchange", oController.onOrientationChange());
 
                 if (window.hasOwnProperty("cordova")) {
-                    document.addEventListener('deviceready', oController.onDeviceReady.bind(this), false);
-
+                    oController.onDeviceReady();
                 } else {
                     oController.getOwnerComponent().getModel("mensagensModel").setData([])
                     oController.getOwnerComponent().getRouter().navTo("Login", null, true);
                 }
-
             },
 
             onDeviceReady: function () {
@@ -88,33 +86,24 @@ sap.ui.define([
 
             checkConnection: function () {
                 if (window.hasOwnProperty("cordova")) {
-                    switch (navigator.connection.type) {
-                        case 'unknown':
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected")
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error")
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline")
-                            this.getOwnerComponent().getModel("conexaoModel").refresh(true)
-                            return false
-                        case 'none':
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected")
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error")
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline")
-                            this.getOwnerComponent().getModel("conexaoModel").refresh(true)
-                            return false
-                        default:
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected")
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success")
-                            this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online")
-                            this.getOwnerComponent().getModel("conexaoModel").refresh(true)
-                            return true;
+                    if (navigator.onLine) {
+                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected");
+                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success");
+                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online");
+                        this.getOwnerComponent().getModel("conexaoModel").refresh(true);
+                        return true;
                     }
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected");
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error");
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline");
+                    this.getOwnerComponent().getModel("conexaoModel").refresh(true);
+                    return false;
                 } else {
-                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected")
-                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success")
-                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online")
-                    this.getOwnerComponent().getModel("conexaoModel").refresh(true)
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected");
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success");
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online");
+                    this.getOwnerComponent().getModel("conexaoModel").refresh(true);
                     return navigator.onLine
-
                 }
             }
 

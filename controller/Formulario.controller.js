@@ -261,6 +261,50 @@ sap.ui.define([
                 });
             },
 
+            limpaEstadoCampoMedicao: function() {
+                const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto");
+                input.setValueState("None");
+                input.setValueStateText("");
+            },
+
+            limpaEstadoCampoDataMedicao: function() {
+                const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData");
+                input.setValueState("None");
+                input.setValueStateText("");
+            },
+
+            limpaEstadoCampoRoleteDireito: function() {
+                const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+                if (!blocoRoletes || blocoRoletes.length < 1) {
+                    return;
+                }
+
+                const viewRoletes = blocoRoletes[0];
+                const input       = viewRoletes.byId("inputRoletesVazandoLD");
+                input.setValueState("None");
+                input.setValueStateText("");
+            },
+
+            limpaEstadoCampoRoleteEsquerdo: function() {
+                const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
+                if (!blocoRoletes || blocoRoletes.length < 1) {
+                    return;
+                }
+
+                const viewRoletes = blocoRoletes[0];
+                const input       = viewRoletes.byId("inputRoletesVazandoLE");
+                input.setValueState("None");
+                input.setValueStateText("");
+            },
+
+            limpaEstadoCampos: function() {
+                this.limpaEstadoCampoMedicao();
+                this.limpaEstadoCampoDataMedicao();
+                this.limpaEstadoCampoRoleteDireito();
+                this.limpaEstadoCampoRoleteEsquerdo();
+            },
+
+
             onCancelar: function () {
                 MessageBox.confirm(oBundle.getText("cancelargravacao"), {
                     title            : oBundle.getText("cancelar"),
@@ -268,6 +312,7 @@ sap.ui.define([
                     emphasizedAction : sap.m.MessageBox.Action.OK,
                     onClose          : function (sAction) {
                         if (sAction == 'OK') {
+                            oController.limpaEstadoCampos();
                             oController.getRouter().navTo("ListaMaterialRodante", {}, true);
                         }
                     }

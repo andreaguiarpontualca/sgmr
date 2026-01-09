@@ -1906,33 +1906,24 @@ sap.ui.define([
 
         checkConnection: function () {
             if (window.hasOwnProperty("cordova")) {
-                switch (navigator.connection.type) {
-                    case 'unknown':
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected")
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error")
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline")
-                        this.getOwnerComponent().getModel("conexaoModel").refresh(true)
-                        return false
-                    case 'none':
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected")
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error")
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline")
-                        this.getOwnerComponent().getModel("conexaoModel").refresh(true)
-                        return false
-                    default:
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected")
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success")
-                        this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online")
-                        this.getOwnerComponent().getModel("conexaoModel").refresh(true)
-                        return true;
+                if (navigator.onLine) {
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected");
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success");
+                    this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online");
+                    this.getOwnerComponent().getModel("conexaoModel").refresh(true);
+                    return true;
                 }
+                this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected");
+                this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error");
+                this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline");
+                this.getOwnerComponent().getModel("conexaoModel").refresh(true);
+                return false;
             } else {
-                this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected")
-                this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success")
-                this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online")
-                this.getOwnerComponent().getModel("conexaoModel").refresh(true)
+                this.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected");
+                this.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success");
+                this.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online");
+                this.getOwnerComponent().getModel("conexaoModel").refresh(true);
                 return navigator.onLine
-
             }
         },
 
@@ -2595,8 +2586,7 @@ sap.ui.define([
 
         verificarDiferencaHoras: function (pDiferenca, pDataInformada) {
             // 1. Criar objetos Date para a data atual e a data informada
-            const dataAtual = new Date();
-            //const dataInformada = new Date(pDataInformadaString);
+            const dataAtual     = new Date();
             const dataInformada = pDataInformada;
 
             // 2. Calcular a diferença em milissegundos
@@ -2604,10 +2594,9 @@ sap.ui.define([
 
             // 3. Converter milissegundos para horas
             const milissegundosPorHora = 1000 * 60 * 60;
-            const diferencaEmHoras = diferencaEmMilissegundos / milissegundosPorHora;
+            const diferencaEmHoras     = Math.floor(diferencaEmMilissegundos / milissegundosPorHora);
 
-            // 4. Verificar se a diferença é de pelo menos 70 horas
-            return diferencaEmHoras >= 70;
+            return diferencaEmHoras > pDiferenca;
         },
 
         limpaZerosNoFoco: function(input) {
@@ -2703,7 +2692,7 @@ sap.ui.define([
                 var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
                 if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
                     input.setValueState("Error");
-                    input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                    input.setValueStateText(oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]));
                     input.focus();
                     aMockMessages.push({
                         type: 'Error',
