@@ -67,7 +67,7 @@ sap.ui.define([
                 this.oMockServer.oModel = oController.getOwnerComponent().getModel("materialRodanteFormularioModel");
                 oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setProperty("/items", [])
 
-                oView.byId("cameraSelectedButton").setVisible(!!cordova);
+                oView.byId("cameraSelectedButton").setVisible(!!window.cordova);
             },
 
             onNavBack: function () {

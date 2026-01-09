@@ -29,64 +29,19 @@
 
 		<headerToolbar>
 			<OverflowToolbar>
-				<Title
-					text="Anexos ({= ${materialRodanteFormularioModel>/items}.length})"
-					level="H2"
-				/>
+				<Title text="Anexos ({= ${materialRodanteFormularioModel>/items}.length})" level="H2" />
+
 				<ToolbarSpacer />
 
-				<SearchField
-					width="20%"
-					placeholder="Pesquisar"
-					liveChange="onSearch"
-				>
-					<layoutData>
-						<OverflowToolbarLayoutData
-							priority="NeverOverflow"
-						/>
-					</layoutData>
-				</SearchField>
+				<SearchField width="{= ${device>/system/phone} ? '15rem' : '20%' }" placeholder="Pesquisar" liveChange="onSearch" />
+
 				<ToolbarSeparator />
 
-				<!-- Use the UploadButtonPlaceholder to add the UploadButton to the toolbar -->
 				<upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
-				<Button
-					id="cameraSelectedButton"
-					icon="sap-icon://camera"
-					enabled="false"
-					press="onCameraPress"
-				/>
-				<Button
-					id="downloadSelectedButton"
-					text="{i18n>download}"
-					enabled="false"
-					visible="false"
-					press="onDownloadFiles"
-				/>
-				<Button
-					id="removeDocumentButton"
-					text="{i18n>remover}"
-					press="onRemoveButtonPress"
-					enabled="false"
-				>
-					<layoutData>
-						<OverflowToolbarLayoutData
-							priority="AlwaysOverflow"
-						/>
-					</layoutData>
-				</Button>
-				<Button
-					id="renameButton"
-					enabled="false"
-					press="onRenameDocument"
-					text="{i18n>renomear}"
-				>
-					<layoutData>
-						<OverflowToolbarLayoutData
-							priority="AlwaysOverflow"
-						/>
-					</layoutData>
-				</Button>
+				<Button id="cameraSelectedButton"   icon="sap-icon://camera" enabled="false" press="onCameraPress" />
+				<Button id="downloadSelectedButton" text="{i18n>download}"   enabled="true"  press="onDownloadFiles" />
+				<Button id="removeDocumentButton"   text="{i18n>remover}"    enabled="false" press="onRemoveButtonPress" />
+				<Button id="renameButton"           text="{i18n>renomear}"   enabled="false" press="onRenameDocument" />
 			</OverflowToolbar>
 		</headerToolbar>
 
@@ -119,7 +74,7 @@
 		</dependents>
 
 		<columns>
-			<Column id="fileName" importance="High"                     minScreenWidth="Phone">
+			<Column id="fileName" importance="High" minScreenWidth="Phone">
 				<header>
 					<Label text="{i18n>arquivo}" />
 				</header>
@@ -149,19 +104,14 @@
 					<Label text="Last Modified" />
 				</header>
 			</Column>
-			<Column id="actionButton" importance="High"  minScreenWidth="Tablet"/>
+			<Column id="actionButton" importance="High"  minScreenWidth="Phone"/>
 		</columns>
 
 
 		<items>
-			<ColumnListItem
-				press="onItemPress"
-				highlight="{= ${materialRodanteFormularioModel>uploadState} === 'Complete' ? 'Indication05' : null }"
-			>
-
-			<!-- Cells with cell template defining content for each column (cells and columns work with 1:1 mapping) -->
+			<ColumnListItem press="onItemPress" highlight="{= ${materialRodanteFormularioModel>uploadState} === 'Complete' ? 'Indication05' : null }" >
 				<cells>
-					<HBox>
+					<HBox direction="{= ${device>/system/phone} ? 'Column' : 'Row'}">
 						<Image
 							src="{materialRodanteFormularioModel>imageUrl}"
 							class="sapMUSTItemImage sapMUSTItemIcon"
@@ -173,14 +123,8 @@
 							visible="{= ${materialRodanteFormularioModel>imageUrl} === undefined || ${materialRodanteFormularioModel>imageUrl} === '' }"
 							class="sapMUSTItemImage sapMUSTItemIcon"
 						/>
-						<VBox
-							class="sapUiTinyMargin sapUiSmallMarginBegin"
-						>
-							<Link
-								text="{materialRodanteFormularioModel>fileName}"
-								press="openPreview"
-								class="sapUiTinyMarginBottom"
-							/>
+						<VBox class="sapUiTinyMargin sapUiSmallMarginBegin" >
+							<Link text="{materialRodanteFormularioModel>fileName}" press="openPreview" class="sapUiTinyMarginBottom" />
 							<Text text="{materialRodanteFormularioModel>documentType}" />
 						</VBox>
 					</HBox>
@@ -192,17 +136,9 @@
 					/>
 					<VBox>
 						<Text text="{materialRodanteFormularioModel>lastModifiedBy}" />
-						<Text
-							class="sapUiTinyMarginTop"
-							text="{materialRodanteFormularioModel>lastmodified}"
-						/>
+						<Text text="{materialRodanteFormularioModel>lastmodified}" class="sapUiTinyMarginTop" />
 					</VBox>
-					<Button
-						class="sapUiTinyMarginBegin"
-						type="Transparent"
-						icon="sap-icon://decline"
-						press="onRemoveHandler"
-					/>
+					<Button type="Transparent" icon="sap-icon://decline" press="onRemoveHandler" class="sapUiTinyMarginBegin" />
 				</cells>
 			</ColumnListItem>
 		</items>
