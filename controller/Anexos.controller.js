@@ -629,7 +629,7 @@ sap.ui.define([
 
                 oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getProperty("/items").unshift(
                     {
-                        "id": uid(), // generate random id if no id sent from response.
+                        "id": uid().split("-")[1], // generate random id if no id sent from response.
                         "fileName": "Arquivo " + new Date().toLocaleString("pt-BR") + "." + blob.type.split('/')[1],
                         "mediaType": blob.type,
                         "url": vUrl,
