@@ -38,7 +38,7 @@
 				<ToolbarSeparator />
 
 				<upload:ActionsPlaceholder id="uploadButton" placeholderFor="UploadButtonPlaceholder" />
-				<Button id="cameraSelectedButton"   icon="sap-icon://camera" enabled="false" press="onCameraPress" />
+				<Button id="cameraSelectedButton"   icon="sap-icon://camera" enabled="true"  press="onCameraPress" ><layoutData><OverflowToolbarLayoutData priority="NeverOverflow" /></layoutData></Button>
 				<Button id="downloadSelectedButton" text="{i18n>download}"   enabled="true"  press="onDownloadFiles" />
 				<Button id="removeDocumentButton"   text="{i18n>remover}"    enabled="false" press="onRemoveButtonPress" />
 				<Button id="renameButton"           text="{i18n>renomear}"   enabled="false" press="onRenameDocument" />
