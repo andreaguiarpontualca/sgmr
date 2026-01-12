@@ -629,8 +629,8 @@ sap.ui.define([
 
                 oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getProperty("/items").unshift(
                     {
-                        "id": uid().split("-")[1], // generate random id if no id sent from response.
-                        "fileName": "Arquivo " + new Date().toLocaleString("pt-BR") + "." + blob.type.split('/')[1],
+                        "id": idAnexo,
+                        "fileName": "IMG_" + idAnexo + "." + blob.type.split('/')[1],
                         "mediaType": blob.type,
                         "url": vUrl,
                         "imageUrl": vUrl,
@@ -638,7 +638,7 @@ sap.ui.define([
                         "revision": "00",
                         "status": "In work",
                         "fileSize": blob.size,
-                        "lastModifiedBy": oController.getOwnerComponent().getModel("usuarioModel").getData(),
+                        "lastModifiedBy": "SGMR",
                         "lastmodified": new Date().toLocaleString("pt-BR"),
                         "documentType": "Arquivo Câmera",
                         "file": pImageData,
