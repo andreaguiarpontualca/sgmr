@@ -144,7 +144,6 @@ sap.ui.define([
                 dados.RoleteVazamento = valorDireito > 0 || valorEsquerdo > 0;
             },
 
-
             validarFormulario: function () {
                 return new Promise((resolve, reject) => {
                     const pMedicao      = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();

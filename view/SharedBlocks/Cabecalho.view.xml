@@ -7,15 +7,15 @@
     xmlns:core="sap.ui.core"
     displayBlock="true"
     xmlns="sap.m"
->
+    >
     <VBox
         id="idVBoxCabecalho"
         class="sapUiSmallMargin"
-    >
+        >
         <f:Form
             id="idCabecalhoForm"
             editable="true"
-        >
+            >
             <f:layout>
                 <f:ResponsiveGridLayout
                     id="idResponsiveGridLayout_R220LC-9"
@@ -29,24 +29,14 @@
             <f:formContainers>
                 <f:FormContainer id="idFormUltimaMedicao" title="{i18n>ultimamedicao}" >
                     <f:formElements>
-                        <f:FormElement id="idFormElementOper" label="{i18n>ultimamedicao}" >
+                        <f:FormElement id="idFormElementOper" label="{i18n>ultimohorimetro}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>UltMedEqpto}"
-                                    inverted="false"
-                                    state="Indication05"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>UltMedEqpto}" inverted="false" state="Indication05" />
                             </f:fields>
                         </f:FormElement>
                         <f:FormElement id="idFormElementUltimaMedData" label="{i18n>data}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>DtHrEqpto}"
-                                    inverted="false"
-                                    state="Indication05"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>DtHrEqpto}" inverted="false" state="Indication05" />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
@@ -54,7 +44,7 @@
 
                 <f:FormContainer id="idFormMedicaoAtual" title="{i18n>dadosinspecao}" >
                     <f:formElements>
-                        <f:FormElement id="idFEMedAtual" label="{i18n>ultimoponto}" >
+                        <f:FormElement id="idFEMedAtual" label="{i18n>horimetroatual}" >
                             <f:fields>
                                 <Input
                                     id="idInputMedEqpto"
@@ -68,15 +58,12 @@
                                 />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEDataAtual"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFEDataAtual" label="{i18n>data}" >
                             <f:fields>
                                 <DateTimePicker
                                     id="idInputData"
                                     required="true"
-                                    change="handleChange"
+                                    change="validaDataMedicao"
                                     class="sapUiSmallMarginBottom"
                                     width="100%"
                                     showCurrentDateButton="true"
@@ -107,172 +94,76 @@
                 </f:FormContainer>
                 <f:FormContainer title="{i18n>esteiraesquerda}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
                     <f:formElements>
-                        <f:FormElement
-                            id="idFETAGE"
-                            label="{i18n>tag}"
-                        >
+                        <f:FormElement id="idFETAGE" label="{i18n>tag}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>TagE}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>TagE}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedTagEsquerda"
-                            label="{i18n>ultimamedicao}"
-                        >
+                        <f:FormElement id="idFEMedTagEsquerda" label="{i18n>ultimohorimetro}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>MedEsquerda}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>MedEsquerda}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedDataEsquerda"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFEMedDataEsquerda" label="{i18n>data}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>DtHrEsq}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>DtHrEsq}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
                 <f:FormContainer title="{i18n>esteiradireita}" visible="{materialRodanteFormularioModel>VisibilidadeTAG}">
                     <f:formElements>
-                        <f:FormElement
-                            id="idFETAGD"
-                            label="{i18n>tag}"
-                        >
+                        <f:FormElement id="idFETAGD" label="{i18n>tag}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>TagD}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>TagD}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedTagDireita"
-                            label="{i18n>ultimamedicao}"
-                        >
+                        <f:FormElement id="idFEMedTagDireita" label="{i18n>ultimohorimetro}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>MedDireita}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>MedDireita}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedDataDireita"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFEMedDataDireita" label="{i18n>data}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>DtHrDir}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>DtHrDir}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
                 <f:FormContainer title="{i18n>truckesquerda}" visible="{= !!${materialRodanteFormularioModel>TruckDireita} &amp;&amp; !!${materialRodanteFormularioModel>TruckEsquerda} &amp;&amp;  ${materialRodanteFormularioModel>VisibilidadeTAG} }">
                     <f:formElements>
-                        <f:FormElement
-                            id="idFETAGTruckE"
-                            label="{i18n>tag}"
-                        >
+                        <f:FormElement id="idFETAGTruckE" label="{i18n>tag}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>TruckEsquerda}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>TruckEsquerda}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedTagTruckEsquerda"
-                            label="{i18n>ultimamedicao}"
-                        >
+                        <f:FormElement id="idFEMedTagTruckEsquerda" label="{i18n>ultimohorimetro}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>MedTruckEsquerda}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>MedTruckEsquerda}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedDataTruckEsquerda"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFEMedDataTruckEsquerda" label="{i18n>data}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>DtHrTruckEsq}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>DtHrTruckEsq}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>
                 </f:FormContainer>
                 <f:FormContainer title="{i18n>truckdireita}" visible="{= !!${materialRodanteFormularioModel>TruckDireita} &amp;&amp; !!${materialRodanteFormularioModel>TruckEsquerda} &amp;&amp;  ${materialRodanteFormularioModel>VisibilidadeTAG}}">
                     <f:formElements>
-                        <f:FormElement
-                            id="idFETAGTruckD"
-                            label="{i18n>tag}"
-                        >
+                        <f:FormElement id="idFETAGTruckD" label="{i18n>tag}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>TruckDireita}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>TruckDireita}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedTagTruckDireita"
-                            label="{i18n>ultimamedicao}"
-                        >
+                        <f:FormElement id="idFEMedTagTruckDireita" label="{i18n>ultimohorimetro}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>MedTruckDireita}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>MedTruckDireita}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
-                        <f:FormElement
-                            id="idFEMedDataTruckDireita"
-                            label="{i18n>data}"
-                        >
+                        <f:FormElement id="idFEMedDataTruckDireita" label="{i18n>data}" >
                             <f:fields>
-                                <ObjectStatus
-                                    class="sapMObjectStatusMedium"
-                                    text="{materialRodanteFormularioModel>DtHrTruckDir}"
-                                    inverted="false"
-                                    state="None"
-                                />
+                                <ObjectStatus class="sapMObjectStatusMedium" text="{materialRodanteFormularioModel>DtHrTruckDir}" inverted="false" state="None" />
                             </f:fields>
                         </f:FormElement>
                     </f:formElements>

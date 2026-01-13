@@ -2686,7 +2686,7 @@ sap.ui.define([
                     type: 'Error',
                     title: oBundle.getText("campoobrigatorio"),
                     description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
-                    subtitle: oBundle.getText("ultimoponto"),
+                    subtitle: oBundle.getText("horimetroatual"),
                     counter: 1
                 });
             } else {
@@ -2700,7 +2700,7 @@ sap.ui.define([
                     input.focus();
                     aMockMessages.push({
                         type: 'Error',
-                        title: oBundle.getText("ultimoponto"),
+                        title: oBundle.getText("horimetroatual"),
                         description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
                         subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
                         counter: 1
@@ -2722,10 +2722,14 @@ sap.ui.define([
             }
         },
 
-        validaDataMedicao: function(aMockMessages) {
+        validaDataMedicao: function(parametro) {
             var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             this.limpaEstadoCampoDataMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")
+            var aMockMessages = parametro;
+            if (!Array.isArray(parametro)) {
+                aMockMessages = [];
+            }
             
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.Data == null || oMedicao.Data == "") {
@@ -2739,20 +2743,36 @@ sap.ui.define([
                     subtitle: oBundle.getText("data"),
                     counter: 1
                 });
-            } else {
-                var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
-                if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
-                    input.setValueState("Error");
-                    input.setValueStateText(oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]));
-                    input.focus();
-                    aMockMessages.push({
-                        type: 'Error',
-                        title: oBundle.getText("limiteretroativo"),
-                        description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
-                        subtitle: oBundle.getText("limiteretroativo"),
-                        counter: 1
-                    });
-                }
+                return;
+            }
+
+            var dataAtual = input.getDateValue();
+            if (dataAtual > new Date()) {
+                input.setValueState("Error");
+                input.setValueStateText(oBundle.getText("datamaiorqueatual"));
+                input.focus();
+                aMockMessages.push({
+                    type: 'Error',
+                    title: oBundle.getText("datainvalida"),
+                    description: oBundle.getText("datamaiorqueatual"),
+                    subtitle: oBundle.getText("data"),
+                    counter: 1
+                });
+                return;
+            }
+
+            var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
+            if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
+                input.setValueState("Error");
+                input.setValueStateText(oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]));
+                input.focus();
+                aMockMessages.push({
+                    type: 'Error',
+                    title: oBundle.getText("limiteretroativo"),
+                    description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
+                    subtitle: oBundle.getText("limiteretroativo"),
+                    counter: 1
+                });
             }
         },
 
