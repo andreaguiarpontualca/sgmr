@@ -10,21 +10,20 @@
         id="idVBoxInspecao"
         class="sapUiSmallMargin"
         >
-			<Table
-                id="idInspecoesTable" 
-                class="sapUiMediumMarginBottom"
-				alternateRowColors="true"
-				autoPopinMode="false" 
-				contextualWidth="Auto"		
-				growing="true" 
-				growingThreshold="100" 
-				mode="None"
-                paste="onPaste"                
-				noDataText="{i18n>dadosnaoencontrados}"
-				items="{
-					path: 'materialRodanteFormularioModel>/Inspecoes',					
-					sorter: [{ path: 'Sequencial',  descending: false }]
-				}"	>        
+        <Table
+            id="idInspecoesTable" 
+            class="sapUiMediumMarginBottom"
+            alternateRowColors="true"
+            autoPopinMode="false" 
+            contextualWidth="Auto"		
+            growing="true" 
+            growingThreshold="100" 
+            mode="None"
+            paste="onPaste"
+            noDataText="{i18n>dadosnaoencontrados}"
+            items="{ path: 'materialRodanteFormularioModel>/Inspecoes', sorter: [{ path: 'Sequencial',  descending: false }] }"
+            visible="{= ${materialRodanteFormularioModel>/Inspecoes}.length > 0 }"
+            >        
             <columns>
                 <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="85%">
                     <Text text="Atividade" />
@@ -46,7 +45,7 @@
                 </ColumnListItem>
             </items>
         </Table>
-        <Text text="Observações" />        
+        <Text text="Observações" />
         <TextArea value="{materialRodanteFormularioModel>Observacoes}" rows="2" growing="true" growingMaxLines="10" width="100%" maxLength="255"/>
     </VBox>
 </mvc:View>

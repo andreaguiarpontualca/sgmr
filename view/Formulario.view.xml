@@ -56,9 +56,9 @@
 						</subSections>
 					</ObjectPageSection>
 
-					<ObjectPageSection titleUppercase="false" title="Condição de Operação">
+					<ObjectPageSection titleUppercase="false" title="Condição de Operação" visible="{= ${materialRodanteFormularioModel>/Condicoes}.length > 0 }">
 						<subSections>
-							<ObjectPageSubSection title="Condição de Operação" titleUppercase="false">
+							<ObjectPageSubSection  titleUppercase="false" title="Condição de Operação" visible="{= ${materialRodanteFormularioModel>/Condicoes}.length > 0 }">
 								<blocks>
 									<blockcolor:Condicoes id="condicoesBlock"/>
 								</blocks>

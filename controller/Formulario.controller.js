@@ -360,8 +360,8 @@ sap.ui.define([
                             var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
                             var aComponentesCombo = []
-                            var aListaInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm) || [];
-                            var aListaCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm) || [];
+                            var aListaCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            var aListaInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
                             const totalRoletes    = { direito  : 0, esquerdo : 0 };
 ;
                             aListaInspecoes.sort((a, b) => a.Sequencial - b.Sequencial);

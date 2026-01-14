@@ -19,26 +19,18 @@
 				mode="None"
                 paste="onPaste"                
 				noDataText="{i18n>dadosnaoencontrados}"
-				items="{
-					path: 'materialRodanteFormularioModel>/Condicoes',					
-					sorter: [{ path: 'IdCondicao',  descending: false }]
-				}"	>        
+				items="{ path: 'materialRodanteFormularioModel>/Condicoes', sorter: [{ path: 'IdCondicao',  descending: false }] }"	>
             <columns>
                 <Column hAlign="Begin" minScreenWidth="Phone" demandPopin="true" width="30%">
                     <Text text="Condição" />
-                </Column>         
+                </Column>
             </columns>
             <items>
                 <ColumnListItem vAlign="Middle">
                     <cells>
                         <VBox>
-                            <ObjectStatus text ="{materialRodanteFormularioModel>Condicao}" />		                            
-                            <ComboBox            
-                                selectedKey="{materialRodanteFormularioModel>Nivel}"                                  
-                                items="{
-                                    path: 'materialRodanteFormularioModel>/NivelCombo',
-                                    sorter: { path: 'text' }
-                                }">
+                            <ObjectStatus text ="{materialRodanteFormularioModel>Condicao}" />
+                            <ComboBox selectedKey="{materialRodanteFormularioModel>Nivel}" items="{ path: 'materialRodanteFormularioModel>/NivelCombo', sorter: { path: 'text' } }">
                                 <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
                             </ComboBox>   
                         </VBox>                                                
