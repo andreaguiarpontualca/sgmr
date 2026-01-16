@@ -15,7 +15,7 @@ sap.ui.define([
         return Controller.extend("com.pontual.sgmr.controller.Cabecalho", {
             onInit: function () {
                 oController = this;
-                oController.oController = this;
+                // oController.registraModeloMensagem();
                 oView = oController.getView();
 
                 var oModel = new JSONModel();

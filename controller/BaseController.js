@@ -88,6 +88,114 @@ sap.ui.define([
             }
         },
 
+        inicializaModeloSGMR: function() {
+            const sgmrODataModel = this.getOwnerComponent().getModel("sgmrODataModel");
+
+            if (sgmrODataModel._inicializado) {
+                return;
+            }
+
+            sgmrODataModel.setHeaders(this.getModelHeader());
+            sgmrODataModel.setUseBatch(false);
+            sgmrODataModel._inicializado = true;
+
+            sgmrODataModel.attachRequestSent(function () {
+                oController?.closeBusyDialog && oController.closeBusyDialog();
+            });
+
+            sgmrODataModel.attachRequestCompleted(function () {
+                oController?.closeBusyDialog && oController.closeBusyDialog();
+            });
+
+            sgmrODataModel.attachMetadataLoaded(function () {
+                oController?.closeBusyDialog && oController.closeBusyDialog();
+            });
+
+            sgmrODataModel.attachRequestFailed(function (oError) {
+                oController?.closeBusyDialog && oController.closeBusyDialog();
+                const response = oError.getParameter("response");
+                const titulo   = response?.statusCode == 500 ? "Erro interno no SAP" : "Problemas de conexão";
+                const pServico = oError.getParameter("url").substr(oError.getParameter("url").lastIndexOf("/") + 1);
+                oController.atualizarBusyDialog(oError.getParameter("message"));
+                oController.adicionarMensagemErro(titulo, "Problemas no serviço " + pServico, response);
+            });
+
+            sgmrODataModel.attachMetadataFailed(function (oError) {
+                oController?.closeBusyDialog && oController.closeBusyDialog();
+                oController.atualizarBusyDialog(oError.getParameter("message"));
+                const response = oError.getParameter("response");
+                const pServico = oError.getParameter("url").substr(oError.getParameter("url").lastIndexOf("/") + 1);
+                oController.adicionarMensagemErro("Problemas no SAP", "Problemas no serviço " + pServico, response);
+            });
+        },
+
+        //-- MENSAGENS --//
+
+        mMensagens: function() {
+            return this.getOwnerComponent().getModel("mMensagens");
+        },
+        
+		adicionarMensagemSucesso: function (message, subtitle, description) {
+			this.adicionarMensagem("Success", message, subtitle, description);
+		},
+
+		adicionarMensagemAviso: function (message, subtitle, description) {
+			this.adicionarMensagem("Warning", message, subtitle, description);
+		},
+
+		adicionarMensagemInfo: function (message, subtitle, description) {
+			this.adicionarMensagem("Information", message, subtitle, description);
+		},
+
+		adicionarMensagemErro: function (message, subtitle, description) {
+			let descricao = '';
+			if (typeof description === 'string') {
+				descricao = description;
+			} else if (typeof description === 'object') {
+				try {
+					const mensagem  = description?.responseText;
+					const oMensagem = JSON.parse(mensagem);
+					descricao       = oMensagem.error.message.value;
+				} catch (error) {
+					descricao = description?.responseText || description?.message || '';
+				}
+			}
+			this.adicionarMensagem("Error", message, subtitle, descricao);
+		},
+
+		adicionarMensagem: function (type, title, subtitle, description) {
+            this._adicionaMensagem({ type, title, subtitle, description });
+		},
+		
+        _adicionaMensagem: function (mensagem) {
+            try {
+                const model     = this.mMensagens();
+                const mensagens = model?.getData() || [];
+                mensagens.push(mensagem);
+                model?.setData(mensagens);
+                model?.refresh(true);
+            } catch (error) {
+                console.error("Erro ao tentar adicionar mensagem:", error);
+            }
+		},
+
+        limparMensagens: function() {
+            const model = this.mMensagens();
+            model?.setData([]);
+            model?.refresh(true);
+            sap.ui.getCore()?.getMessageManager()?.removeAllMessages();
+        },
+       
+        exibeMensagens: function(oEvent) {
+            const popover = oController.getOwnerComponent().obtemPopoverMensagens();
+            if (!popover.getModel("mMensagens")) {
+                popover.setModel(oController.mMensagens(), "mMensagens");
+            }
+            popover.openBy(oEvent.getSource());
+        },
+    
+        //---------------//
+
         /** Funções de Banco de Dados */
 
 
@@ -149,14 +257,14 @@ sap.ui.define([
                 document.addEventListener('deviceready', oController.onDeviceReady.bind(this), false);
 
             } else {
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
+                oController.limparMensagens();
                 oController.getOwnerComponent().getRouter().navTo("Login", null, true);
             }
         },
 
         onDeviceReady: function () {
             if (window.location.hash == "") {
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
+                oController.limparMensagens();
 
                 var oConexao = oController.lerLocalStorage("SGMR_DadosConexao")
                 if (oConexao != null && oConexao.urlsemclient != "") {
@@ -168,7 +276,6 @@ sap.ui.define([
         },
 
         onOnline: function (oEvent) {
-            console.log("You are now connected to the network.");
             oController.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected")
             oController.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success")
             oController.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online")
@@ -177,7 +284,6 @@ sap.ui.define([
         },
 
         onOffline: function (oEvent) {
-            console.log("You are not connected to the network.");
             oController.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected")
             oController.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error")
             oController.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline")
@@ -185,15 +291,17 @@ sap.ui.define([
         },
 
         onOrientationChange: function () {
-            console.log(screen.orientation.type);
+            //console.log(screen.orientation.type);
         },
 
 
-        // Display the button type according to the message with the highest severity
-        // The priority of the message types are as follows: Error > Warning > Success > Info
         buttonTypeFormatter: function () {
             var sHighestSeverityIcon;
-            var aMessages = this.getView().getModel().oData;
+            var aMessages = this.mMensagens()?.getData() || [];
+
+            if (!Array.isArray(aMessages)) {
+                return "Neutral";
+            }
 
             aMessages.forEach(function (sMessage) {
                 switch (sMessage.type) {
@@ -215,35 +323,13 @@ sap.ui.define([
             return sHighestSeverityIcon;
         },
 
-        // Display the number of messages with the highest severity
-        highestSeverityMessages: function () {
-            var sHighestSeverityIconType = this.buttonTypeFormatter();
-            var sHighestSeverityMessageType;
-
-            switch (sHighestSeverityIconType) {
-                case "Negative":
-                    sHighestSeverityMessageType = "Error";
-                    break;
-                case "Critical":
-                    sHighestSeverityMessageType = "Warning";
-                    break;
-                case "Success":
-                    sHighestSeverityMessageType = "Success";
-                    break;
-                default:
-                    sHighestSeverityMessageType = !sHighestSeverityMessageType ? "Information" : sHighestSeverityMessageType;
-                    break;
-            }
-
-            return this.getView().getModel().oData.reduce(function (iNumberOfMessages, oMessageItem) {
-                return oMessageItem.type === sHighestSeverityMessageType ? ++iNumberOfMessages : iNumberOfMessages;
-            }, "");
-        },
-
-        // Set the button icon according to the message with the highest severity
         buttonIconFormatter: function () {
             var sIcon;
-            var aMessages = this.getView().getModel().oData;
+            var aMessages = this.mMensagens()?.getData() || [];
+
+            if (!Array.isArray(aMessages)) {
+                return;
+            }
 
             aMessages.forEach(function (sMessage) {
                 switch (sMessage.type) {
@@ -285,15 +371,9 @@ sap.ui.define([
                 sgmrODataModel.setHeaders(oController.getModelHeader());
                 sgmrODataModel.setUseBatch(false);
 
-                // evita que o model faça um GET/refresh automático após o create
                 if (typeof sgmrODataModel.setRefreshAfterChange === "function") {
                     sgmrODataModel.setRefreshAfterChange(false);
                 }
-
-                // garante path sem barra inicial
-                var sPath = (pServico && pServico.indexOf("/") === 0) ? pServico.substring(1) : pServico;
-
-                console.log("enviarDados -> create path:", sPath, "payload:", pDados);
 
                 sgmrODataModel.create("/" + pServico, pDados, {
                     success: function (oData) {
@@ -304,42 +384,22 @@ sap.ui.define([
                         reject(oError);
                     }
                 });
-                sgmrODataModel.attachRequestSent(function () {
 
-                });
-                sgmrODataModel.attachRequestCompleted(function () {
+                // sgmrODataModel.attachRequestFailed(function (oError) {
+                //     oController.atualizarBusyDialog(oError.getParameter("message"));
+                //     oController.closeBusyDialog();
+                //     const response = oError.getParameter("response");
+                //     const titulo   = response?.statusCode == 500 ? "Erro interno no SAP" : "Problemas de conexão";
+                //     oController.adicionarMensagemErro(titulo, "Problemas no serviço " + pServico, response);
+                //     reject(oError);
+                // });
 
-                });
-                sgmrODataModel.attachRequestFailed(function (oError) {
-                    oController.atualizarBusyDialog(oError.getParameter("message"));
-                    oController.closeBusyDialog()
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'Sem Conexão',
-                        description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                        subtitle: 'Problemas de conexão',
-                        counter: 1
-                    };
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                    reject(oError);
-                });
-                sgmrODataModel.attachMetadataLoaded(function () {
-
-                });
-                sgmrODataModel.attachMetadataFailed(function (oError) {
-                    oController.atualizarBusyDialog(oError.getParameter("message"));
-                    oController.closeBusyDialog()
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'Sem Conexão',
-                        description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                        subtitle: 'Problemas de conexão',
-
-                        counter: 1
-                    };
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                    reject(oError);
-                });
+                // sgmrODataModel.attachMetadataFailed(function (oError) {
+                //     oController.atualizarBusyDialog(oError.getParameter("message"));
+                //     oController.closeBusyDialog()
+                //     oController.adicionarMensagemErro("Problemas no SAP", "Metadados no serviço " + pServico, oError.getParameter('response'));
+                //     reject(oError);
+                // });
             })
 
         },
@@ -405,43 +465,34 @@ sap.ui.define([
                         reject(oError);
                     }
                 });
-                sgmrODataModel.attachRequestSent(function () {
-                    oController.closeBusyDialog();
-                });
-                sgmrODataModel.attachRequestCompleted(function () {
-                    oController.closeBusyDialog();
-                });
-                sgmrODataModel.attachRequestFailed(function (oError) {
-                    oController.closeBusyDialog();
-                    oController.atualizarBusyDialog(oError.getParameter("message"));
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'Sem Conexão',
-                        description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                        subtitle: 'Problemas de conexão',
 
-                        counter: 1
-                    };
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                    reject(oError);
-                });
-                sgmrODataModel.attachMetadataLoaded(function () {
-                    oController.closeBusyDialog();
-                });
-                sgmrODataModel.attachMetadataFailed(function (oError) {
-                    oController.atualizarBusyDialog(oError.getParameter("message"));
-                    oController.closeBusyDialog();
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'Sem Conexão',
-                        description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                        subtitle: 'Problemas de conexão',
+                // sgmrODataModel.attachRequestSent(function () {
+                //     oController.closeBusyDialog();
+                // });
 
-                        counter: 1
-                    };
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                    reject(oError);
-                });
+                // sgmrODataModel.attachRequestCompleted(function () {
+                //     oController.closeBusyDialog();
+                // });
+
+                // sgmrODataModel.attachRequestFailed(function (oError) {
+                //     oController.closeBusyDialog();
+                //     oController.atualizarBusyDialog(oError.getParameter("message"));
+                //     const response = oError.getParameter("response");
+                //     const titulo   = response?.statusCode == 500 ? "Erro interno no SAP" : "Problemas de conexão";
+                //     oController.adicionarMensagemErro(titulo, "Problemas no serviço " + pServico, response);
+                //     reject(oError);
+                // });
+
+                // sgmrODataModel.attachMetadataLoaded(function () {
+                //     oController.closeBusyDialog();
+                // });
+
+                // sgmrODataModel.attachMetadataFailed(function (oError) {
+                //     oController.atualizarBusyDialog(oError.getParameter("message"));
+                //     oController.closeBusyDialog();
+                //     oController.adicionarMensagemErro("Problemas no SAP", "Problemas no serviço " + pServico, oError.getParameter("response"));
+                //     reject(oError);
+                // });
 
             })
         },
@@ -468,40 +519,22 @@ sap.ui.define([
                         aPerfis.push(oPerfil);
                     }
                     oController.getOwnerComponent().getModel("listaPerfilModel").setData(aPerfis)
-
-
                     var vDescricao = "Perfis sincronizados " + aPerfis.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Perfis encaminhados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Perfis download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
+                    oController.adicionarMensagemSucesso(vDescricao, "Download de perfis", "Perfis encaminhados para o dispositivo");
                     resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                }).catch( result => reject(result) )
             })
         },
 
         carregarPerfilIndexDB: function () {
             oController = this;
-
             return new Promise((resolve, reject) => {
-
-                oController.lerTabelaIndexDB("tb_perfil").then(
-                    function (result) {
-                        oController.getOwnerComponent().getModel("listaPerfilModel").setData(result.tb_perfil)
-                        resolve()
-                    }).catch(
-                        function (result) {
-                            reject()
-                        })
-
+                oController.lerTabelaIndexDB("tb_perfil")
+                .then( result => {
+                    oController.getOwnerComponent().getModel("listaPerfilModel").setData(result.tb_perfil);
+                    resolve();
+                })
+                .catch(() => reject());
             })
         },
 
@@ -510,31 +543,16 @@ sap.ui.define([
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocentros"));
                 oController.carregarDados("ListaCentroSet", []).then(function (result) {
                     for (let x = 0; x < result.results.length; x++) {
-
                         result.results.forEach(element => {
                             delete element.__metadata
-
                         });
                     }
 
                     oController.getOwnerComponent().getModel("listaCentrosModel").setData(result.results);
-
-
                     var vDescricao = "Centros sincronizados " + result.results.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Centros encaminhados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Centros download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
+                    oController.adicionarMensagemSucesso(vDescricao, "Centros encaminhados para o dispositivo", "Download de centros");
                     resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                }).catch( result => reject(result) )
             })
         },
 
@@ -545,34 +563,16 @@ sap.ui.define([
                     var aAutorizacoes = []
                     for (let x = 0; x < result.results.length; x++) {
                         const oAutorizacao = result.results[x];
-                        //oAutorizacao.AutorizacaoSet = oAutorizacao;
-                        // oAutorizacao.forEach(element => {
-                        //     delete element.__metadata
-
-                        // });
-
-
                         delete oAutorizacao.__metadata
                         aAutorizacoes.push(oAutorizacao);
                     }
                     oController.getOwnerComponent().getModel("listaAutorizacaoModel").setData(aAutorizacoes)
-
-
-                    var vDescricao = "Autorizações sincronizadas " + aAutorizacoes.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Autorizações encaminhados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Autorizações download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
+                    oController.adicionarMensagemSucesso("Autorizações sincronizadas " + aAutorizacoes.length, "Autorizações download", "Autorizações encaminhados para o dispositivo");
                     resolve()
-                }).catch(
-                    function (result) {
-                        oController.closeBusyDialog();
-                        reject(result)
-                    })
+                }).catch( result => {
+                    oController.closeBusyDialog();
+                    reject(result)
+                })
             })
         },
 
@@ -597,13 +597,10 @@ sap.ui.define([
             }
         },
 
-
-        //Revisar
         sincronizarReceber: function () {
 
             oController = this;
             return new Promise((resolve, reject) => {
-
                 if (oController.checkConnection() == true) {
 
                     // Carregar dados do servidor quando há conexão
@@ -641,7 +638,6 @@ sap.ui.define([
                                     var oAutorizacao = aAutorizacoes.find((oElement) => auth.CodigoAutorizacao == oElement.CodigoAutorizacao);
                                     auth.DescrAutorizacao = oAutorizacao ? oAutorizacao.DescrAutorizacao : ""
                                 })
-
                             });
 
                             var aGravacoes = [
@@ -739,51 +735,34 @@ sap.ui.define([
         },
 
         sincronizar: function () {
-            //oController.carregarPerfil();
-            //oController.carregarAutorizacao()
             oController = this;
-
             return new Promise((resolve, reject) => {
                 if (oController.checkConnection() == true) {
-                    oController.getOwnerComponent().getModel("mensagensModel").setData([])
-                    oController.verificarDisponibilidadeServidor().then(
-                        function (result) {
-                            oController.sincronizarEnviar().then(
-                                function (result) {
-                                    oController.sincronizarReceber().then(
-                                        function (result) {
-                                            var loginInProgress = false;
-                                            try {
-                                                loginInProgress = oController.getOwnerComponent().getModel("busyDialogModel").getProperty("/loginInProgress");
-                                            } catch (e) {
-                                                loginInProgress = false;
-                                            }
+                    oController.limparMensagens();
+                    oController.verificarDisponibilidadeServidor()
+                    .then(result => {
+                        oController.sincronizarEnviar()
+                        .then(result => {
+                            oController.sincronizarReceber()
+                            .then(result => {
+                                var loginInProgress = false;
+                                try {
+                                    loginInProgress = oController.getOwnerComponent().getModel("busyDialogModel").getProperty("/loginInProgress");
+                                } catch (e) {
+                                    loginInProgress = false;
+                                }
 
-                                            if (!loginInProgress) {
-                                                oController.closeBusyDialog();
-                                            }
-                                            resolve(result)
-                                        }).catch(
-                                            function (result) {
-                                                //oController.forceCloseBusyDialog();
-                                                reject(result)
-                                            })
-                                }).catch(
-                                    function (result) {
-                                        //oController.forceCloseBusyDialog();
-                                        reject(result)
-                                    })
-                        }).catch(
-                            function (result) {
-                                //oController.closeBusyDialog();
-                                reject(result)
-                            })
+                                if (!loginInProgress) {
+                                    oController.closeBusyDialog();
+                                }
+                                resolve(result)
+                            }).catch( result => reject(result) )
+                        }).catch( result => reject(result) )
+                    }).catch( result => reject(result) )
                 } else {
                     reject()
                 }
             })
-
-
         },
 
         openBusyDialog: function () {
@@ -867,9 +846,7 @@ sap.ui.define([
 
             } else {
                 return oController.getOwnerComponent().getModel(pModel);
-
             }
-
         },
 
         getModelHeader: function () {
@@ -970,8 +947,6 @@ sap.ui.define([
 
                 if (aPerfilSetPromises.length > 0) {
                     Promise.all(aPerfilSetPromises).then(function (results) {
-                        console.log("prepararPerfil -> resultados recebidos:", results);
-
                         results.forEach(function (oResp, idx) {
                             try {
                                 // Normaliza várias formas de resposta possíveis
@@ -984,7 +959,7 @@ sap.ui.define([
                                 } else if (oResp && (oResp.Tipomensagem || oResp.Mensagem)) {
                                     oFirst = oResp;
                                 } else {
-                                    console.warn("prepararPerfil -> resposta em formato inesperado (índice " + idx + "):", oResp);
+                                    //console.warn("prepararPerfil -> resposta em formato inesperado (índice " + idx + "):", oResp);
                                     oFirst = { Tipomensagem: "", Mensagem: "" };
                                 }
 
@@ -996,14 +971,7 @@ sap.ui.define([
                                 }
 
                                 var sMsg = (oFirst && oFirst.Mensagem) || (oResp && oResp.Mensagem) || "";
-
-                                var oMensagem = {
-                                    "title": "Gestão de perfil",
-                                    "description": sMsg,
-                                    "type": vTipo,
-                                    "subtitle": sMsg
-                                };
-                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem);
+                                oController.adicionarMensagem(vTipo, "Gestão de perfil", sMsg);
                             } catch (e) {
                                 console.error("prepararPerfil -> erro ao processar resultado no índice " + idx + ":", e, oResp);
                             }
@@ -1012,7 +980,6 @@ sap.ui.define([
                         resolve();
                     }).catch(function (err) {
                         console.error("prepararPerfil -> Promise.all rejeitado:", err);
-                        // Não fechar o busy dialog aqui - será fechado no sincronizar principal
                         reject(err);
                     });
                 } else {
@@ -1028,47 +995,13 @@ sap.ui.define([
                 oController.openBusyDialog();
                 oController.sincronizar().then(function (result) {
                     oController.closeBusyDialog();
-
-                    var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-
-                    var oModel = new JSONModel();
-                    oModel.setData(aMockMessages);
-                    oController.getView().setModel(oModel);
-                    oController.getView().getModel().refresh()
-
                 }).catch(
                     function (result) {
                         oController.closeBusyDialog();
                     });
             } else {
-                MessageToast.show("Dispositivo sem conexão com a internet no momento.");
-                var oMockMessage = {
-                    type: 'Error',
-                    title: 'Sem Conexão',
-                    description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                    subtitle: 'Problemas de conexão',
-
-                    counter: 1
-                };
-                aMockMessages.push(oMockMessage)
-
-                var oModel = new JSONModel();
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
+                oController.adicionarMensagemErro("Sem conexão", "Problemas de conexão", "Sem conexão com internet no momento. Tente mais tarde novamente");
             }
-
-
         },
 
         sincronizarEnviar: function () {
@@ -1158,7 +1091,7 @@ sap.ui.define([
 
                 if (aUsuarioPromises.length > 0) {
                     Promise.all(aUsuarioPromises).then(function (results) {
-                        console.log("prepararUsuario -> resultados recebidos:", results);
+                        //console.log("prepararUsuario -> resultados recebidos:", results);
 
                         results.forEach(function (oResp, idx) {
                             try {
@@ -1184,13 +1117,7 @@ sap.ui.define([
 
                                 var sMsg = (oFirst && oFirst.Mensagem) || (oResp && oResp.Mensagem) || "";
 
-                                var oMensagem = {
-                                    "title": "Gestão de usuário",
-                                    "description": sMsg,
-                                    "type": vTipo,
-                                    "subtitle": sMsg
-                                };
-                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem);
+                                oController.adicionarMensagem(vTipo, "Gestão de usuário", sMsg);
                             } catch (e) {
                                 console.error("prepararUsuario -> erro ao processar resultado no índice " + idx + ":", e, oResp);
                             }
@@ -1199,7 +1126,6 @@ sap.ui.define([
                         resolve();
                     }).catch(function (err) {
                         console.error("prepararUsuario -> Promise.all rejeitado:", err);
-                        // Não fechar o busy dialog aqui - será fechado no sincronizar principal
                         reject(err);
                     });
                 } else {
@@ -1208,97 +1134,6 @@ sap.ui.define([
             });
         },
 
-
-        /* prepararUsuario: function () {
-            return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
-                var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData();
-                var aUsuarioSet = []
-
-                if (aUsuarios && aUsuarios.length) {
-                    aUsuarios.forEach(oUsuario => {
-                        if (oUsuario.Bloqueado == true) {
-                            oUsuario.Bloqueado = "X"
-                        } else {
-                            oUsuario.Bloqueado = ""
-                        }
-                        switch (oUsuario.Sincronizado) {
-                            case "N":
-                                var oUsuarioSet = {
-                                    "CodUsuario": oUsuario.CodUsuario,
-                                    "Nome": oUsuario.Nome,
-                                    "Senha": oUsuario.Senha,
-                                    "Deposito": oUsuario.Deposito,
-                                    "Bloqueado": oUsuario.Bloqueado,
-                                    "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
-                                    "Sincronizado": "N"
-                                }
-                                aUsuarioSet.push(oController.enviarDados("UsuarioSet", oUsuarioSet))
-                                break;
-                            case "U":
-                                var oUsuarioSet = {
-                                    "CodUsuario": oUsuario.CodUsuario,
-                                    "Nome": oUsuario.Nome,
-                                    "Senha": oUsuario.Senha,
-                                    "Deposito": oUsuario.Deposito,
-                                    "Bloqueado": oUsuario.Bloqueado,
-                                    "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
-                                    "Sincronizado": "U"
-                                }
-                                aUsuarioSet.push(oController.enviarDados("UsuarioSet", oUsuarioSet))
-                                break;
-                            case "E":
-                                var oUsuarioSet = {
-                                    "CodUsuario": oUsuario.CodUsuario,
-                                    "Nome": oUsuario.Nome,
-                                    "Senha": oUsuario.Senha,
-                                    "Deposito": oUsuario.Deposito,
-                                    "Bloqueado": oUsuario.Bloqueado,
-                                    "Perfil": oUsuario.CodigoPerfil ? oUsuario.CodigoPerfil.toString() : '',
-                                    "Sincronizado": "E"
-                                }
-                                aUsuarioSet.push(oController.enviarDados("UsuarioSet", oUsuarioSet))
-                                break;
-                            default:
-                                break;
-                        }
-                    });
-                }
-
-                if (aUsuarioSet.length > 0) {
-                    Promise.all(aUsuarioSet).then(
-                        function (result) {
-                            result.forEach(oUsuario => {
-                                var vTipo
-                                switch (oUsuario.Tipomensagem) {
-                                    case "S":
-                                        vTipo = "Success"
-                                        break;
-                                    case "E":
-                                        vTipo = "Error"
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                var oMensagem = {
-                                    "title": "Gestão de usuário",
-                                    "description": oUsuario.Mensagem,
-                                    "type": vTipo,
-                                    "subtitle": oUsuario.Mensagem
-                                }
-                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-                            });
-                            resolve()
-                        }).catch(
-                            function (result) {
-                                // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                                reject()
-                            })
-                } else {
-                    resolve()
-                }
-            })
-        }, */
 
         atualizarMaterialRodante: function () {
             return new Promise((resolve, reject) => {
@@ -1310,32 +1145,22 @@ sap.ui.define([
 
         atualizarPerfil: function () {
             return new Promise((resolve, reject) => {
-                oController.lerTabelaIndexDB("tb_perfil").then(
-                    function (result) {
-                        if (result.tb_perfil) {
-                            oController.getOwnerComponent().getModel("listaPerfilModel").setData(result.tb_perfil);
-                            oController.prepararPerfil().then(
-                                function (result) {
-                                    resolve()
-                                }).catch(
-                                    function (result) {
-                                        reject()
-                                    })
-                        }
-
-                    }).catch(
-                        function (result) {
-                            reject(result)
-                        })
-
+                oController.lerTabelaIndexDB("tb_perfil")
+                .then(result => {
+                    if (result.tb_perfil) {
+                        oController.getOwnerComponent().getModel("listaPerfilModel").setData(result.tb_perfil);
+                        oController.prepararPerfil()
+                        .then( result => resolve())
+                        .catch( result => reject())
+                    }
+                })
+                .catch( result => reject(result))
             })
         },
 
         carregarOffline: function () {
-
             oController = this;
             return new Promise((resolve, reject) => {
-
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregaroffline"));
                 var aLeituras = [
                     oController.carregarDadosIndexDB("tb_autorizacao", "autorizacoesModel"),
@@ -1343,35 +1168,24 @@ sap.ui.define([
                     oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel"),
                     oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")
                 ]
-                Promise.all(aLeituras).then(
-                    function (result) {
-                        resolve()
-
-                    }).catch(
-                        function (result) {
-                            oController.closeBusyDialog();
-                            reject(result)
-                        })
-
+                Promise.all(aLeituras)
+                .then( result => resolve())
+                .catch( result =>  {
+                    oController.closeBusyDialog();
+                    reject(result);
+                })
             })
-
         },
 
         carregarOrdens: function () {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoordens"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
 
                 var aFiltros = [
-                    {
-                        key: "Centro",
-                        value: oUsuario.Centro
-                    },
-                    {
-                        key: "Deposito",
-                        value: oUsuario.Deposito
-                    }]
+                    { key: "Centro",   value: oUsuario.Centro },
+                    { key: "Deposito", value: oUsuario.Deposito }
+                ]
                 oUsuario.Autorizacoes.forEach(element => {
                     if (element.CodigoAutorizacao != "000") {
                         aFiltros.push({
@@ -1400,44 +1214,17 @@ sap.ui.define([
                     oController.getOwnerComponent().getModel("ordensModel").setData(aOrdens)
                     oController.getOwnerComponent().getModel("operacoesModel").setData(aOperacoes)
 
-                    var vDescricao = "Ordem recebidas " + aOrdens.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Ordens encaminhadas para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Ordens download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
+                    oController.adicionarMensagemSucesso("Ordens recebidas " + aOrdens.length, "Download de ordens", "Ordens encaminhadas para o dispositivo");
+                    oController.adicionarMensagemSucesso("Operações recebidas " + aOperacoes.length, "Download de operações", "Operações encaminhadas para o dispositivo");
 
-                    var vDescricao = "Operações recebidas " + aOperacoes.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Operações encaminhadas para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Operações download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    resolve();
+                }).catch( result => reject(result));
             })
-
         },
 
         carregarFormulario: function () {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoformularios"));
-                /* 				var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
-                                var aFiltros = [
-                                    {
-                                        key: "Centro",
-                                        value: oUsuario.Centro
-                                    }] */
                 oController.carregarDados("ListaFormularioSet").then(function (result) {
                     var aFormularios = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -1446,29 +1233,15 @@ sap.ui.define([
                         aFormularios.push(oFormulario);
                     }
                     oController.getOwnerComponent().getModel("listaFormularioModel").setData(aFormularios)
+                    oController.adicionarMensagemSucesso("Formulários sincronizados " + aFormularios.length, "Download de formulários", "Formulários encaminhados para o dispositivo");
 
-                    var vDescricao = "Formulários sincronizados " + aFormularios.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Formulário encaminhado para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Formulário download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    resolve();
+                }).catch( result => reject(result));
             })
-
         },
 
 
         carregarEquipamento: function () {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoequipamentos"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
@@ -1485,24 +1258,11 @@ sap.ui.define([
                         aEquipamentos.push(oEquipamento);
                     }
                     oController.getOwnerComponent().getModel("listaEquipamentoModel").setData(aEquipamentos)
+                    oController.adicionarMensagemSucesso("Material Rodante sincronizado " + aEquipamentos.length, "Download de meteriais rodantes", "Material Rodante encaminhado para o dispositivo");
 
-                    var vDescricao = "Material Rodante sincronizado " + aEquipamentos.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Material Rodante encaminhado para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Material Rodante download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    resolve();
+                }).catch( result => reject(result));
             })
-
         },
 
 
@@ -1512,14 +1272,8 @@ sap.ui.define([
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandomateriais"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                 var aFiltros = [
-                    {
-                        key: "Centro",
-                        value: oUsuario.Centro
-                    },
-                    {
-                        key: "Deposito",
-                        value: oUsuario.Deposito
-                    }
+                    { key: "Centro",   value: oUsuario.Centro },
+                    { key: "Deposito", value: oUsuario.Deposito }
                 ]
 
                 oController.carregarDados("ListaMateriaisSet", aFiltros).then(function (result) {
@@ -1534,51 +1288,22 @@ sap.ui.define([
                                 aTipos.push(oTipo)
                             }
                         } else {
-                            oMaterial.ListaTiposAvaliacaoSet.results.push(
-                                {
-                                    Material: "",
-                                    TipoAvaliacao: "NOVO"
-                                }
-                            )
+                            oMaterial.ListaTiposAvaliacaoSet.results.push( { Material: "", TipoAvaliacao: "NOVO" } )
                         }
-
-                        // delete oMaterial.ListaTiposAvaliacaoSet
                         delete oMaterial.__metadata
                         aMateriais.push(oMaterial);
                     }
                     oController.getOwnerComponent().getModel("materiaisModel").setData(aMateriais)
                     oController.getOwnerComponent().getModel("tiposAvaliacaoModel").setData(aTipos)
-
-                    var vDescricao = "Materiais sincronizados " + aMateriais.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Materiais encaminhados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Materiais download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    var vDescricao = "Tipo de Avaliação sincronizados " + aTipos.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Tipo de Avaliação encaminhados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Tipo de Avaliação download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    oController.adicionarMensagemSucesso("Materiais sincronizados " + aMateriais.length, "Download de materiais", "Materiais encaminhados para o dispositivo");
+                    oController.adicionarMensagemSucesso("Tipos de avaliação sincronizados " + aTipos.length, "Download de Tipos de avaliação", "Tipos de avaliação encaminhados para o dispositivo");
+                    resolve();
+                }).catch( result => reject(result));
             })
 
         },
 
         carregarCatalogos: function () {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocatalogos"));
                 var aListaCatalogos = [];
@@ -1601,28 +1326,13 @@ sap.ui.define([
                         }
 
                         oController.getOwnerComponent().getModel("catalogosModel").setData(aCatalogos)
-
-                        var vDescricao = "Catálogos sincronizados " + aCatalogos.length
-                        var oMensagem = {
-                            "title": vDescricao,
-                            "description": "Catálogos encaminhados para o dispositivo",
-                            "type": "Success",
-                            "subtitle": "Catálogos download"
-                        }
-                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                        resolve()
-                    }).catch(
-                        function (result) {
-                            // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                            reject();
-                            console.table(result)
-                        })
+                        oController.adicionarMensagemSucesso("Catálogos sincronizados " + aCatalogos.length, "Download de catálogos", "Catálogos encaminhados para o dispositivo");
+                        resolve();
+                    }).catch( result => reject(result));
             })
         },
 
         carregarComponentes: function (aFormularios) {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocomponentes"));
                 var aComponentes = {
@@ -1651,22 +1361,9 @@ sap.ui.define([
                     });
 
                     oController.getOwnerComponent().getModel("listaComponentesModel").setData(aListaComponentes)
-
-                    var vDescricao = "Componentes sincronizados " + aListaComponentes.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Componentes sincronizados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Componentes download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    oController.adicionarMensagemSucesso("Componentes sincronizados " + aListaComponentes.length, "Download de componentes", "Componentes encaminhados para o dispositivo");
+                    resolve();
+                }).catch( result => reject(result));
             })
 
         },
@@ -1700,27 +1397,13 @@ sap.ui.define([
                     });
 
                     oController.getOwnerComponent().getModel("listaCondicoesModel").setData(aListaCondicoes)
-
-                    var vDescricao = "Condições sincronizados " + aListaCondicoes.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Condições sincronizadas para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Condições download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    oController.adicionarMensagemSucesso("Condições sincronizadas " + aListaCondicoes.length, "Download de condições", "Condições encaminhadas para o dispositivo");
+                    resolve();
+                }).catch( result => reject(result));
             })
         },
 
         carregarInspecoes: function (aFormularios) {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
                 var aInspecoes = {
@@ -1749,27 +1432,13 @@ sap.ui.define([
                     });
 
                     oController.getOwnerComponent().getModel("listaInspecoesModel").setData(aListaInspecoes)
-
-                    var vDescricao = "Inspeções sincronizadas " + aListaInspecoes.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Inspeções sincronizadas para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Inspeções download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    oController.adicionarMensagemSucesso("Inspeções sincronizadas " + aListaInspecoes.length, "Download de inspeções", "Inspeções encaminhadas para o dispositivo");
+                    resolve();
+                }).catch( result => reject(result));
             })
         },
 
         carregarListaDesgaste: function (aModelos) {
-
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
                 var aDesgastes = {
@@ -1795,30 +1464,15 @@ sap.ui.define([
                     });
 
                     oController.getOwnerComponent().getModel("listaDesgastesModel").setData(aLista)
-
-                    var vDescricao = "Desgastes sincronizados " + aLista.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Desgastes sincronizados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Desgastes download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                        reject(result)
-                    })
+                    oController.adicionarMensagemSucesso("Desgastes sincronizados " + aLista.length, "Download de desgastes", "Desgastes encaminhados para o dispositivo");
+                    resolve();
+                }).catch( result => reject(result));
             })
         },
 
         carregarDadosIndexDB: function (pTabela, pModel) {
             oController = this;
-
             return new Promise((resolve, reject) => {
-
                 oController.lerTabelaIndexDB(pTabela).then(
                     function (result) {
                         var data = result[pTabela];
@@ -1835,11 +1489,8 @@ sap.ui.define([
                         }
 
                         oController.getOwnerComponent().getModel(pModel).setData(data)
-                        resolve()
-                    }).catch(
-                        function (result) {
-                            reject()
-                        })
+                        resolve();
+                    }).catch( result => reject(result));
 
             })
         },
@@ -1850,24 +1501,21 @@ sap.ui.define([
 
             return new Promise((resolve, reject) => {
 
-                console.log("Iniciando leitura da tabela " + pTabela);
-
-                var oDBData
-
+                var oDBData;
                 var db;
                 var databaseName = oController.getDatabaseName();
                 var databaseVersion = oController.getDatabaseVersion();
                 var openRequest = window.indexedDB.open(databaseName, databaseVersion);
 
                 openRequest.onerror = function (event) {
-                    console.log(openRequest.errorCode);
+                    console.error(openRequest.errorCode);
                     reject('Erro durante a leitura do banco de dados!')
                 };
 
                 openRequest.onsuccess = function (event) {
                     db = event.target.result;
                     db.onerror = function () {
-                        console.log(db.errorCode);
+                        console.error(db.errorCode);
                         reject('Erro durante a leitura do banco de dados!')
                     };
 
@@ -1937,27 +1585,17 @@ sap.ui.define([
                 if (oConexao.verificarDisponibilidade) {
                     if (oController.checkConnection() == true) {
                         if (oConexao.url && oConexao.urlsemclient) {
-                            // Validar se a URL tem formato válido
                             try {
                                 new URL(oConexao.urlsemclient);
                             } catch (urlError) {
                                 console.error("URL inválida:", oConexao.urlsemclient, urlError);
-                                var oMockMessage = {
-                                    type: 'Error',
-                                    title: 'URL Inválida',
-                                    description: "O endereço configurado não é válido: " + oConexao.urlsemclient,
-                                    subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"),
-                                    counter: 1
-                                };
-                                oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                                reject()
+                                oController.adicionarMensagemErro("URL inválida", oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"), "O endereço configurado não é válido: " + oConexao.urlsemclient);
+                                reject();
                                 return;
                             }
 
                             oController.openBusyDialog();
                             oController.atualizarBusyDialog("Tentando conexão com o endereço " + oConexao.urlsemclient);
-
-                            console.log("Testando conexão com:", oConexao.urlsemclient);
 
                             try {
                                 fetch(oConexao.urlsemclient, {
@@ -1965,59 +1603,25 @@ sap.ui.define([
                                     method: 'GET',
                                     cache: 'no-cache'
                                 }).then(r => {
-                                    console.log("Fetch success:", r);
                                     oController.atualizarBusyDialog("Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
-
-                                    var oMockMessage = {
-                                        type: 'Success',
-                                        title: oController.getView().getModel("i18n").getResourceBundle().getText("sucessoservidor"),
-                                        description: "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso",
-                                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosucesso"),
-                                        counter: 1
-                                    };
-
-                                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
+                                    oController.adicionarMensagemSucesso(oController.getView().getModel("i18n").getResourceBundle().getText("sucessoservidor"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosucesso"), "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
                                     resolve()
                                 })
                                     .catch(e => {
                                         console.error("Fetch error:", e);
-                                        // oController.atualizarBusyDialog("Não foi possível alcançar o endereço " + oConexao.urlsemclient + " informado");
-
-                                        // var oMockMessage = {
-                                        //     type: 'Error',
-                                        //     title: oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"),
-                                        //     description: "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient,
-                                        //     subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"),
-                                        //     counter: 1
-                                        // };
-
-                                        // oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                                        resolve() // Resolve para não quebrar o fluxo
+                                        oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"), "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient);
+                                        resolve();
                                     });
                             } catch (error) {
-                                resolve()
+                                resolve();
                             }
                         } else {
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oController.getView().getModel("i18n").getResourceBundle().getText("configurarconexao"),
-                                description: "Configure os dados de conexão antes de continuar",
-                                subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"),
-                                counter: 1
-                            };
-                            oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
-                            reject()
+                            oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("configurarconexao"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"), "Configure os dados de conexão antes de continuar");
+                            reject();
                         }
 
                     } else {
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oController.getView().getModel("i18n").getResourceBundle().getText("testeerro"),
-                            description: "Por favor verifque a disponibilidade de rede ou wi-fi.",
-                            subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"),
-                            counter: 1
-                        };
-                        oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMockMessage)
+                        oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("testeerro"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"), "Por favor verifque a disponibilidade de rede ou wi-fi");
                         reject()
                     }
                 } else {
@@ -2044,8 +1648,7 @@ sap.ui.define([
                                 oUsuario.Autorizacoes = oPerfil.AutorizacaoSet
                             }
                         } else {
-                            // Perfis ainda não carregados - mantém dados originais do usuário
-                            console.log("Perfis ainda não disponíveis durante carregamento de usuários");
+                            console.warn("Perfis ainda não disponíveis durante carregamento de usuários");
                         }
 
                         if (oUsuario.Bloqueado == 'X') {
@@ -2058,60 +1661,42 @@ sap.ui.define([
                         aUsuarios.push(oUsuario);
                     }
                     oController.getOwnerComponent().getModel("listaUsuariosModel").setData(aUsuarios)
-
-
-                    var vDescricao = "Usuários sincronizados " + aUsuarios.length
-                    var oMensagem = {
-                        "title": vDescricao,
-                        "description": "Usuários encaminhados para o dispositivo",
-                        "type": "Success",
-                        "subtitle": "Usuários download"
-                    }
-                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-
-                    resolve()
-                }).catch(
-                    function (result) {
-                        oController.closeBusyDialog();
-                        reject(result)
-                    })
+                    oController.adicionarMensagemSucesso("Usuários sincronizados " + aUsuarios.length, "Download de usuários", "Usuários encaminhados para o dispositivo");
+                    resolve();
+                }).catch( result =>  {
+                    oController.closeBusyDialog();
+                    reject(result);
+                })
             })
         },
 
         limparTabelaIndexDB: function (pTabela) {
-
             oController = this;
-
             return new Promise((resolve, reject) => {
-
                 var db;
                 var databaseName = oController.getDatabaseName();
                 var databaseVersion = oController.getDatabaseVersion();
                 var openRequest = window.indexedDB.open(databaseName, databaseVersion);
 
                 openRequest.onerror = function (event) {
-                    console.log(openRequest.errorCode);
-                    // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
+                    console.error(openRequest.errorCode);
                     reject();
                 };
 
                 openRequest.onsuccess = function (event) {
                     db = event.target.result;
                     db.onerror = function () {
-                        console.log(db.errorCode);
-                        // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
+                        console.error(db.errorCode);
                         reject();
                     };
                     var oTransaction = db.transaction([pTabela], "readwrite");
                     oTransaction.oncomplete = function (event) {
                         db.close();
-                        // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
                         resolve();
                     };
 
                     oTransaction.onerror = function (event) {
                         db.close();
-                        // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
                         reject();
                     };
                     var oObjectStore = oTransaction.objectStore(pTabela);
@@ -2123,10 +1708,7 @@ sap.ui.define([
 
         gravarTabelaIndexDB: function (pTabela, pData) {
             var oController = this;
-
             return new Promise((resolve, reject) => {
-
-
                 var vMsg = oController.getView().getModel("i18n").getResourceBundle().getText("gravandotabela") + " " + pTabela;
                 oController.atualizarBusyDialog(vMsg);
 
@@ -2136,30 +1718,26 @@ sap.ui.define([
                 var openRequest = window.indexedDB.open(databaseName, databaseVersion);
 
                 openRequest.onerror = function (event) {
-                    console.log(openRequest.errorCode);
-                    // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
+                    console.error(openRequest.errorCode);
                     reject()
                 };
 
                 openRequest.onsuccess = function (event) {
                     db = event.target.result;
                     db.onerror = function () {
-                        console.log(db.errorCode);
-                        // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
+                        console.error(db.errorCode);
                         reject()
                     };
                     var objectStore = db.transaction([pTabela], "readwrite").objectStore(pTabela);
                     objectStore.openCursor().onsuccess = function (event) {
                         var transaction = db.transaction([pTabela], "readwrite");
                         transaction.oncomplete = function (event) {
-
                             db.close();
                             resolve()
                         };
 
                         transaction.onerror = function (event) {
                             db.close();
-                            // Não fechar o busy dialog aqui - será fechado no onSincronizarGeral
                             reject();
                         };
                         var values = pData
@@ -2167,28 +1745,24 @@ sap.ui.define([
                         if (values.length == undefined) {
                             var objectStoreRequest = objectStore.add(values);
                             objectStoreRequest.onsuccess = function (event) {
-                                console.table(event);
+                                //console.table(event);
                             }
 
                             objectStoreRequest.onerror = function (oError) {
                                 console.table(oError);
-
                             }
                         } else {
                             for (var i = 0; i < values.length; i++) {
                                 var objectStoreRequest = objectStore.add(values[i]);
                                 objectStoreRequest.onsuccess = function (event) {
-                                    console.table(event);
+                                    //console.table(event);
                                 }
 
                                 objectStoreRequest.onerror = function (oError) {
                                     console.table(oError);
-
                                 }
                             }
                         }
-
-
                     };
                 };
             })
@@ -2467,18 +2041,11 @@ sap.ui.define([
                                 const vInspecao             = element;
                                 const vStatus               = vInspecao.Status;
                                 aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
-                                    const vTipo     = tipoStatus[oMedicaoRetorno.Type] || "None";
-                                    const oMensagem = {
-                                        "title"       : "Medição",
-                                        "description" : oMedicaoRetorno.Message,
-                                        "type"        : vTipo,
-                                        "subtitle"    : oMedicaoRetorno.MessageV1
-                                    }
-                                    oController.getOwnerComponent().getModel("mensagensModel").getData().push(oMensagem)
-                                    oController.getOwnerComponent().getModel("mensagensModel").refresh(true)
-                                    oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([])
+                                    const vTipo = tipoStatus[oMedicaoRetorno.Type] || "None";
+                                    oController.adicionarMensagem(vTipo, "Medição", oMedicaoRetorno.MessageV1, oMedicaoRetorno.Message);
+                                    oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([]);
                                     if (vStatus == 'E') {
-                                        oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao)
+                                        oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao);
                                     }
                                 });
                             });
@@ -2487,19 +2054,15 @@ sap.ui.define([
                             .then(result => {
                                 resolve(result);
                             }).catch(result => {
-                                console.log("ERRO: sincronizarReceber() ===================");
                                 console.error(result);
                                 resolve(result);
                             })
                         }).catch(result => {
-                            // Não fechar o busy dialog aqui - será fechado no método sincronizar principal
-                            console.log("ERRO: ===================");
                             console.error(result);
                             reject(result);
                         });
                     } else {
-                        console.log("ERRO: Lista de Medições vazia ===================");
-                        console.error(aListaMedicaoes);
+                        console.log(aListaMedicaoes);
                         resolve();
                     }
                 });

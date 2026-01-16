@@ -28,7 +28,6 @@ sap.ui.define([
                 oView.bindElement("listaEquipamentoModel>/");
                 oView.bindElement("layoutTelaModel>/");
                 oView.bindElement("busyDialogModel>/");
-                oView.bindElement("mensagensModel>/");
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -40,78 +39,27 @@ sap.ui.define([
             },
 
             _handleRouteMatched: function (oEvent) {
-
                 oBundle = oView.getModel("i18n").getResourceBundle();
                 oController.getView().byId("idListaMaterialRodanteTable").setBusy(true);
 
-                /*   var aFilters = []
-                  var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
-                  aFilters.push(filter);
-                  this.getView().byId("idListaMaterialRodanteTable").getBinding("items").filter(aFilters, "Application");
-   */
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
-
                 oView.bindElement("listaEquipamentoModel>/");
 
-                oController.lerTabelaIndexDB("tb_medicao").then(
-                    function (result) {
-
-                        oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
-                            var vIdx = result.tb_medicao.findIndex(e => e.Equnr == element.Equnr);
-                            if (vIdx == -1) {
-                                //      element.Status = 'S';
-                            } else {
-                                element.Status = result.tb_medicao[vIdx].Status
-                            }
-                        });
-                        oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
-                        oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
-                    }).catch(
-                        function (result) {
-                            oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
-                        })
+                oController.lerTabelaIndexDB("tb_medicao")
+                .then( result => {
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
+                        var vIdx = result.tb_medicao.findIndex(e => e.Equnr == element.Equnr);
+                        if (vIdx == -1) {
+                            //      element.Status = 'S';
+                        } else {
+                            element.Status = result.tb_medicao[vIdx].Status
+                        }
+                    });
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
+                    oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                })
+                .catch(() => {
+                    oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                })
 
             },
 
@@ -150,21 +98,9 @@ sap.ui.define([
 
             onSincronizar: function (oEvent) {
                 oView.byId("idListaMaterialRodanteTable").setBusy(true);
-                oController.medicaoUpdate(oController).then(
-                    function (result) {
-                        var oModel = new JSONModel();
-                        oModel.setData(oController.getOwnerComponent().getModel("mensagensModel").getData());
-                        oView.setModel(oModel);
-                        oView.byId("idListaMaterialRodanteTable").setBusy(false);
-                    }).catch(
-                        function (result) {
-                            oView.byId("idListaMaterialRodanteTable").setBusy(false);
-                        })
-
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
+                oController.medicaoUpdate(oController)
+                .then(() => oView.byId("idListaMaterialRodanteTable").setBusy(false))
+                .catch(() => oView.byId("idListaMaterialRodanteTable").setBusy(false));
             },
 
             onSearchEquipamento: function (oEvent) {

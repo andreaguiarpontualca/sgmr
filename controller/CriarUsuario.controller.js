@@ -42,7 +42,6 @@ sap.ui.define([
                 var oNomeInput = oView.byId("nomeInput")
                 var oSenhaInput = oView.byId("senhaInput")
                 var oConfirmarInput = oView.byId("confirmarSenhaInput")
-                //var oCentroInput = oView.byId("centroInput")
                 var oDepositoInput = oView.byId("depositoInput")
                 var oPerfilInput = oView.byId("perfilInput")
 
@@ -50,56 +49,10 @@ sap.ui.define([
                 oNomeInput.setValueState("None");
                 oSenhaInput.setValueState("None");
                 oConfirmarInput.setValueState("None");
-                //oCentroInput.setValueState("None");
-                //oDepositoInput.setValueState("None");
                 oPerfilInput.setValueState("None");
 
                 var oConfirmarButton = oView.byId("confirmarUsuarioButton")
                 oConfirmarButton.setBusy(false);
-
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
 
                 var aFilters = []
                 var filter = new sap.ui.model.Filter({ path: "Selecionado", operator: sap.ui.model.FilterOperator.EQ, value1: true });
@@ -162,14 +115,7 @@ sap.ui.define([
                     var filter = new sap.ui.model.Filter({ path: "Selecionado", operator: sap.ui.model.FilterOperator.EQ, value1: true });
                     aFilters.push(filter);
                     this.getView().byId("idListaAutorizacoesTable").getBinding("items").filter(aFilters, "Application");
-
                 }
-
-            },
-
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             },
 
             onConfirmarUsuario: function (oEvent) {

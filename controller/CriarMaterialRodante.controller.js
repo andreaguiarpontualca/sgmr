@@ -187,11 +187,6 @@ sap.ui.define([
                     oConfirmarButton.setEnabled(true);
                     oConfirmarButton.setBusy(false);
                 }
-            },
-
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             }
 
 

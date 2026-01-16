@@ -52,7 +52,7 @@ sap.ui.define([
         return Controller.extend("com.pontual.sgmr.controller.Anexos", {
             onInit: function () {
                 oController = this;
-                oController.oController = this;
+                // oController.registraModeloMensagem();
                 oView = oController.getView();
 
                 var oModel = new JSONModel();
@@ -250,7 +250,6 @@ sap.ui.define([
                                                             console.error(err);
                                                         },
                                                         success: function success() {
-                                                            console.log("success with opening the file");
                                                             document.removeEventListener("click", eventListener);
                                                         }
                                                     });
@@ -428,6 +427,7 @@ sap.ui.define([
                 }
                 return !bHasError;
             },
+
             _validateAddOrEditUrlDialog: function () {
                 const domRefUrl = Element.getElementById('addViaUrlDialog--urlInput'),
                     domRefName = Element.getElementById('addViaUrlDialog--nameInput'),
@@ -449,8 +449,8 @@ sap.ui.define([
                     url: sUrl
                 };
             },
+
             showEditConfirmation: function () {
-                // validate name and set valueState.
                 const DialogType = mobileLibrary.DialogType;
                 const ValueState = coreLibrary.ValueState;
                 const ButtonType = mobileLibrary.ButtonType;
@@ -495,16 +495,14 @@ sap.ui.define([
                 });
                 this.oWarningMessageDialog.open();
             },
+
             onSearch: function (oEvent) {
-                // add filter for search
                 const aFilters = [];
                 const sQuery = oEvent.getSource().getValue();
                 if (sQuery && sQuery.length > 0) {
                     const filter = new Filter("fileName", FilterOperator.Contains, sQuery);
                     aFilters.push(filter);
                 }
-
-                // update list binding
                 const oTable = this.byId("table-uploadSet");
                 const oBinding = oTable.getBinding("items");
                 oBinding.filter(aFilters, "Application");
@@ -532,89 +530,59 @@ sap.ui.define([
             },
 
             obterArquivo: function (pNome, pImageData) {
-                // pImageData = oView.byId("idImage").getSrc()
                 window.resolveLocalFileSystemURL(pImageData,
                     function success(fileEntry) {
-                        // Do something with the FileEntry object, like write to it, upload it, etc.
-                        // writeFile(fileEntry, imgUri);
                         fileEntry.file(function (file) {
                             var reader = new FileReader();
-
                             reader.onloadend = function () {
-                                console.log("Successful file write: " + this.result);
-                                //                            displayFileData(fileEntry.fullPath + ": " + this.result);             
-                                var blob = new Blob([new Uint8Array(this.result)], { type: "image/jpeg" });
-
-                                var reader2 = new FileReader();
-                                reader2.readAsDataURL(blob);
-                                reader2.onloadend = function () {
-                                    var base64data = reader2.result.substr(reader2.result.indexOf(',') + 1);
+                                var blob   = new Blob([new Uint8Array(this.result)], { type: "image/jpeg" });
+                                var reader = new FileReader();
+                                reader.readAsDataURL(blob);
+                                reader.onloadend = function () {
+                                    var base64data = reader.result.substr(reader.result.indexOf(',') + 1);
                                     oController.gravarImagem(base64data);
                                 }
-
-
                             };
-
                             reader.readAsArrayBuffer(file);
 
                         }, onErrorReadFile);
                         function onErrorReadFile(oErro) {
-
+                            console.error("Erro ao ler arquivo:", oErro);
                         }
-
-                        console.log("got file: " + fileEntry.fullPath);
-                        // displayFileData(fileEntry.nativeURL, "Native URL");
-
-                    }, function () {
-                        // If don't get the FileEntry (which may happen when testing
-                        // on some emulators), copy to a new FileEntry.
+                    },
+                    function () {
                         oController.createNewFileEntry(imgUri);
-                    });
+                    }
+                );
             },
 
             createNewFileEntry: function (imgUri) {
                 window.resolveLocalFileSystemURL(cordova.file.cacheDirectory, function success(dirEntry) {
-
-                    // JPEG file
                     dirEntry.getFile("tempFile.jpeg", { create: true, exclusive: false }, function (fileEntry) {
-
-                        // Do something with it, like write to it, upload it, etc.
-                        // writeFile(fileEntry, imgUri);
-                        console.log("got file: " + fileEntry.fullPath);
-                        // displayFileData(fileEntry.fullPath, "File copied to");
-
                         oController.gravarImagem(fileEntry);
                         oController.imageClean();
-
                     }, onErrorCreateFile);
-
                     function onErrorCreateFile(oErro) {
-
+                        console.error("Erro ao criar o arquivo:", oErro);
                     }
-
                 }, onErrorResolveUrl);
 
                 function onErrorResolveUrl(oErro) {
-
+                    console.error("Erro ao tentar recuperar a url:", oErro);
                 }
             },
 
             imageClean: function () {
-                navigator.camera.cleanup(onSuccess, onFail);
-
-                function onSuccess() {
-                    console.log("Camera cleanup success.")
-                }
-
-                function onFail(message) {
-                    console.log('Failed clean picture ');
-                }
+                navigator.camera.cleanup(
+                () => {
+                    //console.log("Camera cleanup success.")
+                },
+                (message) => {
+                    console.error('Failed clean picture ', message);
+                });
             },
 
             gravarImagem: function (pImageData) {
-
-                //            var src = "data:image/jpeg;base64," + pImageData;
-
                 var arquivo = pImageData;
                 var fMres = atob(arquivo);
                 var byteNumbers = new Array(fMres.length);
@@ -629,26 +597,24 @@ sap.ui.define([
 
                 oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getProperty("/items").unshift(
                     {
-                        "id": idAnexo,
-                        "fileName": "IMG_" + idAnexo + "." + blob.type.split('/')[1],
-                        "mediaType": blob.type,
-                        "url": vUrl,
-                        "imageUrl": vUrl,
-                        "uploadState": "Complete",
-                        "revision": "00",
-                        "status": "In work",
-                        "fileSize": blob.size,
-                        "lastModifiedBy": "SGMR",
-                        "lastmodified": new Date().toLocaleString("pt-BR"),
-                        "documentType": "Arquivo Câmera",
-                        "file": pImageData,
-                        "previewable": true,
-                        "trustedSource": true
+                        "id"             : idAnexo,
+                        "fileName"       : "IMG_" + idAnexo + "." + blob.type.split('/')[1],
+                        "mediaType"      : blob.type,
+                        "url"            : vUrl,
+                        "imageUrl"       : vUrl,
+                        "uploadState"    : "Complete",
+                        "revision"       : "00",
+                        "status"         : "In work",
+                        "fileSize"       : blob.size,
+                        "lastModifiedBy" : "SGMR",
+                        "lastmodified"   : new Date().toLocaleString("pt-BR"),
+                        "documentType"   : "Arquivo Câmera",
+                        "file"           : pImageData,
+                        "previewable"    : true,
+                        "trustedSource"  : true
                     }
                 );
                 oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
             }
-
-
         });
     });

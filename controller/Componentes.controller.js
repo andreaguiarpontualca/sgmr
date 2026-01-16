@@ -19,7 +19,7 @@ sap.ui.define([
 
             onInit: function () {
                 oController = this;
-                oController.oController = this;
+                // oController.registraModeloMensagem();
                 oView = oController.getView();
                 this.getView().addStyleClass("sapUiSizeCompact");
 
@@ -186,20 +186,10 @@ sap.ui.define([
                     return;
                 }
 
-                //TODO : REMOVER COMENTÁRIO ANTES DO APK.
                 console.clear();
 
                 tabelaCre.sort((a, b) => Number(a.MedidaMm) - Number(b.MedidaMm));
-               
-                console.log("Tabela Sup: ==================================================");
-                tabelaCre.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
-                console.log("==============================================================");
-
                 tabelaDec.sort((a, b) => Number(b.MedidaMm) - Number(a.MedidaMm));
-
-                console.log("Tabela Inf: ==================================================");
-                tabelaDec.map( a=> console.log("Componente: ", a.Componente, " | ", a.MedidaMm, " | ", a.PercDesgaste, " | ", a.Alerta));
-                console.log("==============================================================");
 
                 const medidaAtual = componente.Valormedido;
                 const limiteSup   = tabelaCre.filter( l => Number(l.MedidaMm) >= medidaAtual )[0];
@@ -211,13 +201,6 @@ sap.ui.define([
                 const percRefPos    = Number(limiteInf && limiteInf.PercDesgaste) || 0.0;
                 const percIntervalo = desgVsRefAnt / 5;
                 const desgaste      = ((percRefPos - percRefAnt) * percIntervalo + percRefAnt).toFixed(2);
-
-                console.log("Medida Atual.........: ", medidaAtual);
-                console.log("Desgaste vs Ref. Ant.: ", desgVsRefAnt);
-                console.log("Desgaste Ref. Ant....: ", percRefAnt, "%");
-                console.log("Desgaste Ref. Pos....: ", percRefPos, "%");
-                console.log("Perc. do Intervalo...: ", percIntervalo, "%");
-                console.log("Desgaste.............: ", desgaste, "%");
 
                 const limiteIni = tabelaCre[0];
                 const medidaIni = Number(limiteIni.MedidaMm)      || 0.0;

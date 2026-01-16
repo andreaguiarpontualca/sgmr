@@ -51,70 +51,9 @@ sap.ui.define([
 
 
             _handleRouteMatched: function (oEvent) {
-
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("idMessagePopoverBtn").addDependent(oMessagePopover);
-                
-                /* var aCondicoes = [{ key: "EX1200 - 6" }, 
-                                  { key: "EX2500 - 5" },   
-                                  { key: "320" }, 
-                                  { key: "930" }]
-                oController.getOwnerComponent().getModel("formularioModel").setData(aCondicoes);
-                oController.getOwnerComponent().getModel("formularioModel").refresh();
-
-                var aModelosEquipamentos = [{ CodigoModeloEquipamento: "EX1200", DescricaoModeloEquipamento: "HITACHI", Selecionado: false}, 
-                                            { CodigoModeloEquipamento: "EX2500", DescricaoModeloEquipamento: "HITACHI", Selecionado: false }, 
-                                            { CodigoModeloEquipamento: "320", DescricaoModeloEquipamento: "CAT", Selecionado: false }, 
-                                            { CodigoModeloEquipamento: "930", DescricaoModeloEquipamento: "KOMATSU", Selecionado: false }]
-                oController.getOwnerComponent().getModel("modeloEquipamentoModel").setData(aModelosEquipamentos);
-                oController.getOwnerComponent().getModel("modeloEquipamentoModel").refresh(); */
-
                 var oFormularioSet = { Codigo: "" };
-
                 oController.getOwnerComponent().getModel("listaAssociarFormularioModel").setData(oFormularioSet);
                 oController.getOwnerComponent().getModel("listaAssociarFormularioModel").refresh();
-
             },
 
 
@@ -122,13 +61,10 @@ sap.ui.define([
                 this.getRouter().navTo("Administrativo", {}, true /*no history*/);
             },
 
-            //Cancelar
             onCancelarFormulario: function () {
                 oController.getRouter().navTo("Administrativo", {}, true /*no history*/);
             },
-            //Cancelar
 
-            //Confirmar
             onConfirmarFormulario: function () {
                 var aMockMessages = [];
                 var vPodeGravar = true;
@@ -234,7 +170,6 @@ sap.ui.define([
                     oConfirmarButton.setBusy(false);
                 }
             },
-            //Confirmar
 
             //Formulários
             _handleAssociarFormularioValueHelpRequest: function (oEvent) {
@@ -391,9 +326,6 @@ sap.ui.define([
                                     oController.materialRodanteUpdate().then(
                                         function (result) {
                                             MessageToast.show("materialRodante eliminado com sucesso");
-                                            var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                                            oController.getView().getModel().setData(aMensagens);
-                                            oController.getView().getModel().refresh()
                                         }).catch(
                                             function (result) {
 
@@ -459,11 +391,6 @@ sap.ui.define([
 
             onSincronizar: function (oEvent) {
                 oController.onSincronizarGeral(oController, false)
-
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             }
 
         });

@@ -60,11 +60,11 @@
             <OverflowToolbar>
                 <Button
                     id="messagePopoverBtn"
-                    visible="{=!!${message>/}.length}"
-                    icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-                    type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-                    text="{path: '/', formatter: '.highestSeverityMessages' }"
-                    press=".handleMessagePopoverPress"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
                     ariaHasPopup="Dialog"
                 />
                 <ToolbarSpacer />

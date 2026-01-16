@@ -16,6 +16,7 @@ sap.ui.define([
             onInit: function () {
 
                 oController = this;
+                // oController.registraModeloMensagem();
                 oView = oController.getView();
 
                 var omaterialRodante = [
@@ -27,9 +28,6 @@ sap.ui.define([
                 oController.getOwnerComponent().getModel("sincronizarModel").refresh()
 
                 oView.bindElement("busyDialogModel>/")
-
-
-
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -43,50 +41,7 @@ sap.ui.define([
 
             _handleRouteMatched: function (oEvent) {
 
-
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
+                this.limparMensagens();
 
                 oView.byId("sincronismoFormContainer").setBusy(true);
                 var aLeituras = [
@@ -108,20 +63,21 @@ sap.ui.define([
                 })
             },
 
-
             onNavBack: function () {
+                this.limparMensagens();
+
                 this.getRouter().navTo("Inicio", {}, true /*no history*/);
             },
 
             onSincronizar: function (oEvent) {
+                this.limparMensagens();
+
                 oController.onSincronizarGeral(oController, false)
             },
 
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
-            },
-
             onDownloadAutorizacao: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadAutorizacaoButton"
                 var vTabela = "tb_autorizacao"
                 var vModel = "listaAutorizacaoModel"
@@ -144,6 +100,8 @@ sap.ui.define([
             },
 
             onDownloadPerfil: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadPerfilButton"
                 var vTabela = "tb_perfil"
                 var vModel = "listaPerfilModel"
@@ -164,7 +122,10 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadCentros: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadCentrosButton"
                 var vTabela = "tb_centros"
                 var vModel = "listaCentrosModel"
@@ -185,7 +146,10 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadEquipamento: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadEquipamentoButton"
                 var vTabela = "tb_equipamento"
                 var vModel = "listaEquipamentoModel"
@@ -249,7 +213,10 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadUsuario: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadUsuarioButton"
                 var vTabela = "tb_usuario"
                 var vModel = "listaUsuariosModel"
@@ -270,7 +237,10 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadFormulario: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadFormularioButton"
                 var vTabela = "tb_formulario"
                 var vModel = "listaFormularioModel"
@@ -291,7 +261,9 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },            
+
             onUploadMedicao: function (oEvent) {
+                this.limparMensagens();
                 oView.byId("uploadMedicaoButton").setBusy(true);
                 oController.medicaoUpdate(oController, true).then(function () {
                     oView.byId("uploadMedicaoButton").setBusy(false);

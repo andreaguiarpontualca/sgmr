@@ -231,11 +231,6 @@ sap.ui.define([
                     oModel.setData(aMockMessages);
                     this.getView().setModel(oModel);
                 }
-            },
-
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             }
 
 

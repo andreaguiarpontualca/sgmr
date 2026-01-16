@@ -25,6 +25,7 @@ sap.ui.define([
                 oController = this;
                 oView       = oController.getView();
 
+
                 sap.ui.Device.orientation.attachHandler(function (oEvt) {
                     oController.ajustarTela();
                 });
@@ -42,65 +43,21 @@ sap.ui.define([
                 this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this._oRouter.getRoute("Login").attachMatched(this._handleRouteMatched, this);
 
+                this.inicializaModeloSGMR();
             },
 
             _handleRouteMatched: function (oEvent) {
-                //var urlLogo = oController.obterArquivo("logo.png")
                 var oLogin = {
                     CodUsuario: "",
                     Senha: "",
-                    imgLogo: ""//urlLogo
+                    imgLogo: ""
                 }
 
                 oController.getOwnerComponent().getModel("loginModel").setData(oLogin);
                 oController.getOwnerComponent().getModel("usuarioModel").setData({});
 
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
-
                 oController.ajustarTela();
                 oController.prepararLogin();
-
             },
 
             determinarOrigemArquivos: function () {
@@ -284,10 +241,6 @@ sap.ui.define([
                         }).catch(
                             function (result) {
                                 oController.carregarOffline().then(function (result) {
-                                    var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                                    oController.getView().getModel().setData(aMensagens);
-                                    oController.getView().getModel().refresh()
-                                    // Busy será fechado no controller Inicio após carregamento completo
                                     oController.carregarAcessos()
                                     oController.getOwnerComponent().getRouter().navTo("Inicio", null, true);
                                 })
@@ -296,16 +249,9 @@ sap.ui.define([
                     }
                 ).catch(
                     function (result) {
-                        var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                        oController.getView().getModel().setData(aMensagens);
-                        oController.getView().getModel().refresh()
                         oController.getOwnerComponent().getModel("busyDialogModel").setProperty("/loginInProgress", false);
                         oController.forceCloseBusyDialog();
                     });
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             },
 
             carregarUsuariosOffLine: function () {
@@ -314,14 +260,12 @@ sap.ui.define([
             },
 
             prepararIndexDB: function (pUsuario) {
-
-
                 return new Promise((resolve, reject) => {
                     oController = this;
 
                     //check for support
                     if (!('indexedDB' in window)) {
-                        console.log('Armazenamento offline não suportado.');
+                        console.warn('Armazenamento offline não suportado.');
                         reject();
                         return;
                     }
@@ -335,7 +279,6 @@ sap.ui.define([
 
                     openRequest.onupgradeneeded = function (e) {
                         db = e.target.result;
-                        console.log('Banco de dados sendo criado');
 
                         if (!db.objectStoreNames.contains('tb_autorizacao')) {
                             db.createObjectStore("tb_autorizacao", { autoIncrement: true });
@@ -388,7 +331,6 @@ sap.ui.define([
                     };
 
                     openRequest.onsuccess = function (e) {
-                        console.log('Banco de dados iniciado com sucesso!');
                         db = e.target.result;
                         db.close();
                         resolve();

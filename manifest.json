@@ -172,7 +172,7 @@
       "medicaoAcoesModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
-      "mensagensModel": {
+      "mMensagens": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "objectPageModel": {

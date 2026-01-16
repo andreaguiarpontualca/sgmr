@@ -36,7 +36,7 @@ sap.ui.define([
                 if (window.hasOwnProperty("cordova")) {
                     oController.onDeviceReady();
                 } else {
-                    oController.getOwnerComponent().getModel("mensagensModel").setData([])
+                    oController.limparMensagens();
                     oController.getOwnerComponent().getRouter().navTo("Login", null, true);
                 }
             },
@@ -45,7 +45,7 @@ sap.ui.define([
                 console.log("Cordova está pronto.");
                 document.addEventListener("backbutton", oController.onBackKeyDown, false);
                 if (window.location.hash == "") {
-                    oController.getOwnerComponent().getModel("mensagensModel").setData([])
+                    oController.limparMensagens();
 
                     var oConexao = oController.lerLocalStorage("SGMR_DadosConexao")
                     if (oConexao != null && oConexao.urlsemclient != "") {
@@ -57,7 +57,6 @@ sap.ui.define([
             },
 
             onOnline: function (oEvent) {
-                console.log("You are now connected to the network.");
                 oController.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://connected")
                 oController.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Success")
                 oController.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "online")
@@ -66,7 +65,6 @@ sap.ui.define([
             },
 
             onOffline: function (oEvent) {
-                console.log("You are not connected to the network.");
                 oController.getOwnerComponent().getModel("conexaoModel").setProperty("/iconeConexao", "sap-icon://disconnected")
                 oController.getOwnerComponent().getModel("conexaoModel").setProperty("/corIconeConexao", "Error")
                 oController.getOwnerComponent().getModel("conexaoModel").setProperty("/statusConexao", "offline")
@@ -77,11 +75,8 @@ sap.ui.define([
             },
 
             onBackKeyDown: function (oEvent) {
-                // e.preventDefault() é usado para prevenir o comportamento padrão (se aplicável)
                 oEvent.preventDefault();
-                console.log("Botão de voltar pressionado!");
-                oController.onNavBackCordova()
-
+                oController.onNavBackCordova();
             },
 
             checkConnection: function () {

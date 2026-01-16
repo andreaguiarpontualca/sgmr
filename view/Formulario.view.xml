@@ -112,12 +112,15 @@
 			</ObjectPageLayout>
 			<m:footer>
 				<m:OverflowToolbar>
-					<m:Button id="messagePopoverBtn"
-						icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-						type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-						text= "{path: '/', formatter: '.highestSeverityMessages' }"
-						press=".handleMessagePopoverPress"
-						ariaHasPopup="Dialog"/>		 
+					<m:Button
+						id="messagePopoverBtn"
+						visible="{=!!${mMensagens>/}.length > 0}"
+						icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+						type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+						text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+						press=".exibeMensagens"
+						ariaHasPopup="Dialog"
+					/>
 					<m:ToolbarSpacer/>
 					<m:Button id="confirmarButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmar" icon="sap-icon://save" />
 					<m:Button id="cancelarButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelar"  icon="sap-icon://undo" />

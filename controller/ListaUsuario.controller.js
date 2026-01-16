@@ -35,55 +35,6 @@ sap.ui.define([
 
             _handleRouteMatched: function (oEvent) {
 
-                var aFilters = []
-                var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
-                aFilters.push(filter);
-                this.getView().byId("idListaUsuarioTable").getBinding("items").filter(aFilters, "Application");
-
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
-
             },
 
 
@@ -117,9 +68,6 @@ sap.ui.define([
                                                     oController.usuarioUpdate().then(
                                                         function (result) {
                                                             MessageToast.show("Perfil eliminado com sucesso");
-                                                            var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                                                            oController.getView().getModel().setData(aMensagens);
-                                                            oController.getView().getModel().refresh()
                                                         }).catch(
                                                             function (result) {
                                                             })
@@ -234,11 +182,6 @@ sap.ui.define([
 
             onSincronizar: function (oEvent) {
                 oController.onSincronizarGeral(oController, false)
-
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             }
 
         });
