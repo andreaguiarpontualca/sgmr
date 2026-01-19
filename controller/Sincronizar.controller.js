@@ -168,7 +168,7 @@ sap.ui.define([
                             Promise.all(aLeiturasForm).then(
                                 function () {
                                     //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                                    oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
                                     var aLimpezas = [
                                         oController.limparTabelaIndexDB("tb_componentes"),
                                         oController.limparTabelaIndexDB("tb_condicoes"),

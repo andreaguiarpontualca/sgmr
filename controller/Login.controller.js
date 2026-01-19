@@ -47,15 +47,9 @@ sap.ui.define([
             },
 
             _handleRouteMatched: function (oEvent) {
-                var oLogin = {
-                    CodUsuario: "",
-                    Senha: "",
-                    imgLogo: ""
-                }
-
+                const oLogin = { CodUsuario: "", Senha: "", imgLogo: "" };
                 oController.getOwnerComponent().getModel("loginModel").setData(oLogin);
                 oController.getOwnerComponent().getModel("usuarioModel").setData({});
-
                 oController.ajustarTela();
                 oController.prepararLogin();
             },

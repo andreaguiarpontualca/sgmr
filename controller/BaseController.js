@@ -4,16 +4,15 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     'sap/m/MessageToast',
     "sap/ui/core/Fragment",
-    "sap/ui/core/syncStyleClass",
-    'sap/ui/model/json/JSONModel'
-], function (Controller, UIComponent, History, MessageToast, Fragment, syncStyleClass, JSONModel) {
+    "sap/ui/core/syncStyleClass"
+], function (Controller, UIComponent, History, MessageToast, Fragment, syncStyleClass) {
     "use strict";
     var oController
     var oView
 
     const BD_VERSION = 8;
-    var aFilters = ""
-    var oExpand = ""
+    var aFilters     = "";
+    var oExpand      = "";
     var oPerfilChave = {};
 
     return Controller.extend("com.pontual.sgmr.controller.BaseController", {
@@ -21,6 +20,25 @@ sap.ui.define([
         getRouter: function () {
             return UIComponent.getRouterFor(this);
         },
+
+		getResourceBundle: function () {
+ 			var modelo = this.getOwnerComponent().getModel("i18n");
+ 			if (!!modelo && typeof modelo.getResourceBundle === 'function') {
+ 				return modelo.getResourceBundle();
+ 			}
+			return;
+		},
+		
+		i18n: function (chave, parametros) {
+			if (!chave) {
+				return this.getResourceBundle();
+			} 
+			var rb = this.getResourceBundle(); 
+			if (rb) {
+				return rb.getText(chave, (parametros || []));
+			}
+			return chave;
+		},
 
         onNavBack: function () {
             var oHistory, sPreviousHash;
@@ -46,18 +64,15 @@ sap.ui.define([
         },
 
         carregarAcessos: function () {
-
             oController = this;
-
-            var aAutorizacoes = oController.getOwnerComponent().getModel("usuarioModel").getProperty("/Autorizacoes")
-
-            var oAcesso = {
-                administrativo: false,
-                materialrodante: false,
-                perfil: false,
-                usuario: false,
-                associar: false,
-                sincronizar: false
+            const aAutorizacoes = oController.getOwnerComponent().getModel("usuarioModel").getProperty("/Autorizacoes")
+            const oAcesso       = {
+                administrativo  : false,
+                materialrodante : false,
+                perfil          : false,
+                usuario         : false,
+                associar        : false,
+                sincronizar     : false
             }
 
             if (aAutorizacoes) {
@@ -76,14 +91,9 @@ sap.ui.define([
                         if (oAutorizacao.CodigoAutorizacao == "004") {
                             oAcesso.associar = true;
                         }
-                        /*                         if(oAutorizacao.CodigoAutorizacao == "005"){
-                                                    oAcesso.sincronizar = true;
-                                                } */
                     }
                 });
-
-
-                oController.getOwnerComponent().getModel("acessosModel").setData(oAcesso)
+                oController.getOwnerComponent().getModel("acessosModel").setData(oAcesso);
                 oController.getOwnerComponent().getModel("acessosModel").refresh();
             }
         },
@@ -163,7 +173,10 @@ sap.ui.define([
 			this.adicionarMensagem("Error", message, subtitle, descricao);
 		},
 
-		adicionarMensagem: function (type, title, subtitle, description) {
+		adicionarMensagem: function (type, titulo, subtitulo, descricao) {
+            const title       = (!titulo    || titulo.includes(" ")   ) ? titulo    : this.i18n(titulo);
+            const subtitle    = (!subtitulo || subtitulo.includes(" ")) ? subtitulo : this.i18n(subtitulo);
+            const description = (!descricao || descricao.includes(" ")) ? descricao : this.i18n(descricao);
             this._adicionaMensagem({ type, title, subtitle, description });
 		},
 		
@@ -499,7 +512,7 @@ sap.ui.define([
 
         carregarPerfil: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoperfis"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoperfis"));
                 oController.carregarDados("PerfilSet", []).then(function (result) {
                     var aPerfis = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -540,7 +553,7 @@ sap.ui.define([
 
         carregarCentro: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocentros"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocentros"));
                 oController.carregarDados("ListaCentroSet", []).then(function (result) {
                     for (let x = 0; x < result.results.length; x++) {
                         result.results.forEach(element => {
@@ -558,7 +571,7 @@ sap.ui.define([
 
         carregarAutorizacoes: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoautorizacoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoautorizacoes"));
                 oController.carregarDados("ListaAutorizacaoSet", []).then(function (result) {
                     var aAutorizacoes = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -615,7 +628,7 @@ sap.ui.define([
 
                     Promise.all(aLeituras).then(function () {
                         // Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                        oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
                         var aLimpezas = [
                             oController.limparTabelaIndexDB("tb_autorizacao"),
                             oController.limparTabelaIndexDB("tb_perfil"),
@@ -664,7 +677,7 @@ sap.ui.define([
                                 Promise.all(aLeiturasForm).then(
                                     function () {
                                         //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                                        oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
                                         var aLimpezas = [
                                             oController.limparTabelaIndexDB("tb_componentes"),
                                             oController.limparTabelaIndexDB("tb_condicoes"),
@@ -714,7 +727,7 @@ sap.ui.define([
 
                 } else {
                     // Sem conexão - carregar dados do IndexedDB
-                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregarIDB"));
+                    oController.atualizarBusyDialog(oController.i18n("carregarIDB"));
                     var aLeiturasOffline = [
                         oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
                         oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
@@ -863,7 +876,7 @@ sap.ui.define([
         prepararPerfil: function () {
             return new Promise((resolve, reject) => {
                 oController = this;
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoperfis"));
+                oController.atualizarBusyDialog(oController.i18n("atualizandoperfis"));
                 var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
                 var aPerfilSetPromises = [];
 
@@ -1052,7 +1065,7 @@ sap.ui.define([
         prepararUsuario: function () {
             return new Promise((resolve, reject) => {
                 oController = this;
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
+                oController.atualizarBusyDialog(oController.i18n("atualizandousuarios"));
 
                 var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
                 var aUsuarioPromises = [];
@@ -1161,7 +1174,7 @@ sap.ui.define([
         carregarOffline: function () {
             oController = this;
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregaroffline"));
+                oController.atualizarBusyDialog(oController.i18n("carregaroffline"));
                 var aLeituras = [
                     oController.carregarDadosIndexDB("tb_autorizacao", "autorizacoesModel"),
                     oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
@@ -1179,7 +1192,7 @@ sap.ui.define([
 
         carregarOrdens: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoordens"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoordens"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
 
                 var aFiltros = [
@@ -1224,7 +1237,7 @@ sap.ui.define([
 
         carregarFormulario: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoformularios"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoformularios"));
                 oController.carregarDados("ListaFormularioSet").then(function (result) {
                     var aFormularios = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -1243,7 +1256,7 @@ sap.ui.define([
 
         carregarEquipamento: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoequipamentos"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoequipamentos"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                 var aFiltros = [
                     {
@@ -1269,7 +1282,7 @@ sap.ui.define([
         carregarMateriais: function () {
 
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandomateriais"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandomateriais"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                 var aFiltros = [
                     { key: "Centro",   value: oUsuario.Centro },
@@ -1305,7 +1318,7 @@ sap.ui.define([
 
         carregarCatalogos: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocatalogos"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocatalogos"));
                 var aListaCatalogos = [];
                 qtdeCatalogo = 0;
                 var aEquipamentos = oController.getOwnerComponent().getModel("equipamentosModel").getData()
@@ -1334,7 +1347,7 @@ sap.ui.define([
 
         carregarComponentes: function (aFormularios) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocomponentes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocomponentes"));
                 var aComponentes = {
                     Chave: 'X',
                     ComponentesSet: []
@@ -1370,7 +1383,7 @@ sap.ui.define([
 
         carregarCondicoes: function (aFormularios) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocondicoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocondicoes"));
                 var aCondicoes = {
                     Chave: 'X',
                     CondicoesSet: []
@@ -1405,7 +1418,7 @@ sap.ui.define([
 
         carregarInspecoes: function (aFormularios) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoinspecoes"));
                 var aInspecoes = {
                     Chave: 'X',
                     InspecoesSet: []
@@ -1440,7 +1453,7 @@ sap.ui.define([
 
         carregarListaDesgaste: function (aModelos) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoinspecoes"));
                 var aDesgastes = {
                     Chave: 'X',
                     DesgastesSet: []
@@ -1589,7 +1602,7 @@ sap.ui.define([
                                 new URL(oConexao.urlsemclient);
                             } catch (urlError) {
                                 console.error("URL inválida:", oConexao.urlsemclient, urlError);
-                                oController.adicionarMensagemErro("URL inválida", oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"), "O endereço configurado não é válido: " + oConexao.urlsemclient);
+                                oController.adicionarMensagemErro("URL inválida", oController.i18n("conexaoerro"), "O endereço configurado não é válido: " + oConexao.urlsemclient);
                                 reject();
                                 return;
                             }
@@ -1604,24 +1617,24 @@ sap.ui.define([
                                     cache: 'no-cache'
                                 }).then(r => {
                                     oController.atualizarBusyDialog("Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
-                                    oController.adicionarMensagemSucesso(oController.getView().getModel("i18n").getResourceBundle().getText("sucessoservidor"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosucesso"), "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
+                                    oController.adicionarMensagemSucesso(oController.i18n("sucessoservidor"), oController.i18n("conexaosucesso"), "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
                                     resolve()
                                 })
                                     .catch(e => {
                                         console.error("Fetch error:", e);
-                                        oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"), "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient);
+                                        oController.adicionarMensagemErro(oController.i18n("erroservidor"), oController.i18n("conexaoerro"), "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient);
                                         resolve();
                                     });
                             } catch (error) {
                                 resolve();
                             }
                         } else {
-                            oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("configurarconexao"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"), "Configure os dados de conexão antes de continuar");
+                            oController.adicionarMensagemErro(oController.i18n("configurarconexao"), oController.i18n("conexaosem"), "Configure os dados de conexão antes de continuar");
                             reject();
                         }
 
                     } else {
-                        oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("testeerro"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"), "Por favor verifque a disponibilidade de rede ou wi-fi");
+                        oController.adicionarMensagemErro(oController.i18n("testeerro"), oController.i18n("conexaosem"), "Por favor verifque a disponibilidade de rede ou wi-fi");
                         reject()
                     }
                 } else {
@@ -1633,7 +1646,7 @@ sap.ui.define([
         carregarUsuario: function () {
             oController = this
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandousuarios"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandousuarios"));
                 oController.carregarDados("UsuarioSet", []).then(function (result) {
                     var aUsuarios = []
                     // Obtém os perfis carregados (pode estar vazio se carregamento paralelo ainda não terminou)
@@ -1709,7 +1722,7 @@ sap.ui.define([
         gravarTabelaIndexDB: function (pTabela, pData) {
             var oController = this;
             return new Promise((resolve, reject) => {
-                var vMsg = oController.getView().getModel("i18n").getResourceBundle().getText("gravandotabela") + " " + pTabela;
+                var vMsg = oController.i18n("gravandotabela") + " " + pTabela;
                 oController.atualizarBusyDialog(vMsg);
 
                 var db;
@@ -1778,7 +1791,7 @@ sap.ui.define([
                         Promise.all(aLeituras).then(
                             function (result) {
                                 //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
+                                oController.atualizarBusyDialog(oController.i18n("atualizandousuarios"));
                                 var aLimpezas = [oController.limparTabelaIndexDB("tb_usuario")]
                                 Promise.all(aLimpezas).then(
                                     function (result) {
@@ -1820,7 +1833,7 @@ sap.ui.define([
                         Promise.all(aLeituras).then(
                             function (result) {
                                 //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoperfis"));
+                                oController.atualizarBusyDialog(oController.i18n("atualizandoperfis"));
                                 var aLimpezas = [oController.limparTabelaIndexDB("tb_perfil")]
                                 Promise.all(aLimpezas).then(
                                     function (result) {
@@ -1873,7 +1886,7 @@ sap.ui.define([
                             oController.prepararMedicao().then(
                                 function () {
                                     //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandomedicoes"));
+                                    oController.atualizarBusyDialog(oController.i18n("atualizandomedicoes"));
                                     var aLimpezas = [oController.limparTabelaIndexDB("tb_medicao")]
                                     Promise.all(aLimpezas).then(
                                         function () {
@@ -1934,7 +1947,7 @@ sap.ui.define([
 
         prepararMedicao: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoordenscorretiva"));
+                oController.atualizarBusyDialog(oController.i18n("atualizandoordenscorretiva"));
                 var aMedicoes = oController.getOwnerComponent().getModel("listaMedicoesModel").getData();
                 var aListaMedicaoes = {
                     Chave: 'X',
@@ -2042,7 +2055,7 @@ sap.ui.define([
                                 const vStatus               = vInspecao.Status;
                                 aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
                                     const vTipo = tipoStatus[oMedicaoRetorno.Type] || "None";
-                                    oController.adicionarMensagem(vTipo, "Medição", oMedicaoRetorno.MessageV1, oMedicaoRetorno.Message);
+                                    oController.adicionarMensagem(vTipo, "medicao", oMedicaoRetorno.MessageV1, oMedicaoRetorno.Message);
                                     oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([]);
                                     if (vStatus == 'E') {
                                         oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao);
@@ -2232,7 +2245,6 @@ sap.ui.define([
         },
 
         validaMedicao: function(parametro) {
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             var aMockMessages = parametro;
             if (!Array.isArray(parametro)) {
                 aMockMessages = [];
@@ -2243,13 +2255,13 @@ sap.ui.define([
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.MedEquipamento == null || oMedicao.MedEquipamento == "") {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.setValueStateText(oController.i18n("campoobrigatorio"));
                 input.focus();
                 aMockMessages.push({
                     type: 'Error',
-                    title: oBundle.getText("campoobrigatorio"),
-                    description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
-                    subtitle: oBundle.getText("horimetroatual"),
+                    title: oController.i18n("campoobrigatorio"),
+                    description: oController.i18n("preenchimentoobrigatorio", ["Horimero Equipamento"]),
+                    subtitle: oController.i18n("horimetroatual"),
                     counter: 1
                 });
             } else {
@@ -2259,26 +2271,26 @@ sap.ui.define([
                 var vDifMaxMedicoes = parseInt(oMedicao.DifMaxMedicoes);
                 if (vMedEpto < vUltMedEqpto) {
                     input.setValueState("Error");
-                    input.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.setValueStateText(oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
                     input.focus();
                     aMockMessages.push({
                         type: 'Error',
-                        title: oBundle.getText("horimetroatual"),
-                        description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
-                        subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
+                        title: oController.i18n("horimetroatual"),
+                        description: oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]),
+                        subtitle: oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]),
                         counter: 1
                     });
                 }
 
                 if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
                     input.setValueState("Error");
-                    input.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.setValueStateText(oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
                     input.focus();
                     aMockMessages.push({
                         type: 'Error',
-                        title: oBundle.getText("diferencaomedicao"),
-                        description: oBundle.getText("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
-                        subtitle: oBundle.getText("medicao"),
+                        title: oController.i18n("diferencaomedicao"),
+                        description: oController.i18n("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
+                        subtitle: oController.i18n("medicao"),
                         counter: 1
                     });
                 }
@@ -2286,7 +2298,6 @@ sap.ui.define([
         },
 
         validaDataMedicao: function(parametro) {
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             this.limpaEstadoCampoDataMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")
             var aMockMessages = parametro;
@@ -2297,13 +2308,13 @@ sap.ui.define([
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.Data == null || oMedicao.Data == "") {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.setValueStateText(oController.i18n("campoobrigatorio"));
                 input.focus();
                 aMockMessages.push({
                     type: 'Error',
-                    title: oBundle.getText("campoobrigatorio"),
-                    description: oBundle.getText("preenchimentoobrigatorio", ["Data"]),
-                    subtitle: oBundle.getText("data"),
+                    title: oController.i18n("campoobrigatorio"),
+                    description: oController.i18n("preenchimentoobrigatorio", ["Data"]),
+                    subtitle: oController.i18n("data"),
                     counter: 1
                 });
                 return;
@@ -2312,13 +2323,13 @@ sap.ui.define([
             var dataAtual = input.getDateValue();
             if (dataAtual > new Date()) {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("datamaiorqueatual"));
+                input.setValueStateText(oController.i18n("datamaiorqueatual"));
                 input.focus();
                 aMockMessages.push({
                     type: 'Error',
-                    title: oBundle.getText("datainvalida"),
-                    description: oBundle.getText("datamaiorqueatual"),
-                    subtitle: oBundle.getText("data"),
+                    title: oController.i18n("datainvalida"),
+                    description: oController.i18n("datamaiorqueatual"),
+                    subtitle: oController.i18n("data"),
                     counter: 1
                 });
                 return;
@@ -2327,13 +2338,13 @@ sap.ui.define([
             var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
             if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]));
+                input.setValueStateText(oController.i18n("limiteretroativomsg", [vLimiteRetroativo]));
                 input.focus();
                 aMockMessages.push({
                     type: 'Error',
-                    title: oBundle.getText("limiteretroativo"),
-                    description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
-                    subtitle: oBundle.getText("limiteretroativo"),
+                    title: oController.i18n("limiteretroativo"),
+                    description: oController.i18n("limiteretroativomsg", [vLimiteRetroativo]),
+                    subtitle: oController.i18n("limiteretroativo"),
                     counter: 1
                 });
             }
@@ -2341,7 +2352,6 @@ sap.ui.define([
 
         validaVazamentoRoleteDireito: function(mensagens) {
             this.limpaEstadoCampoRoleteDireito();
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
             if (!blocoRoletes || blocoRoletes.length < 1) {
                 return;
@@ -2362,21 +2372,20 @@ sap.ui.define([
             }
 
             input.setValueState("Error");
-            input.setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.setValueStateText(oController.i18n(mensagemLimite, [limite]));
             input.focus();
 
             mensagens.push({
                 type        : 'Error',
-                title       : oBundle.getText(mensagemLimite, [limite]),
-                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
-                subtitle    : oBundle.getText("roletes.lado.direito"),
+                title       : oController.i18n(mensagemLimite, [limite]),
+                description : oController.i18n(mensagemLimite + ".detalhe", [limite]),
+                subtitle    : oController.i18n("roletes.lado.direito"),
                 counter     : 1
             });
         },
 
         validaVazamentoRoleteEsquerdo: function(mensagens) {
             this.limpaEstadoCampoRoleteEsquerdo();
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
             if (!blocoRoletes || blocoRoletes.length < 1) {
                 return;
@@ -2397,14 +2406,14 @@ sap.ui.define([
             }
 
             input.setValueState("Error");
-            input.setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.setValueStateText(oController.i18n(mensagemLimite, [limite]));
             input.focus();
 
             mensagens.push({
                 type        : 'Error',
-                title       : oBundle.getText(mensagemLimite, [limite]),
-                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
-                subtitle    : oBundle.getText("roletes.lado.esquerdo"),
+                title       : oController.i18n(mensagemLimite, [limite]),
+                description : oController.i18n(mensagemLimite + ".detalhe", [limite]),
+                subtitle    : oController.i18n("roletes.lado.esquerdo"),
                 counter     : 1
             });
         }
