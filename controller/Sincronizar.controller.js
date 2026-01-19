@@ -38,11 +38,8 @@ sap.ui.define([
 
             },
 
-
             _handleRouteMatched: function (oEvent) {
-
                 this.limparMensagens();
-
                 oView.byId("sincronismoFormContainer").setBusy(true);
                 var aLeituras = [
                     oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
@@ -51,7 +48,8 @@ sap.ui.define([
                     oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel"),
                     oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel"),
                     oController.carregarDadosIndexDB("tb_formulario", "listaFormularioModel"),
-                    oController.carregarDadosIndexDB("tb_medicao", "listaMedicoesModel")];
+                    oController.carregarDadosIndexDB("tb_medicao", "listaMedicoesModel")
+                ];
 
                 Promise.all(aLeituras).then(function (result) {
                     oView.byId("sincronismoFormContainer").setBusy(false);

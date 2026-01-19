@@ -54,7 +54,7 @@ sap.ui.define([
 
 
             _handleRouteMatched: function (oEvent) {
-
+                this.limparMensagens();
                 aMockMessages = [];
                 var oModel = new JSONModel();
                 oModel.setData(aMockMessages);

@@ -1,22 +1,14 @@
 sap.ui.define([
     "com/pontual/sgmr/controller/BaseController",
-    "com/pontual/sgmr/model/formatter",
-    'sap/m/MessagePopover',
-    'sap/m/MessageItem',
     'sap/ui/model/json/JSONModel',
-    "sap/m/Dialog",
-    "sap/m/Button",
     'sap/base/util/uid',
-    'sap/m/MessageToast',
     "sap/m/MessageBox"
 ],
-    function (Controller, formatter, MessagePopover, MessageItem, JSONModel, Dialog, Button, uid, MessageToast, MessageBox) {
+    function (Controller, JSONModel, uid, MessageBox) {
         "use strict";
         var oView
         var oController
         var oBundle
-        var oMedicao
-        var oMessagePopover;
         var aMockMessages = []
 
         return Controller.extend("com.pontual.sgmr.controller.Formulario", {
@@ -42,6 +34,7 @@ sap.ui.define([
             },
 
             _handleRouteMatched: function (oEvent) {
+                this.limparMensagens();
                 oBundle = oController.getView().getModel("i18n").getResourceBundle();
                 try {
                     oView.byId("idFormulario").scrollTo(0);
@@ -50,22 +43,18 @@ sap.ui.define([
                 }
 
                 var oEquipamento = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData();
-
                 if (oEquipamento.FormularioCarregado != true) {
                     oEquipamento.FormularioCarregado = true
                     oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").setData(oEquipamento)
                     oController.lerTabelaIndexDB("tb_medicao")
                     .then(result => {
-                        var aMedicoes = result.tb_medicao
-                        var oMedicaoEncontrada = aMedicoes.find((oElement) => oEquipamento.Equnr == oElement.Equnr);
-
+                        var aMedicoes           = result.tb_medicao;
+                        var oMedicaoEncontrada  = aMedicoes.find((oElement) => oEquipamento.Equnr == oElement.Equnr);
                         if (oMedicaoEncontrada != undefined) {
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oMedicaoEncontrada);
                         } else {
-
                             oController.carregarElementosFormularios()
                         }
-
                     });
                     sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("None");
                     sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText("");
@@ -93,13 +82,14 @@ sap.ui.define([
             },
 
             validarFormulario: function () {
+                this.limparMensagens();
                 return new Promise((resolve, reject) => {
                     const pMedicao      = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
                     aMockMessages       = [];
                     var vValido         = true;
                     var vAlerta         = false;
                     var vMensagemAlerta = "";
-                    
+
                     //-- Validações no BaseController par acompartilhar com os blocos do form --//
                     oController.validaMedicao(aMockMessages);
                     oController.validaDataMedicao(aMockMessages);

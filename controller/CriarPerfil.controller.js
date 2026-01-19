@@ -48,7 +48,6 @@ sap.ui.define([
                 }
             },
 
-
             onNavBack: function () {
                 this.getRouter().navTo("ListaPerfil", {}, true);
             },

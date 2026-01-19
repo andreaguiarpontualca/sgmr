@@ -37,13 +37,13 @@ sap.ui.define([
 
 
             _handleRouteMatched: function (oEvent) {
+                this.limparMensagens();
 
-                var oUsuarioInput = oView.byId("usuarioInput")
-                var oNomeInput = oView.byId("nomeInput")
-                var oSenhaInput = oView.byId("senhaInput")
-                var oConfirmarInput = oView.byId("confirmarSenhaInput")
-                var oDepositoInput = oView.byId("depositoInput")
-                var oPerfilInput = oView.byId("perfilInput")
+                var oUsuarioInput   = oView.byId("usuarioInput");
+                var oNomeInput      = oView.byId("nomeInput");
+                var oSenhaInput     = oView.byId("senhaInput");
+                var oConfirmarInput = oView.byId("confirmarSenhaInput");
+                var oPerfilInput    = oView.byId("perfilInput");
 
                 oUsuarioInput.setValueState("None");
                 oNomeInput.setValueState("None");
@@ -51,15 +51,14 @@ sap.ui.define([
                 oConfirmarInput.setValueState("None");
                 oPerfilInput.setValueState("None");
 
-                var oConfirmarButton = oView.byId("confirmarUsuarioButton")
+                var oConfirmarButton = oView.byId("confirmarUsuarioButton");
                 oConfirmarButton.setBusy(false);
 
-                var aFilters = []
-                var filter = new sap.ui.model.Filter({ path: "Selecionado", operator: sap.ui.model.FilterOperator.EQ, value1: true });
+                const aFilters = [];
+                const filter   = new sap.ui.model.Filter({ path: "Selecionado", operator: sap.ui.model.FilterOperator.EQ, value1: true });
                 aFilters.push(filter);
                 this.getView().byId("idListaAutorizacoesTable").getBinding("items").filter(aFilters, "Application");
             },
-
 
             onNavBack: function () {
                 this.getRouter().navTo("ListaUsuario", {}, true /*no history*/);

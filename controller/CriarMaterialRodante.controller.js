@@ -50,9 +50,8 @@ sap.ui.define([
 
             },
 
-
             _handleRouteMatched: function (oEvent) {
-
+                this.limparMensagens();
                 aMockMessages = [];
                 var oModel = new JSONModel();
                 oModel.setData(aMockMessages);
@@ -64,9 +63,7 @@ sap.ui.define([
                 var oConfirmarButton = oView.byId("confirmarMaterialRodanteButton")
 
                 oConfirmarButton.setBusy(false);
-
             },
-
 
             onNavBack: function () {
                 this.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
