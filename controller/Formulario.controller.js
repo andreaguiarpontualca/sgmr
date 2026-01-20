@@ -287,23 +287,28 @@ sap.ui.define([
             carregarElementosFormularios: function (aFormularios) {
                 return new Promise((resolve, reject) => {
                     var aLeiturasForm = [
-                        oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel"),
-                        oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel"),
-                        oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")
+                        oController.carregarDadosIndexDB("tb_componentes",  "listaComponentesModel"),
+                        oController.carregarDadosIndexDB("tb_condicoes",    "listaCondicoesModel"),
+                        oController.carregarDadosIndexDB("tb_temperaturas", "listaTemperaturasModel"),
+                        oController.carregarDadosIndexDB("tb_inspecoes",    "listaInspecoesModel")
                     ];
 
                     Promise.all(aLeiturasForm).then(
                         function () {
-                            var oEquipamento = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData()
-                            var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
+                            var oEquipamento           = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData();
+                            var aListaComponetes       = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
-                            var aComponentesCombo = []
-                            var aListaCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
-                            var aListaInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
-                            const totalRoletes    = { direito  : 0, esquerdo : 0 };
-;
-                            aListaInspecoes.sort((a, b) => a.Sequencial - b.Sequencial);
+                            const aListaCondicoes      = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            //FIXME: Adicionar idFormulario
+                            const aListaTemperaturas   = oController.getOwnerComponent().getModel("listaTemperaturasModel").getData() || [];
+                            const aListaInspecoes      = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            const totalRoletes         = { direito : 0, esquerdo : 0 };
+                            const aComponentesCombo    = [];
+                            let   corDireita           = "";
+                            let   corEsquerda          = "";
+
                             aListaCondicoes.sort((a, b) => Number(a.IdCondicao) - Number(b.IdCondicao));
+                            aListaInspecoes.sort((a, b) => a.Sequencial - b.Sequencial);
 
                             aListaComponetes.forEach(element => {
                                 element.Valormedido = 0
@@ -320,14 +325,20 @@ sap.ui.define([
 
                                 element.PercDesgasteValueState = 'Indication05'  //Azul
                                 oController.somaRoletes(element, totalRoletes);
+
+                                if (!corDireita && element.IdLado === "LD") {
+                                    corDireita = element.Cor;
+                                }
+                                if (!corEsquerda && element.IdLado === "LE") {
+                                    corEsquerda = element.Cor;
+                                }
                             });
 
-                            aListaComponentesCombo.forEach(element => {
-                                aComponentesCombo.push({
-                                    key: element.key,
-                                    text: element.key
-                                })
-                            })
+                            aListaTemperaturas.forEach(item => {
+                                item.Cor = item.IdLado === "LD" ? corDireita : corEsquerda;
+                            });
+
+                            aListaComponentesCombo.forEach(element => aComponentesCombo.push({ key: element.key, text: element.key }));
 
                             aComponentesCombo.push({ key: 'Todos', text: 'Todos' });
 
@@ -336,7 +347,6 @@ sap.ui.define([
                                 { key: "Lado Direito",  text: "Lado Direito" },
                                 { key: "Lado Esquerdo", text: "Lado Esquerdo" }
                             ];
-
 
                             aListaCondicoes.forEach(element => {
                                 element.Nivel = "Não Informada"
@@ -373,6 +383,7 @@ sap.ui.define([
                             oFormulario.RoleteQtdeLE            = "0";
                             oFormulario.MaxRoleteQtdeLD         = totalRoletes.direito;
                             oFormulario.MaxRoleteQtdeLE         = totalRoletes.esquerdo;
+                            oFormulario.Temperaturas            = aListaTemperaturas;
                             oFormulario.Inspecoes               = aListaInspecoes;
                             oFormulario.Observacoes             = "";
                             oFormulario.items                   = [];

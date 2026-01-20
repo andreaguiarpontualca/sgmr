@@ -639,12 +639,12 @@ sap.ui.define([
                         ];
 
                         Promise.all(aLimpezas).then(function () {
-                            var aAutorizacoes = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData() || [];
-                            var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
-                            var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
-                            var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData() || [];
+                            var aAutorizacoes    = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData() || [];
+                            var aPerfis          = oController.getOwnerComponent().getModel("listaPerfilModel").getData()      || [];
+                            var aUsuarios        = oController.getOwnerComponent().getModel("listaUsuariosModel").getData()    || [];
+                            var aCentros         = oController.getOwnerComponent().getModel("listaCentrosModel").getData()     || [];
                             var aMaterialRodante = oController.getOwnerComponent().getModel("listaEquipamentoModel").getData() || [];
-                            var aFormularios = oController.getOwnerComponent().getModel("listaFormularioModel").getData() || [];
+                            var aFormularios     = oController.getOwnerComponent().getModel("listaFormularioModel").getData()  || [];
 
                             aPerfis.forEach(element => {
                                 element.AutorizacaoSet.forEach(auth => {
@@ -655,72 +655,69 @@ sap.ui.define([
 
                             var aGravacoes = [
                                 oController.gravarTabelaIndexDB("tb_autorizacao", aAutorizacoes),
-                                oController.gravarTabelaIndexDB("tb_perfil", aPerfis),
-                                oController.gravarTabelaIndexDB("tb_centros", aCentros),
-                                oController.gravarTabelaIndexDB("tb_usuario", aUsuarios),
+                                oController.gravarTabelaIndexDB("tb_perfil",      aPerfis),
+                                oController.gravarTabelaIndexDB("tb_centros",     aCentros),
+                                oController.gravarTabelaIndexDB("tb_usuario",     aUsuarios),
                                 oController.gravarTabelaIndexDB("tb_equipamento", aMaterialRodante),
-                                oController.gravarTabelaIndexDB("tb_formulario", aFormularios)
+                                oController.gravarTabelaIndexDB("tb_formulario",  aFormularios)
                             ];
 
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
 
-                                var aForms = oController.agruparPorCampo(aMaterialRodante, "IdForm")
+                                var aForms   = oController.agruparPorCampo(aMaterialRodante, "IdForm")
                                 var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo")
                                 var aLeiturasForm = [
-                                    oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
-                                    oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
-                                    oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
-                                    oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))
+                                    oController.carregarComponentes(aForms).catch(    () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
+                                    oController.carregarCondicoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_condicoes",     "listaCondicoesModel"   )),
+                                    oController.carregarTemperaturas(aForms).catch(   () => oController.carregarDadosIndexDB("tb_temperaturas",  "listaTemperaturasModel")),
+                                    oController.carregarInspecoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_inspecoes",     "listaInspecoesModel"   )),
+                                    oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"   ))
                                 ];
 
-                                Promise.all(aLeiturasForm).then(
-                                    function () {
-                                        //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                        oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
-                                        var aLimpezas = [
-                                            oController.limparTabelaIndexDB("tb_componentes"),
-                                            oController.limparTabelaIndexDB("tb_condicoes"),
-                                            oController.limparTabelaIndexDB("tb_inspecoes"),
-                                            oController.limparTabelaIndexDB("tb_listadesgaste")
+                                Promise.all(aLeiturasForm)
+                                .then(() => {
+                                    //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                    oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
+                                    var aLimpezas = [
+                                        oController.limparTabelaIndexDB("tb_componentes"),
+                                        oController.limparTabelaIndexDB("tb_condicoes"),
+                                        oController.limparTabelaIndexDB("tb_temperaturas"),
+                                        oController.limparTabelaIndexDB("tb_inspecoes"),
+                                        oController.limparTabelaIndexDB("tb_listadesgaste")
+                                    ];
+                                    Promise.all(aLimpezas)
+                                    .then( () => {
+                                        var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
+                                        var aCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
+                                        var aTemperaturas= oController.getOwnerComponent().getModel("listaTemperaturasModel").getData();
+                                        var aInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                        var aDesgastes   = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();
+                                        var aGravacoes   = [
+                                            oController.gravarTabelaIndexDB("tb_componentes",   aComponentes),
+                                            oController.gravarTabelaIndexDB("tb_condicoes",     aCondicoes),
+                                            oController.gravarTabelaIndexDB("tb_temperaturas",  aTemperaturas),
+                                            oController.gravarTabelaIndexDB("tb_inspecoes",     aInspecoes),
+                                            oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes),
                                         ];
-                                        Promise.all(aLimpezas).then(
-                                            function () {
-                                                var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
-                                                var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
-                                                var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
-                                                var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();
-                                                var aGravacoes = [
-                                                    oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
-                                                    oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
-                                                    oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
-                                                    oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes),
-                                                ];
-                                                Promise.all(aGravacoes).then(
-                                                    function (result) {
-                                                        resolve()
-                                                    })
-                                            }).catch(
-                                                function (result) {
-                                                    oController.closeBusyDialog();
-                                                    resolve()
-                                                })
-                                    }).catch(
-                                        function (result) {
-                                            oController.closeBusyDialog();
-                                            resolve()
-                                        })
-                            }).catch(function (err) {
+                                        Promise.all(aGravacoes).then( () => resolve());
+                                    }).catch(() => {
+                                        oController.closeBusyDialog();
+                                        resolve();
+                                    });
+                                }).catch(() => {
+                                    oController.closeBusyDialog();
+                                    resolve();
+                                });
+                            }).catch((err) => {
                                 oController.closeBusyDialog();
                                 reject(err);
                             });
-
-                        }).catch(function (err) {
+                        }).catch((err) => {
                             oController.closeBusyDialog();
                             reject(err);
                         });
-
-                    }).catch(function (err) {
+                    }).catch((err) => {
                         oController.closeBusyDialog();
                         reject(err);
                     });
@@ -730,9 +727,9 @@ sap.ui.define([
                     oController.atualizarBusyDialog(oController.i18n("carregarIDB"));
                     var aLeiturasOffline = [
                         oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
-                        oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
-                        oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel"),
-                        oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")
+                        oController.carregarDadosIndexDB("tb_perfil",      "listaPerfilModel"),
+                        oController.carregarDadosIndexDB("tb_centros",     "listaCentrosModel"),
+                        oController.carregarDadosIndexDB("tb_usuario",     "listaUsuariosModel")
                     ];
 
                     Promise.all(aLeiturasOffline).then(function () {
@@ -1171,6 +1168,15 @@ sap.ui.define([
             })
         },
 
+        limpaElemento: function(elemento) {
+            delete elemento.__metadata;
+            delete elemento.ListaCondicoes;
+            delete elemento.Medicao;
+            delete elemento.ListaComponentes;
+            delete elemento.ListaInspecoes;
+            delete elemento.ListaTemperaturas;
+        },
+
         carregarOffline: function () {
             oController = this;
             return new Promise((resolve, reject) => {
@@ -1365,11 +1371,7 @@ sap.ui.define([
                 oController.enviarDados("ListaComponentesSet", aComponentes).then(function (result) {
                     var aListaComponentes = []
                     result.ComponentesSet.results.forEach(element => {
-                        delete element.__metadata
-                        delete element.ListaCondicoes
-                        delete element.Medicao
-                        delete element.ListaComponentes
-                        delete element.ListaInspecoes
+                        oController.limpaElemento(element);
                         aListaComponentes.push(element);
                     });
 
@@ -1401,11 +1403,7 @@ sap.ui.define([
                 oController.enviarDados("ListaCondicoesSet", aCondicoes).then(function (result) {
                     var aListaCondicoes = []
                     result.CondicoesSet.results.forEach(element => {
-                        delete element.__metadata
-                        delete element.ListaCondicoes
-                        delete element.Medicao
-                        delete element.ListaComponentes
-                        delete element.ListaInspecoes
+                        oController.limpaElemento(element)
                         aListaCondicoes.push(element);
                     });
 
@@ -1413,6 +1411,41 @@ sap.ui.define([
                     oController.adicionarMensagemSucesso("Condições sincronizadas " + aListaCondicoes.length, "Download de condições", "Condições encaminhadas para o dispositivo");
                     resolve();
                 }).catch( result => reject(result));
+            })
+        },
+
+        carregarTemperaturas: function (aFormularios) {
+            return new Promise((resolve, reject) => {
+                oController.atualizarBusyDialog(oController.i18n("sincronizandotemperaturas"));
+                // const aTemperaturas = { Chave: 'X', TemperaturasSet: [] }
+                // aFormularios.forEach(oFormulario => {
+                //     if (oFormulario.key != "") {
+                //         aTemperaturas.TemperaturasSet.push({ Chave: 'X', IdForm: oFormulario.key });
+                //     }
+                // })
+
+                // oController.enviarDados("ListaTemperaturasSet", aTemperaturas).then(function (result) {
+                //     const aListaTemperaturas = [];
+                //     result.TemperaturasSet.results.forEach(element => {
+                //         oController.limpaElemento(element);
+                //         aListaTemperaturas.push(element);
+                //     });
+
+                //     oController.getOwnerComponent().getModel("listaTemperaturasModel").setData(aListaTemperaturas)
+                //     oController.adicionarMensagemSucesso(oController.i18n("temperatura.mensagem.sucesso.sync", [aListaTemperaturas.length]), "temperatura.download", "temperatura.mensagem.sucesso");
+                //     resolve();
+                // }).catch( result => reject(result));
+
+                const aListaTemperaturas = [];
+                //TOOD: Descomentar para testar preenchimento
+                // aListaTemperaturas.push({ IdLado : "LD", Cor : "None", Secao : "Seção 1" });
+                // aListaTemperaturas.push({ IdLado : "LD", Cor : "None", Secao : "Seção 2" });
+                // aListaTemperaturas.push({ IdLado : "LD", Cor : "None", Secao : "Seção 3" });
+                // aListaTemperaturas.push({ IdLado : "LE", Cor : "None", Secao : "Seção 1" });
+                // aListaTemperaturas.push({ IdLado : "LE", Cor : "None", Secao : "Seção 2" });
+                // aListaTemperaturas.push({ IdLado : "LE", Cor : "None", Secao : "Seção 3" });
+                oController.getOwnerComponent().getModel("listaTemperaturasModel").setData(aListaTemperaturas);
+                resolve();
             })
         },
 
@@ -1436,11 +1469,7 @@ sap.ui.define([
                 oController.enviarDados("ListaInspecoesSet", aInspecoes).then(function (result) {
                     var aListaInspecoes = []
                     result.InspecoesSet.results.forEach(element => {
-                        delete element.__metadata
-                        delete element.ListaCondicoes
-                        delete element.Medicao
-                        delete element.ListaComponentes
-                        delete element.ListaInspecoes
+                        oController.limpaElemento(element);
                         aListaInspecoes.push(element);
                     });
 
@@ -2416,6 +2445,14 @@ sap.ui.define([
                 subtitle    : oController.i18n("roletes.lado.esquerdo"),
                 counter     : 1
             });
-        }
+        },
+
+		formataTextoLado: function (value) {
+			if (!value) {
+				return "-";
+			}
+			return oController.i18n("texto.lado." + value) || "-";
+		},
+
     });
 });

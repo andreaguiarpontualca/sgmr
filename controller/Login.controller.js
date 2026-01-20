@@ -294,6 +294,10 @@ sap.ui.define([
                             db.createObjectStore("tb_condicoes", { autoIncrement: true });
                         }
 
+                        if (!db.objectStoreNames.contains('tb_temperaturas')) {
+                            db.createObjectStore("tb_temperaturas", { autoIncrement: true });
+                        }
+
                         if (!db.objectStoreNames.contains('tb_inspecoes')) {
                             db.createObjectStore("tb_inspecoes", { autoIncrement: true });
                         }

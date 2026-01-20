@@ -127,6 +127,9 @@
       "listaCondicoesModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
+      "listaTemperaturasModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
       "listaInspecoesModel": {
         "type": "sap.ui.model.json.JSONModel"
       },

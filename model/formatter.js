@@ -125,6 +125,7 @@ sap.ui.define(function () {
 					return "sap-icon://status-inactive"
 			}
 		},
+
 		getOrdencaoIcone: function (value) {
 			switch (value) {
 				case "D":
@@ -134,7 +135,7 @@ sap.ui.define(function () {
 				default:
 					return "sap-icon://sort"
 			}
-		},							
+		}
 
 	};
 
