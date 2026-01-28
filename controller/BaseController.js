@@ -1,10 +1,10 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/core/UIComponent",
-    "sap/ui/core/routing/History",
+    'sap/ui/core/mvc/Controller',
+    'sap/ui/core/UIComponent',
+    'sap/ui/core/routing/History',
     'sap/m/MessageToast',
-    "sap/ui/core/Fragment",
-    "sap/ui/core/syncStyleClass"
+    'sap/ui/core/Fragment',
+    'sap/ui/core/syncStyleClass'
 ], function (Controller, UIComponent, History, MessageToast, Fragment, syncStyleClass) {
     "use strict";
     var oController
@@ -665,10 +665,11 @@ sap.ui.define([
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
 
-                                var aForms   = oController.agruparPorCampo(aMaterialRodante, "IdForm")
-                                var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo")
+                                var aCentros = oController.agruparPorCampo(aMaterialRodante, "Centro");
+                                var aForms   = oController.agruparPorCampo(aMaterialRodante, "IdForm");
+                                var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo");
                                 var aLeiturasForm = [
-                                    oController.carregarComponentes(aForms).catch(    () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
+                                    oController.carregarComponentes(aForms, aCentros).catch(    () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
                                     oController.carregarCondicoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_condicoes",     "listaCondicoesModel"   )),
                                     oController.carregarTemperaturas(aForms).catch(   () => oController.carregarDadosIndexDB("tb_temperaturas",  "listaTemperaturasModel")),
                                     oController.carregarInspecoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_inspecoes",     "listaInspecoesModel"   )),
@@ -1037,24 +1038,17 @@ sap.ui.define([
 
         atualizarUsuario: function () {
             return new Promise((resolve, reject) => {
-                oController.lerTabelaIndexDB("tb_usuario").then(
-                    function (result) {
-                        if (result.tb_usuario) {
-                            oController.getOwnerComponent().getModel("listaUsuariosModel").setData(result.tb_usuario);
-                            oController.prepararUsuario().then(
-                                function (result) {
-                                    resolve()
-                                }).catch(
-                                    function (result) {
-                                        reject()
-                                    })
-                        } else {
-                            resolve()
-                        }
-                    }).catch(
-                        function (result) {
-                            reject(result)
-                        })
+                oController.lerTabelaIndexDB("tb_usuario")
+                .then( result => {
+                    if (result.tb_usuario) {
+                        oController.getOwnerComponent().getModel("listaUsuariosModel").setData(result.tb_usuario);
+                        oController.prepararUsuario()
+                        .then( (result) => resolve())
+                        .catch((result) => reject());
+                    } else {
+                        resolve()
+                    }
+                }).catch( result => reject(result));
             })
         },
 
@@ -1351,22 +1345,21 @@ sap.ui.define([
             })
         },
 
-        carregarComponentes: function (aFormularios) {
+        carregarComponentes: function (aFormularios, aCentros) {
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.i18n("sincronizandocomponentes"));
-                var aComponentes = {
-                    Chave: 'X',
-                    ComponentesSet: []
-                }
-                aFormularios.forEach(oFormulario => {
-                    if (oFormulario.key != "") {
-                        var oComponente = {
-                            Chave: 'X',
-                            IdForm: oFormulario.key,
+                const aComponentes = { Chave: 'X', ComponentesSet: [] }
+                aCentros.forEach(centro => {
+                    aFormularios.forEach(oFormulario => {
+                        if (oFormulario.key != "") {
+                            aComponentes.ComponentesSet.push({
+                                Chave  : 'X',
+                                IdForm : oFormulario.key,
+                                Centro : centro.key
+                            });
                         }
-                        aComponentes.ComponentesSet.push(oComponente);
-                    }
-                })
+                    });
+                });
 
                 oController.enviarDados("ListaComponentesSet", aComponentes).then(function (result) {
                     var aListaComponentes = []
@@ -1417,35 +1410,25 @@ sap.ui.define([
         carregarTemperaturas: function (aFormularios) {
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.i18n("sincronizandotemperaturas"));
-                // const aTemperaturas = { Chave: 'X', TemperaturasSet: [] }
+                const aTemperaturas = { Chave: 'X', TemperaturaSet: [] }
+                // //TODO: Descomentar para validar consulta de temperaturas configuradas
                 // aFormularios.forEach(oFormulario => {
                 //     if (oFormulario.key != "") {
-                //         aTemperaturas.TemperaturasSet.push({ Chave: 'X', IdForm: oFormulario.key });
+                //         aTemperaturas.TemperaturaSet.push({ Chave: 'X', IdForm: oFormulario.key });
                 //     }
                 // })
 
-                // oController.enviarDados("ListaTemperaturasSet", aTemperaturas).then(function (result) {
-                //     const aListaTemperaturas = [];
-                //     result.TemperaturasSet.results.forEach(element => {
-                //         oController.limpaElemento(element);
-                //         aListaTemperaturas.push(element);
-                //     });
+                oController.enviarDados("ListaTemperaturaSet", aTemperaturas).then(function (result) {
+                    const aListaTemperaturas = [];
+                    result.TemperaturaSet.results.forEach(element => {
+                        oController.limpaElemento(element);
+                        aListaTemperaturas.push(element);
+                    });
 
-                //     oController.getOwnerComponent().getModel("listaTemperaturasModel").setData(aListaTemperaturas)
-                //     oController.adicionarMensagemSucesso(oController.i18n("temperatura.mensagem.sucesso.sync", [aListaTemperaturas.length]), "temperatura.download", "temperatura.mensagem.sucesso");
-                //     resolve();
-                // }).catch( result => reject(result));
-
-                const aListaTemperaturas = [];
-                //TOOD: Descomentar para testar preenchimento
-                // aListaTemperaturas.push({ IdLado : "LD", Cor : "None", Secao : "Seção 1" });
-                // aListaTemperaturas.push({ IdLado : "LD", Cor : "None", Secao : "Seção 2" });
-                // aListaTemperaturas.push({ IdLado : "LD", Cor : "None", Secao : "Seção 3" });
-                // aListaTemperaturas.push({ IdLado : "LE", Cor : "None", Secao : "Seção 1" });
-                // aListaTemperaturas.push({ IdLado : "LE", Cor : "None", Secao : "Seção 2" });
-                // aListaTemperaturas.push({ IdLado : "LE", Cor : "None", Secao : "Seção 3" });
-                oController.getOwnerComponent().getModel("listaTemperaturasModel").setData(aListaTemperaturas);
-                resolve();
+                    oController.getOwnerComponent().getModel("listaTemperaturasModel").setData(aListaTemperaturas)
+                    oController.adicionarMensagemSucesso(oController.i18n("temperatura.mensagem.sucesso.sync", [aListaTemperaturas.length]), "temperatura.download", "temperatura.mensagem.sucesso");
+                    resolve();
+                }).catch( result => reject(result));
             })
         },
 
@@ -1986,41 +1969,36 @@ sap.ui.define([
 
                 aMedicoes.forEach(oMedicao => {
 
-                    var now = oMedicao.Data;
-                    var hours = now.getHours().toString().padStart(2, '0');
-                    var minutes = now.getMinutes().toString().padStart(2, '0');
-                    var seconds = now.getSeconds().toString().padStart(2, '0');
-                    var timeString = "PT" + hours + "H" + minutes + "M" + seconds + "S"; //"PT10H19M23S"
-
-                    var oMedicaoSet = {
-                        Chave: 'X',
-                        Data: oMedicao.Data,
-                        DataSt: oMedicao.Data.toLocaleString().replace(',', ""),
-                        Eqktx: oMedicao.Eqktx,
-                        Equnr: oMedicao.Equnr,
-                        Formulario: oMedicao.IdForm,
-                        MedEqpto: oMedicao.MedEquipamento,
-                        Mensagem: "",
-                        Modelo: oMedicao.Modelo,
-                        Objnr: oMedicao.Objnr,
-                        Observacoes: oMedicao.Observacoes,
-                        Pltxt: oMedicao.Pltxt,
-                        Roleteqtdeld: oMedicao.RoleteQtdeLD?.toString() || "0",
-                        Roleteqtdele: oMedicao.RoleteQtdeLE?.toString() || "0",
+                    const oMedicaoSet = {
+                        Chave          : 'X',
+                        Data           : oMedicao.Data,
+                        DataSt         : oMedicao.Data.toLocaleString().replace(',', ""),
+                        Eqktx          : oMedicao.Eqktx,
+                        Equnr          : oMedicao.Equnr,
+                        Formulario     : oMedicao.IdForm,
+                        MedEqpto       : oMedicao.MedEquipamento,
+                        Mensagem       : "",
+                        Modelo         : oMedicao.Modelo,
+                        Objnr          : oMedicao.Objnr,
+                        Observacoes    : oMedicao.Observacoes,
+                        Pltxt          : oMedicao.Pltxt,
+                        Roleteqtdeld   : oMedicao.RoleteQtdeLD?.toString() || "0",
+                        Roleteqtdele   : oMedicao.RoleteQtdeLE?.toString() || "0",
                         Roletevazamento: oMedicao.RoleteVazamento,
-                        Status: oMedicao.Status,
-                        Tplnr: oMedicao.Tplnr,
-                        Usuario: oMedicao.Usuario,
-                        Uuid: oMedicao.Uuid,
-                        TagDireita: oMedicao.TagDireita,
-                        TagEsquerda: oMedicao.TagEsquerda,
-                        TruckDireita: oMedicao.TruckDireita,
-                        TruckEsquerda: oMedicao.TruckEsquerda,
-                        ComponentesSet: [],
-                        CondicoesSet: [],
-                        InspecoesSet: [],
-                        AnexosSet: [],
-                        RetornoSet: []
+                        Status         : oMedicao.Status,
+                        Tplnr          : oMedicao.Tplnr,
+                        Usuario        : oMedicao.Usuario,
+                        Uuid           : oMedicao.Uuid,
+                        TagDireita     : oMedicao.TagDireita,
+                        TagEsquerda    : oMedicao.TagEsquerda,
+                        TruckDireita   : oMedicao.TruckDireita,
+                        TruckEsquerda  : oMedicao.TruckEsquerda,
+                        ComponentesSet : [],
+                        CondicoesSet   : [],
+                        TemperaturaSet : [],
+                        InspecoesSet   : [],
+                        AnexosSet      : [],
+                        RetornoSet     : []
                     };
 
 
@@ -2028,13 +2006,13 @@ sap.ui.define([
                         delete oComponente.ListaComponentes
                         if (oComponente.Valormedido != "" && oComponente.Valormedido != null && oComponente.Valormedido != undefined && oComponente.Valormedido != 0) {
                             var oComp = {
-                                Chave: 'X',
-                                Valormedido: String(oComponente.Valormedido),
-                                IdComponente: oComponente.IdComponente,
-                                Posicao: oComponente.Posicao,
-                                PosicaoTec: oComponente.PosicaoTec,
-                                CodiFabr: oComponente.CodiFabr,
-                                IdLado: oComponente.IdLado
+                                Chave        : 'X',
+                                Valormedido  : String(oComponente.Valormedido),
+                                IdComponente : oComponente.IdComponente,
+                                Posicao      : oComponente.Posicao,
+                                PosicaoTec   : oComponente.PosicaoTec,
+                                CodiFabr     : oComponente.CodiFabr,
+                                IdLado       : oComponente.IdLado
                             }
 
                             oMedicaoSet.ComponentesSet.push(oComp)
@@ -2042,18 +2020,25 @@ sap.ui.define([
                     });
 
                     oMedicao.Condicoes.forEach(oCondicoes => {
-                        delete oCondicoes.ListaCondicoes
-                        oMedicaoSet.CondicoesSet.push(oCondicoes)
+                        delete oCondicoes.ListaCondicoes;
+                        oMedicaoSet.CondicoesSet.push(oCondicoes);
                     });
 
-                    oMedicao.Inspecoes.forEach(oInspecao => {
-                        oMedicaoSet.InspecoesSet.push(oInspecao)
+                    oMedicao.Inspecoes.forEach(oInspecao => oMedicaoSet.InspecoesSet.push(oInspecao));
+
+                    oMedicao.Temperaturas.forEach(temperatura => {
+                        oMedicaoSet.TemperaturaSet.push({
+                            Chave            : "X",
+                            Lado             : temperatura.Lado,
+                            TagEsteira       : temperatura.Lado === "D" ? oMedicaoSet.TagDireita : oMedicaoSet.TagEsquerda,
+                            IdForm           : temperatura.IdForm,
+                            Secao            : temperatura.Secao,
+                            Item             : temperatura.Item,
+                            ValorTemperatura : temperatura.ValorTemperatura.toString(10),
+                        })
                     });
 
-                    oMedicao.items.forEach(oAnexo => {
-                        var oAnexoNovo = Object.assign({}, oAnexo); // Cria uma cópia do objeto para evitar mutações
-                        oMedicaoSet.AnexosSet.push(oAnexoNovo)
-                    });
+                    oMedicao.items.forEach(oAnexo => oMedicaoSet.AnexosSet.push(Object.assign({}, oAnexo)));
 
                     aListaMedicaoes.MedicaoSet.push(oMedicaoSet)
                 });
@@ -2451,7 +2436,18 @@ sap.ui.define([
 			if (!value) {
 				return "-";
 			}
-			return oController.i18n("texto.lado." + value) || "-";
+			return oController.i18n("texto.lado.L" + value) || "-";
+		},
+
+        formataMaximoItens: function (value) {
+			if (!value) {
+				return 0;
+			}
+			try {
+                return value;
+            } catch (error) {
+                return 0;
+            }
 		},
 
     });

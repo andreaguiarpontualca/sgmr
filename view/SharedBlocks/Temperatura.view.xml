@@ -26,10 +26,10 @@
         <items templateShareable="false" >
             <ColumnListItem vAlign="Middle">
                 <cells>
-                    <ObjectStatus text="{path : 'materialRodanteFormularioModel>IdLado', formatter : '.formataTextoLado'}" state="{materialRodanteFormularioModel>Cor}" />
+                    <ObjectStatus text="{path : 'materialRodanteFormularioModel>Lado', formatter : '.formataTextoLado'}" state="{materialRodanteFormularioModel>Cor}" />
                     <Text text="{materialRodanteFormularioModel>Secao}"/>
-                    <StepInput value="{materialRodanteFormularioModel>Item}"        displayValuePrecision="0" step="1" min="0" editable="true" change="validaTemperatura" max="{materialRodanteFormularioModel>MaxPinos}" />
-                    <StepInput value="{materialRodanteFormularioModel>Temperatura}" displayValuePrecision="0" step="1" min="0" editable="true" change="validaTemperatura"/>
+                    <StepInput value="{materialRodanteFormularioModel>Item}"             displayValuePrecision="0" step="1" min="0"    editable="true" change="validaTemperatura" max="{materialRodanteFormularioModel>MaxItens}"/>
+                    <StepInput value="{materialRodanteFormularioModel>ValorTemperatura}" displayValuePrecision="2" step="1" min="0.00" editable="true" change="validaTemperatura"/>
                 </cells>
             </ColumnListItem>
         </items>

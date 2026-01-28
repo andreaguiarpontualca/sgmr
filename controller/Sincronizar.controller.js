@@ -156,10 +156,11 @@ sap.ui.define([
                     oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
                         var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
                         oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
-                            var aForms = oController.agruparFormularios(aDados)
-                            var aModelos = oController.agruparPorCampo(aDados, "Modelo")
+                            var aForms        = oController.agruparFormularios(aDados);
+                            var aCentros      = oController.agruparPorCampo(aDados, "Centro");
+                            var aModelos      = oController.agruparPorCampo(aDados, "Modelo");
                             var aLeiturasForm = [
-                                oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
+                                oController.carregarComponentes(aForms, aCentros).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
                                 oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
                                 oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
                                 oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))                                

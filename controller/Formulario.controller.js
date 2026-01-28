@@ -298,10 +298,9 @@ sap.ui.define([
                             var oEquipamento           = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData();
                             var aListaComponetes       = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
-                            const aListaCondicoes      = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
-                            //FIXME: Adicionar idFormulario
-                            const aListaTemperaturas   = oController.getOwnerComponent().getModel("listaTemperaturasModel").getData() || [];
-                            const aListaInspecoes      = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            const aListaCondicoes      = oController.getOwnerComponent().getModel("listaCondicoesModel"   ).getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            const aListaInspecoes      = oController.getOwnerComponent().getModel("listaInspecoesModel"   ).getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            const aListaTemperaturas   = oController.getOwnerComponent().getModel("listaTemperaturasModel").getData().filter(c => c.IdForm == oEquipamento.IdForm ) || [];
                             const totalRoletes         = { direito : 0, esquerdo : 0 };
                             const aComponentesCombo    = [];
                             let   corDireita           = "";
@@ -335,7 +334,13 @@ sap.ui.define([
                             });
 
                             aListaTemperaturas.forEach(item => {
-                                item.Cor = item.IdLado === "LD" ? corDireita : corEsquerda;
+                                item.Cor = item.Lado === "D" ? corDireita : corEsquerda;
+                            });
+
+                            aListaTemperaturas.sort((a, b) => {
+                                if (a.Lado < b.Lado) return -1;
+                                if (a.Lado > b.Lado) return 1;
+                                return 0;
                             });
 
                             aListaComponentesCombo.forEach(element => aComponentesCombo.push({ key: element.key, text: element.key }));
