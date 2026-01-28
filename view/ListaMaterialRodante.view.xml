@@ -14,20 +14,11 @@
         class="sapUiContentPadding sapUiResponsivePadding--header sapUiResponsivePadding--subHeader sapUiResponsivePadding--content sapUiResponsivePadding--footer"
     >
         <headerContent>
-            <Button
-                tooltip="{i18n>sincronizar}"
-                icon="sap-icon://synchronize"
-                press="onSincronizar"
-                type="Neutral"
-            />
+            <Button tooltip="{i18n>sincronizar}" icon="sap-icon://synchronize" press="onSincronizar" type="Neutral" />
             <ObjectStatus
-                id="networkStatus"
-                active="false"
-                inverted="true"
-                icon="{path: 'conexaoModel>statusConexao',
-                    formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
-                state="{path: 'conexaoModel>statusConexao',
-                        formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
+                active="false" inverted="true"
+                icon="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                state="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
             />
         </headerContent>
         <content>
@@ -39,20 +30,12 @@
                 growing="false"
                 growingThreshold="10"
                 items="{listaEquipamentoModel>/}"
-            >
+                >
                 <headerToolbar>
                     <OverflowToolbar id="otbSubheader">
-                        <Title
-                            text="Equipamentos ({= ${listaEquipamentoModel>/}.length})"
-                            level="H2"
-                        />
+                        <Title text="Equipamentos ({= ${listaEquipamentoModel>/}.length})" level="H2" />
                         <ToolbarSpacer />
-                        <SearchField
-                            id="searchEquipamento"
-                            search="onSearchEquipamento"
-                            width="50%"
-                            placeholder="Pesquisa"
-                        />
+                        <SearchField id="searchEquipamento" search="onSearchEquipamento" width="50%" placeholder="Pesquisa" />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
@@ -68,20 +51,14 @@
                         detailPress="onMedicaoOpcaoDialogOpen"
                         press="onMaterialRodantePress"
                     >
-                        <cells>
-                            <ObjectStatus
-                                title="{listaEquipamentoModel>Equnr}"
-                                text="{listaEquipamentoModel>Eqktx}"
-                                icon="{
-                                                path:'listaEquipamentoModel>Status',
-                                                formatter:'com.pontual.sgmr.model.formatter.getIconeEquipamento'
-                                            }"
-                                state="{
-                                                path:'listaEquipamentoModel>Status',
-                                                formatter:'com.pontual.sgmr.model.formatter.getStatusEquipamento'
-                                            }"
-                            />
-                        </cells>
+                    <cells>
+                        <ObjectStatus
+                            title="{listaEquipamentoModel>Equnr}"
+                            text="{listaEquipamentoModel>Eqktx}"
+                            icon="{ path:'listaEquipamentoModel>Status', formatter:'com.pontual.sgmr.model.formatter.getIconeEquipamento' }"
+                            state="{ path:'listaEquipamentoModel>Status', formatter:'com.pontual.sgmr.model.formatter.getStatusEquipamento' }"
+                        />
+                    </cells>
                     </ColumnListItem>
                 </items>
             </Table>

@@ -75,12 +75,11 @@ sap.ui.define([
 
             onConfirmarMaterialRodante: function () {
 
-                var aMockMessages = [];
-                var vPodeGravar = true;
-                var oMockMessage = {}
-                var omaterialRodante = oController.getOwnerComponent().getModel("materialRodanteCriarModel").getData()
-                var omaterialRodanteInput = oView.byId("materialRodanteInput")
-                var oConfirmarButton = oView.byId("confirmarmaterialRodanteButton")
+                var aMockMessages         = [];
+                var vPodeGravar           = true;
+                var omaterialRodante      = oController.getOwnerComponent().getModel("materialRodanteCriarModel").getData();
+                var omaterialRodanteInput = oView.byId("materialRodanteInput");
+                var oConfirmarButton      = oView.byId("confirmarmaterialRodanteButton");
                 oConfirmarButton.setEnabled(false);
                 oConfirmarButton.setBusy(true);
 

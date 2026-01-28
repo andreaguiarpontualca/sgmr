@@ -85,18 +85,18 @@ sap.ui.define([
                 this.limparMensagens();
                 return new Promise((resolve, reject) => {
                     const pMedicao      = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
-                    aMockMessages       = [];
+                    const erros         = [];
                     var vValido         = true;
                     var vAlerta         = false;
                     var vMensagemAlerta = "";
 
                     //-- Validações no BaseController par acompartilhar com os blocos do form --//
-                    oController.validaMedicao(aMockMessages);
-                    oController.validaDataMedicao(aMockMessages);
-                    oController.validaVazamentoRoleteDireito(aMockMessages);
-                    oController.validaVazamentoRoleteEsquerdo(aMockMessages);
+                    oController.validaMedicao(erros);
+                    oController.validaDataMedicao(erros);
+                    oController.validaVazamentoRoleteDireito(erros);
+                    oController.validaVazamentoRoleteEsquerdo(erros);
 
-                    vValido = aMockMessages.length < 1;
+                    vValido = erros.length < 1;
                   
                     var aComponentes = oController.agruparPorCampo(pMedicao.Componentes, "ComponenteLado")
                     aComponentes.forEach(oComponente => {
@@ -105,18 +105,9 @@ sap.ui.define([
 
                         if (aCompMedNaoInformada != 0 && aCompMedInformada != 0) {
 
-                            var oComp = pMedicao.Componentes.find(c => c.ComponenteLado == oComponente.key);
-
-                            var oMockMessage = {
-                                type: 'Warning',
-                                title: oBundle.getText("componentesmedicao", [oComp.Componente, oComp.Lado]),
-                                description: oBundle.getText("componentesmedicaomsg", [oComp.Componente, oComp.Lado]),
-                                subtitle: oBundle.getText("campoobrigatorio"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
-
-                            vMensagemAlerta = oBundle.getText("componentesmedicaomsg", [oComp.Componente, oComp.Lado])
+                            const oComp = pMedicao.Componentes.find(c => c.ComponenteLado == oComponente.key);
+                            vMensagemAlerta = oController.i18n("componentesmedicaomsg", [oComp.Componente, oComp.Lado]);
+                            oController.adicionarMensagemAviso(oController.i18n("componentesmedicao", [oComp.Componente, oComp.Lado]), "campoobrigatorio", vMensagemAlerta);
 
                             pMedicao.Componentes.forEach(element => {
                                 if (element.ComponenteLado == oComp.ComponenteLado) {
@@ -137,26 +128,18 @@ sap.ui.define([
                         switch (oComponente.Ordenacao) {
                             case "D":
                                 if (vValorMedido != 0 && vValorMedido > vUltimoValorMedido) {
-                                    aMockMessages.push({
-                                        type: 'Error',
-                                        title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        description: oBundle.getText("valormaiormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        subtitle: oBundle.getText("medicao"),
-                                        counter: 1
-                                    });
+                                    const titulo    = oController.i18n("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    const descricao = oController.i18n("valormaiormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    oController.adicionarMensagemErro(titulo, "medicao", descricao);
                                     oComponente.ValorMedidoValueState = 'Error'
                                     vValido = false;
                                 }
                                 break;
                             case "C":
                                 if (vValorMedido != 0 && vValorMedido < vUltimoValorMedido) {
-                                    aMockMessages.push({
-                                        type: 'Error',
-                                        title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        description: oBundle.getText("valormenormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        subtitle: oBundle.getText("medicao"),
-                                        counter: 1
-                                    })
+                                    const titulo    = oController.i18n("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    const descricao = oController.i18n("valormenormsg",  [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    oController.adicionarMensagemErro(titulo, "medicao", descricao);
                                     oComponente.ValorMedidoValueState = 'Error'
                                     vValido = false;
                                 }
@@ -171,7 +154,7 @@ sap.ui.define([
                     oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
 
                     var oModel = new JSONModel();
-                    oModel.setData(aMockMessages);
+                    oModel.setData(erros);
                     try {
                         sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario").setModel(oModel);
                     } catch (error) {

@@ -100,36 +100,11 @@ sap.ui.define([
                             function (result) {
                                 var aListaUser = oController.lerLocalStorage("SGMR_Login")
                                 if (aListaUser != null && aListaUser.length > 0) {
-                                    var oMockMessage3 = {
-                                        type: 'Warning',
-                                        title: 'Sem Conexão',
-                                        description: 'Não foi possível conectar ao SAP. Prosseguindo com acesso offline.',
-                                        subtitle: 'Problemas de conexão',
-                                        counter: 1
-                                    };
-                                    oController.getOwnerComponent().getModel("usuariosLoginModel").setData(aListaUser)
-                                    oController.getView().getModel().setData([oMockMessage3]);
-                                    oController.getView().getModel().refresh()
-                                    oView.byId("entrarButton").setEnabled(true)
+                                    oController.getOwnerComponent().getModel("usuariosLoginModel").setData(aListaUser);
+                                    oView.byId("entrarButton").setEnabled(true);
                                 } else {
                                     MessageToast.show("Por favor, verificar suas conexões antes do primeiro acesso!");
-                                    var oMockMessage = {
-                                        type: 'Error',
-                                        title: 'Sem Conexão',
-                                        description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                                        subtitle: 'Problemas de conexão',
-                                        counter: 1
-                                    };
-                                    var oMockMessage2 = {
-                                        type: 'Error',
-                                        title: 'Primeiro Acesso',
-                                        description: 'É necessário conexão com o SAP antes do primeiro acesso',
-                                        subtitle: 'Problemas de conexão',
-                                        counter: 1
-                                    };
-                                    oController.getView().getModel().setData([oMockMessage, oMockMessage2]);
-                                    oController.getView().getModel().refresh()
-                                    oView.byId("entrarButton").setEnabled(false)
+                                    oView.byId("entrarButton").setEnabled(false);
                                 }
                                 oController.closeBusyDialog();
                             });
@@ -140,23 +115,7 @@ sap.ui.define([
                         oView.byId("entrarButton").setEnabled(true)
                     } else {
                         MessageToast.show("Por favor, verificar suas conexões antes do primeiro acesso!");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: 'Sem Conexão',
-                            description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                            subtitle: 'Problemas de conexão',
-                            counter: 1
-                        };
-                        var oMockMessage2 = {
-                            type: 'Error',
-                            title: 'Primeiro Acesso',
-                            description: 'É necessário conexão com o SAP antes do primeiro acesso',
-                            subtitle: 'Problemas de conexão',
-                            counter: 1
-                        };
-                        oController.getView().getModel().setData([oMockMessage, oMockMessage2]);
-                        oController.getView().getModel().refresh()
-                        oView.byId("entrarButton").setEnabled(false)
+                        oView.byId("entrarButton").setEnabled(false);
                     }
                 }
 
@@ -167,8 +126,6 @@ sap.ui.define([
             },
 
             onLogin: function (oEvent) {
-                // oController.iniciarAplicativo()
-                // oController.getOwnerComponent().getRouter().navTo("Inicio", null, true);
                 var aListaUsuarios = oController.getOwnerComponent().getModel("usuariosLoginModel").getData()
                 if (aListaUsuarios.length == undefined) {
                     oController.carregarUsuariosOffLine();
@@ -184,38 +141,14 @@ sap.ui.define([
                             oController.iniciarAplicativo()
                         } else {
                             MessageToast.show("Usuário bloqueado");
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: 'Bloqueado',
-                                description: 'Usuário bloqueado',
-                                subtitle: 'Usuário e Senha',
-                                counter: 1
-                            };
-                            oController.getView().getModel().setData([oMockMessage]);
                             oController.getView().getModel().refresh()
                         }
                     } else {
                         MessageToast.show("Usuário ou senha inválidos");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: 'Inválido',
-                            description: 'Usuário ou Senha inválido',
-                            subtitle: 'Usuário e Senha',
-                            counter: 1
-                        };
-                        oController.getView().getModel().setData([oMockMessage]);
                         oController.getView().getModel().refresh()
                     }
                 } else {
                     MessageToast.show("Por favor, informe usuário e senha");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'Campos obrigatórios',
-                        description: 'Por favor, informe usuário e senha',
-                        subtitle: 'Usuário e Senha',
-                        counter: 1
-                    };
-                    oController.getView().getModel().setData([oMockMessage]);
                     oController.getView().getModel().refresh()
                 }
             },

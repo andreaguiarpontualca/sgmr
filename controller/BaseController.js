@@ -665,11 +665,11 @@ sap.ui.define([
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
 
-                                var aCentros = oController.agruparPorCampo(aMaterialRodante, "Centro");
+                                var aEqunrs  = oController.agruparPorCampo(aMaterialRodante, "Equnr");
                                 var aForms   = oController.agruparPorCampo(aMaterialRodante, "IdForm");
                                 var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo");
                                 var aLeiturasForm = [
-                                    oController.carregarComponentes(aForms, aCentros).catch(    () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
+                                    oController.carregarComponentes(aEqunrs).catch(   () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
                                     oController.carregarCondicoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_condicoes",     "listaCondicoesModel"   )),
                                     oController.carregarTemperaturas(aForms).catch(   () => oController.carregarDadosIndexDB("tb_temperaturas",  "listaTemperaturasModel")),
                                     oController.carregarInspecoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_inspecoes",     "listaInspecoesModel"   )),
@@ -1345,19 +1345,14 @@ sap.ui.define([
             })
         },
 
-        carregarComponentes: function (aFormularios, aCentros) {
+        carregarComponentes: function (equipamentos) {
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.i18n("sincronizandocomponentes"));
                 const aComponentes = { Chave: 'X', ComponentesSet: [] }
-                aCentros.forEach(centro => {
-                    aFormularios.forEach(oFormulario => {
-                        if (oFormulario.key != "") {
-                            aComponentes.ComponentesSet.push({
-                                Chave  : 'X',
-                                IdForm : oFormulario.key,
-                                Centro : centro.key
-                            });
-                        }
+                equipamentos.forEach(equipamento => {
+                    aComponentes.ComponentesSet.push({
+                        Chave       : 'X',
+                        Equipamento : equipamento.key
                     });
                 });
 
@@ -2259,9 +2254,9 @@ sap.ui.define([
         },
 
         validaMedicao: function(parametro) {
-            var aMockMessages = parametro;
+            var erros = parametro;
             if (!Array.isArray(parametro)) {
-                aMockMessages = [];
+                erros = [];
             }
             this.limpaEstadoCampoMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto");
@@ -2271,13 +2266,8 @@ sap.ui.define([
                 input.setValueState("Error");
                 input.setValueStateText(oController.i18n("campoobrigatorio"));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oController.i18n("campoobrigatorio"),
-                    description: oController.i18n("preenchimentoobrigatorio", ["Horimero Equipamento"]),
-                    subtitle: oController.i18n("horimetroatual"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("campoobrigatorio", "horimetroatual", oController.i18n("preenchimentoobrigatorio", ["Horimero Equipamento"]));
+                erros.push(1);
             } else {
                 oMedicao.MedEquipamento = parseInt(oMedicao.MedEquipamento).toFixed(0);
                 var vMedEpto        = parseInt(oMedicao.MedEquipamento);
@@ -2287,26 +2277,16 @@ sap.ui.define([
                     input.setValueState("Error");
                     input.setValueStateText(oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
                     input.focus();
-                    aMockMessages.push({
-                        type: 'Error',
-                        title: oController.i18n("horimetroatual"),
-                        description: oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]),
-                        subtitle: oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]),
-                        counter: 1
-                    });
+                    oController.adicionarMensagemErro("horimetroatual", oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]), oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
+                    erros.push(1);
                 }
 
                 if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
                     input.setValueState("Error");
                     input.setValueStateText(oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
                     input.focus();
-                    aMockMessages.push({
-                        type: 'Error',
-                        title: oController.i18n("diferencaomedicao"),
-                        description: oController.i18n("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
-                        subtitle: oController.i18n("medicao"),
-                        counter: 1
-                    });
+                    oController.adicionarMensagemErro("diferencaomedicao", "medicao", oController.i18n("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]));
+                    erros.push(1);
                 }
             }
         },
@@ -2314,23 +2294,15 @@ sap.ui.define([
         validaDataMedicao: function(parametro) {
             this.limpaEstadoCampoDataMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")
-            var aMockMessages = parametro;
-            if (!Array.isArray(parametro)) {
-                aMockMessages = [];
-            }
+            const erros = !Array.isArray(parametro) ? [] : parametro;
             
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.Data == null || oMedicao.Data == "") {
                 input.setValueState("Error");
                 input.setValueStateText(oController.i18n("campoobrigatorio"));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oController.i18n("campoobrigatorio"),
-                    description: oController.i18n("preenchimentoobrigatorio", ["Data"]),
-                    subtitle: oController.i18n("data"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("campoobrigatorio", "data", oController.i18n("preenchimentoobrigatorio", ["Data"]));
+                erros.push(1);
                 return;
             }
 
@@ -2339,13 +2311,8 @@ sap.ui.define([
                 input.setValueState("Error");
                 input.setValueStateText(oController.i18n("datamaiorqueatual"));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oController.i18n("datainvalida"),
-                    description: oController.i18n("datamaiorqueatual"),
-                    subtitle: oController.i18n("data"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("datainvalida", "data", "datamaiorqueatual");
+                erros.push(1);
                 return;
             }
 
@@ -2354,13 +2321,8 @@ sap.ui.define([
                 input.setValueState("Error");
                 input.setValueStateText(oController.i18n("limiteretroativomsg", [vLimiteRetroativo]));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oController.i18n("limiteretroativo"),
-                    description: oController.i18n("limiteretroativomsg", [vLimiteRetroativo]),
-                    subtitle: oController.i18n("limiteretroativo"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("limiteretroativo", "limiteretroativo", oController.i18n("limiteretroativomsg", [vLimiteRetroativo]));
+                erros.push(1);
             }
         },
 
@@ -2389,13 +2351,8 @@ sap.ui.define([
             input.setValueStateText(oController.i18n(mensagemLimite, [limite]));
             input.focus();
 
-            mensagens.push({
-                type        : 'Error',
-                title       : oController.i18n(mensagemLimite, [limite]),
-                description : oController.i18n(mensagemLimite + ".detalhe", [limite]),
-                subtitle    : oController.i18n("roletes.lado.direito"),
-                counter     : 1
-            });
+            oController.adicionarMensagemErro(oController.i18n(mensagemLimite, [limite]), "roletes.lado.direito", oController.i18n(mensagemLimite + ".detalhe", [limite]));
+            mensagens.push(1);
         },
 
         validaVazamentoRoleteEsquerdo: function(mensagens) {
@@ -2423,13 +2380,8 @@ sap.ui.define([
             input.setValueStateText(oController.i18n(mensagemLimite, [limite]));
             input.focus();
 
-            mensagens.push({
-                type        : 'Error',
-                title       : oController.i18n(mensagemLimite, [limite]),
-                description : oController.i18n(mensagemLimite + ".detalhe", [limite]),
-                subtitle    : oController.i18n("roletes.lado.esquerdo"),
-                counter     : 1
-            });
+            oController.adicionarMensagemErro(oController.i18n(mensagemLimite, [limite]), "roletes.lado.esquerdo", oController.i18n(mensagemLimite + ".detalhe", [limite]));
+            mensagens.push(1);
         },
 
 		formataTextoLado: function (value) {
