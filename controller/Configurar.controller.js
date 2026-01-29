@@ -117,8 +117,8 @@ sap.ui.define([
             },
 
             onTestar: function () {
+                oController.limparMensagens();
                 var oConexao = oController.getOwnerComponent().getModel("configurarModel").getData()
-
                 if (oController.checkConnection() == true) {
                     if (oConexao.url) {
                         oController.openBusyDialog();
@@ -130,7 +130,7 @@ sap.ui.define([
                             MessageToast.show(msgSucesso, { duration: 3000, onClose: "" });
                             oController.closeBusyDialog();
 
-                            oController.adicionarMensagemSucesso("testesucesso", "conexacosucesso", msgSucesso);
+                            oController.adicionarMensagemSucesso("testesucesso", "sucessoservidor", msgSucesso);
                         }).catch(e => {
                             const msgErro = oController.i18n("mensagem.conexao.erro", [oConexao.urlsemclient]);
                             oController.atualizarBusyDialog(msgErro);
