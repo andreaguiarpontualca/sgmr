@@ -1406,13 +1406,6 @@ sap.ui.define([
             return new Promise((resolve, reject) => {
                 oController.atualizarBusyDialog(oController.i18n("sincronizandotemperaturas"));
                 const aTemperaturas = { Chave: 'X', TemperaturaSet: [] }
-                // //TODO: Descomentar para validar consulta de temperaturas configuradas
-                // aFormularios.forEach(oFormulario => {
-                //     if (oFormulario.key != "") {
-                //         aTemperaturas.TemperaturaSet.push({ Chave: 'X', IdForm: oFormulario.key });
-                //     }
-                // })
-
                 oController.enviarDados("ListaTemperaturaSet", aTemperaturas).then(function (result) {
                     const aListaTemperaturas = [];
                     result.TemperaturaSet.results.forEach(element => {
@@ -2014,23 +2007,29 @@ sap.ui.define([
                         }
                     });
 
-                    oMedicao.Condicoes.forEach(oCondicoes => {
-                        delete oCondicoes.ListaCondicoes;
-                        oMedicaoSet.CondicoesSet.push(oCondicoes);
-                    });
+                    const condicoes = oMedicao.Condicoes.filter(i => !i.Nivel && i.Nivel !== "Não Informada") || [];
+                    if (condicoes.length) {
+                        oMedicao.Condicoes.forEach(oCondicoes => {
+                            delete oCondicoes.ListaCondicoes;
+                            oMedicaoSet.CondicoesSet.push(oCondicoes);
+                        });
+                    }
+
 
                     oMedicao.Inspecoes.forEach(oInspecao => oMedicaoSet.InspecoesSet.push(oInspecao));
 
                     oMedicao.Temperaturas.forEach(temperatura => {
-                        oMedicaoSet.TemperaturaSet.push({
-                            Chave            : "X",
-                            Lado             : temperatura.Lado,
-                            TagEsteira       : temperatura.Lado === "D" ? oMedicaoSet.TagDireita : oMedicaoSet.TagEsquerda,
-                            IdForm           : temperatura.IdForm,
-                            Secao            : temperatura.Secao,
-                            Item             : temperatura.Item,
-                            ValorTemperatura : temperatura.ValorTemperatura.toString(10),
-                        })
+                        if (temperatura && temperatura.Item) {
+                            oMedicaoSet.TemperaturaSet.push({
+                                Chave            : "X",
+                                Lado             : temperatura.Lado,
+                                TagEsteira       : temperatura.Lado === "D" ? oMedicaoSet.TagDireita : oMedicaoSet.TagEsquerda,
+                                IdForm           : temperatura.IdForm,
+                                Secao            : temperatura.Secao,
+                                Item             : temperatura.Item,
+                                ValorTemperatura : temperatura.ValorTemperatura.toString(10),
+                            });
+                        }
                     });
 
                     oMedicao.items.forEach(oAnexo => oMedicaoSet.AnexosSet.push(Object.assign({}, oAnexo)));
