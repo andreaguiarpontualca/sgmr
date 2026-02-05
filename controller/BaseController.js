@@ -2007,14 +2007,13 @@ sap.ui.define([
                         }
                     });
 
-                    const condicoes = oMedicao.Condicoes.filter(i => !i.Nivel && i.Nivel !== "Não Informada") || [];
+                    const condicoes = oMedicao.Condicoes.filter(i => !i.Nivel || i.Nivel !== "Não Informada") || [];
                     if (condicoes.length) {
                         oMedicao.Condicoes.forEach(oCondicoes => {
                             delete oCondicoes.ListaCondicoes;
                             oMedicaoSet.CondicoesSet.push(oCondicoes);
                         });
                     }
-
 
                     oMedicao.Inspecoes.forEach(oInspecao => oMedicaoSet.InspecoesSet.push(oInspecao));
 
