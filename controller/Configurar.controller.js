@@ -76,6 +76,8 @@ sap.ui.define([
 
             onConfirmar: function () {
 
+                this.limparMensagens();
+
                 var oConexao = oController.getOwnerComponent().getModel("configurarModel").getData()
                 oConexao.host = oConexao.host.trim();
 

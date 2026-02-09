@@ -148,69 +148,63 @@ sap.ui.define([
             onDownloadEquipamento: function (oEvent) {
                 this.limparMensagens();
 
-                var vButton = "downloadEquipamentoButton"
-                var vTabela = "tb_equipamento"
-                var vModel = "listaEquipamentoModel"
+                const vButton = "downloadEquipamentoButton"
+                const vTabela = "tb_equipamento"
+                const vModel  = "listaEquipamentoModel"
                 oView.byId(vButton).setBusy(true);
-                oController.carregarEquipamento().then(function () {
-                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
-                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
-                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
-                            var aForms        = oController.agruparFormularios(aDados);
-                            var aEqunrs       = oController.agruparPorCampo(aDados, "Equnr");
-                            var aModelos      = oController.agruparPorCampo(aDados, "Modelo");
-                            var aLeiturasForm = [
-                                oController.carregarComponentes(aEqunrs).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
-                                oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
-                                oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
-                                oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))                                
+                oController.carregarEquipamento()
+                .then(() => {
+                    oController.limparTabelaIndexDB(vTabela)
+                    .then(() => {
+                        const aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados)
+                        .then(() => {
+                            const aForms        = oController.agruparFormularios(aDados);
+                            const aEqunrs       = oController.agruparPorCampo(aDados, "Equnr");
+                            const aModelos      = oController.agruparPorCampo(aDados, "Modelo");
+                            const aLeiturasForm = [
+                                oController.carregarComponentes(aEqunrs).catch(   () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
+                                oController.carregarCondicoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_condicoes",     "listaCondicoesModel"   )),
+                                oController.carregarInspecoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_inspecoes",     "listaInspecoesModel"   )),
+                                oController.carregarTemperaturas(aForms).catch(   () => oController.carregarDadosIndexDB("tb_temperaturas",  "listaTemperaturasModel")),
+                                oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"   ))                                
                             ];
 
-                            Promise.all(aLeiturasForm).then(
-                                function () {
-                                    //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                    oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
-                                    var aLimpezas = [
-                                        oController.limparTabelaIndexDB("tb_componentes"),
-                                        oController.limparTabelaIndexDB("tb_condicoes"),
-                                        oController.limparTabelaIndexDB("tb_inspecoes"),
-                                        oController.limparTabelaIndexDB("tb_listadesgaste")
+                            Promise.all(aLeiturasForm)
+                            .then(() => {
+                                //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
+                                const aLimpezas = [
+                                    oController.limparTabelaIndexDB("tb_componentes"),
+                                    oController.limparTabelaIndexDB("tb_condicoes"),
+                                    oController.limparTabelaIndexDB("tb_inspecoes"),
+                                    oController.limparTabelaIndexDB("tb_temperaturas"),
+                                    oController.limparTabelaIndexDB("tb_listadesgaste")
+                                ];
+                                Promise.all(aLimpezas)
+                                .then(() => {
+                                    const aComponentes  = oController.getOwnerComponent().getModel("listaComponentesModel" ).getData();
+                                    const aCondicoes    = oController.getOwnerComponent().getModel("listaCondicoesModel"   ).getData();
+                                    const aInspecoes    = oController.getOwnerComponent().getModel("listaInspecoesModel"   ).getData();
+                                    const aTemperaturas = oController.getOwnerComponent().getModel("listaTemperaturasModel").getData();
+                                    const aDesgastes    = oController.getOwnerComponent().getModel("listaDesgastesModel"   ).getData();
+                                    const aGravacoes    = [
+                                        oController.gravarTabelaIndexDB("tb_componentes",   aComponentes),
+                                        oController.gravarTabelaIndexDB("tb_condicoes",     aCondicoes),
+                                        oController.gravarTabelaIndexDB("tb_inspecoes",     aInspecoes),
+                                        oController.gravarTabelaIndexDB("tb_temperaturas",  aTemperaturas),
+                                        oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes)                                                
                                     ];
-                                    Promise.all(aLimpezas).then(
-                                        function () {
-                                            var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
-                                            var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
-                                            var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
-                                            var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();                                            
-                                            var aGravacoes = [
-                                                oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
-                                                oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
-                                                oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
-                                                oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes)                                                
-                                            ];
-                                            Promise.all(aGravacoes).then(
-                                                function (result) {
-                                                    oView.byId(vButton).setBusy(false);
-                                                    MessageToast.show("Download de Equipamentos concluído");
-                                                })
-                                        }).catch(
-                                            function (result) {
-                                                oView.byId(vButton).setBusy(false);
-                                            })
-                                }).catch(
-                                    function (result) {
+                                    Promise.all(aGravacoes)
+                                    .then((result) => {
                                         oView.byId(vButton).setBusy(false);
-                                    })
-
-                        }).catch(function () {
-                            oView.byId(vButton).setBusy(false);
-                        })
-                    }).catch(function () {
-                        oView.byId(vButton).setBusy(false);
-                    })
-                }).catch(function () {
-                    oView.byId(vButton).setBusy(false);
-                })
+                                        MessageToast.show("Download de Equipamentos concluído");
+                                    });
+                                }).catch((error) => oView.byId(vButton).setBusy(false));
+                            }).catch((error) => oView.byId(vButton).setBusy(false));
+                        }).catch((error) => oView.byId(vButton).setBusy(false));
+                    }).catch((error) => oView.byId(vButton).setBusy(false));
+                }).catch((error) => oView.byId(vButton).setBusy(false));
             },
 
             onDownloadUsuario: function (oEvent) {

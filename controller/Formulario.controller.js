@@ -292,7 +292,10 @@ sap.ui.define([
                             aListaCondicoes.sort((a, b) => Number(a.IdCondicao) - Number(b.IdCondicao));
                             aListaInspecoes.sort((a, b) => a.Sequencial - b.Sequencial);
 
+                            var total = 0;
+
                             aListaComponetes.forEach(element => {
+                                element.Sequenciamento = element.Sequenciamento || total++;
                                 element.Valormedido = 0
                                 element.ValorMedidoValueState = 'None'
                                 element.ComponenteLado = element.IdComponente + element.IdLado
