@@ -28,8 +28,8 @@
                 <cells>
                     <ObjectStatus text="{path : 'materialRodanteFormularioModel>Lado', formatter : '.formataTextoLado'}" state="{materialRodanteFormularioModel>Cor}" />
                     <Text text="{materialRodanteFormularioModel>Secao}"/>
-                    <StepInput value="{materialRodanteFormularioModel>Item}"             displayValuePrecision="0" step="1" min="0"    editable="true" change="validaTemperatura" max="{materialRodanteFormularioModel>MaxItens}"/>
-                    <StepInput value="{materialRodanteFormularioModel>ValorTemperatura}" displayValuePrecision="2" step="1" min="0.00" editable="true" change="validaTemperatura"/>
+                    <StepInput id="inputPino" value="{materialRodanteFormularioModel>Item}"             displayValuePrecision="0" step="1" min="0"    editable="true" change="validaTemperatura" max="{materialRodanteFormularioModel>MaxItens}"/>
+                    <StepInput id="inputTemp" value="{materialRodanteFormularioModel>ValorTemperatura}" displayValuePrecision="2" step="1" min="0.00" editable="true" change="validaTemperatura"/>
                 </cells>
             </ColumnListItem>
         </items>

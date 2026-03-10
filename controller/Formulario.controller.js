@@ -399,11 +399,16 @@ sap.ui.define([
 
             inicializaCamposNumericos: function() {
                 const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
-                if (!blocoRoletes || blocoRoletes.length < 1) {
-                    return;
+                if (!!blocoRoletes && blocoRoletes.length > 0) {
+                    oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLD");
+                    oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLE");
                 }
-				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLD");
-				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLE");
+
+                const blocoTemperaturas = oController.byId("temperaturaBlock").getAggregation("_views");
+                if (!!blocoTemperaturas && blocoTemperaturas.length > 0) {
+                    oController.inicializaLimpezaFoco(blocoTemperaturas[0], "inputPino");
+                    oController.inicializaLimpezaFoco(blocoTemperaturas[0], "inputTemp");
+                }
 			},
 
             inicializaLimpezaFoco: function(bloco, id) {
