@@ -96,11 +96,7 @@ sap.ui.define([
                 if (window.location.protocol == "file:") {
                     sSrc = "file:///android_asset/www/img/" + sImagem + ".png";
                 } else {
-                    if (window.location.hostname == "localhost") {
-                        sSrc = "/img/" + sImagem + ".png";
-                    } else {
-                        sSrc = "/sap/bc/ui5_ui5/sap/zsgmr/img/" + sImagem + ".png";
-                    }
+                    sSrc = "./img/" + sImagem + ".png";
                 }
 
                 var oImage = new sap.m.Image({
