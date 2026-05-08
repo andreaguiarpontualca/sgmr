@@ -17,7 +17,7 @@
 				tooltip="{i18n>sincronizar}"
 				icon="sap-icon://synchronize"
 				press="onSincronizar"
-                type="Emphasized"/>
+                type="Neutral"/>
             <ObjectStatus
                 id="idNetworkStatus"
                 active="false"
@@ -108,16 +108,18 @@
 		</content>
 		<footer>
 			<OverflowToolbar id="idOverflowToolbar">
-				<Button id="idMessagePopoverBtn"
-					visible="{=!!${message>/}.length}"
-					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-					text= "{path: '/', formatter: '.highestSeverityMessages' }"
-					press=".handleMessagePopoverPress"
-					ariaHasPopup="Dialog"/>                      
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
+                    ariaHasPopup="Dialog"
+                />
 				<ToolbarSpacer id="idToolbarSpacerFooter"/>
-                <Button id="idConfirmarFormularioButton" text="{i18n>confirmar}" type="Success" press="onConfirmarFormulario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"></Button>
-                <Button id="idCancelarFormularioButton" text="{i18n>cancelar}" type="Reject" press="onCancelarFormulario" icon="sap-icon://cancel" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"></Button>   
+                <Button id="idConfirmarFormularioButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmarFormulario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}" />
+                <Button id="idCancelarFormularioButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelarFormulario"  icon="sap-icon://undo" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}" />
 			</OverflowToolbar>
 		</footer>
     </Page>

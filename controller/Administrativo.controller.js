@@ -14,8 +14,9 @@ sap.ui.define([
         return Controller.extend("com.pontual.sgmr.controller.Administrativo", {
             onInit: function () {
                 oController = this;
-                oController.oController = this;
+                // oController.registraModeloMensagem();
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCozy");
 
                 oView.bindElement("conexaoModel>/");
                 oView.bindElement("busyDialogModel>/");
@@ -34,53 +35,8 @@ sap.ui.define([
             },
 
             _handleRouteMatched: function (oEvent) {
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
-
+                oController.limparMensagens();
                 oView.bindElement("acessosModel>/");
-
             },
 
             onEntrarPerfil: function (oEvent) {
@@ -98,11 +54,6 @@ sap.ui.define([
 
             onSincronizar: function (oEvent) {
               oController.getOwnerComponent().getRouter().navTo("Sincronizar", null, true);
-
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             }
 
         });

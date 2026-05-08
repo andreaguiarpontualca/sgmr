@@ -23,11 +23,11 @@ sap.ui.define([
 
                 oController = this;
                 oView = oController.getView();
+                this.getView().addStyleClass("sapUiSizeCompact");
 
                 oView.bindElement("listaEquipamentoModel>/");
                 oView.bindElement("layoutTelaModel>/");
                 oView.bindElement("busyDialogModel>/");
-                oView.bindElement("mensagensModel>/");
 
                 var oModel = new JSONModel();
                 oModel.setData([]);
@@ -39,78 +39,27 @@ sap.ui.define([
             },
 
             _handleRouteMatched: function (oEvent) {
-
                 oBundle = oView.getModel("i18n").getResourceBundle();
                 oController.getView().byId("idListaMaterialRodanteTable").setBusy(true);
 
-                /*   var aFilters = []
-                  var filter = new sap.ui.model.Filter({ path: "Sincronizado", operator: sap.ui.model.FilterOperator.NE, value1: "E" });
-                  aFilters.push(filter);
-                  this.getView().byId("idListaMaterialRodanteTable").getBinding("items").filter(aFilters, "Application");
-   */
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
-
                 oView.bindElement("listaEquipamentoModel>/");
 
-                oController.lerTabelaIndexDB("tb_medicao").then(
-                    function (result) {
-
-                        oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
-                            var vIdx = result.tb_medicao.findIndex(e => e.Equnr == element.Equnr);
-                            if (vIdx == -1) {
-                                //      element.Status = 'S';
-                            } else {
-                                element.Status = result.tb_medicao[vIdx].Status
-                            }
-                        });
-                        oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
-                        oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
-                    }).catch(
-                        function (result) {
-                            oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
-                        })
+                oController.lerTabelaIndexDB("tb_medicao")
+                .then( result => {
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
+                        var vIdx = result.tb_medicao.findIndex(e => e.Equnr == element.Equnr);
+                        if (vIdx == -1) {
+                            //      element.Status = 'S';
+                        } else {
+                            element.Status = result.tb_medicao[vIdx].Status
+                        }
+                    });
+                    oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
+                    oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                })
+                .catch(() => {
+                    oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                })
 
             },
 
@@ -132,16 +81,7 @@ sap.ui.define([
                 if (oRoute !== undefined) {
                     oRouter.navTo(oDestiny, null, true);
                 } else {
-                    var oBundle = oView.getModel("i18n").getResourceBundle();
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: "Erro ao navegar",
-                        description: "Não foi possível encontrar o formulário: " + oMaterialRodante.Modelo,
-                        subtitle: oBundle.getText("materialRodante"),
-                        counter: 1
-                    };
-                    oController.getView().getModel().setData([oMockMessage]);
-                    oController.getView().getModel().refresh();
+                    oController.adicionarMensagemErro("Erro ao navegar", "materialRodante", "Não foi possível encontrar o formulário: " + oMaterialRodante.Modelo);
                     oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
                 }
 
@@ -149,21 +89,9 @@ sap.ui.define([
 
             onSincronizar: function (oEvent) {
                 oView.byId("idListaMaterialRodanteTable").setBusy(true);
-                oController.medicaoUpdate(oController).then(
-                    function (result) {
-                        var oModel = new JSONModel();
-                        oModel.setData(oController.getOwnerComponent().getModel("mensagensModel").getData());
-                        oView.setModel(oModel);
-                        oView.byId("idListaMaterialRodanteTable").setBusy(false);
-                    }).catch(
-                        function (result) {
-                            oView.byId("idListaMaterialRodanteTable").setBusy(false);
-                        })
-
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
+                oController.medicaoUpdate(oController)
+                .then(() => oView.byId("idListaMaterialRodanteTable").setBusy(false))
+                .catch(() => oView.byId("idListaMaterialRodanteTable").setBusy(false));
             },
 
             onSearchEquipamento: function (oEvent) {
@@ -203,19 +131,10 @@ sap.ui.define([
 
                 switch (oAtendimentoSelecionado.Status) {
                     case "X":
-                        var oBundle = oView.getModel("i18n").getResourceBundle();
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oBundle.getText("equipamentoincompleto"),
-                            description: oBundle.getText("equipamentoincompletomsg", [oAtendimentoSelecionado.Equnr]),
-                            subtitle: oAtendimentoSelecionado.Equnr,
-                            counter: 1
-                        };
-                        oController.getView().getModel().setData([oMockMessage]);
-                        oController.getView().getModel().refresh();
+                        this.limparMensagens();
+                        this.adicionarMensagemErro("equipamentoincompleto", oAtendimentoSelecionado.Equnr, this.i18n("equipamentoincompletomsg", [oAtendimentoSelecionado.Equnr]));
                         oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
                         break;
-
                     case "S":
                         oController.onMaterialRodantePress()
                         break;
@@ -224,8 +143,6 @@ sap.ui.define([
                             var oView = oController.getView();
                             oController._sInputId = oEvent.getSource().getId();
 
-
-                            // create value help dialog
                             if (!oController._pDialog) {
                                 oController._pDialog = Fragment.load({
                                     id: oView.getId(),
@@ -237,7 +154,6 @@ sap.ui.define([
                                 });
                             }
 
-                            // open value help dialog
                             oController._pDialog.then(function (oValueHelpDialog) {
                                 oValueHelpDialog.open();
                             });
@@ -249,122 +165,80 @@ sap.ui.define([
 
             onMedicaoOpcaoDialogSearch: function (oEvent) {
                 var sValue = oEvent.getParameter("value");
-                var oFilters = [new Filter(
-                    {
-                        filters: [
-                            new Filter("acao", FilterOperator.Contains, sValue)
-                        ],
-                        and: false
-                    }
-                )];
-                oFilters.push(oFilters);
-
-                oEvent.getSource().getBinding("items").filter([oFilters]);
+                oEvent.getSource().getBinding("items").filter([new Filter( { filters: [ new Filter("acao", FilterOperator.Contains, sValue) ], and: false } )]);
             },
 
 
             onMedicaoOpcaoDialogClose: function (oEvent) {
-                var aSelectedItem = oEvent.getParameter("selectedItem")
-
+                var aSelectedItem = oEvent.getParameter("selectedItem");
                 if (aSelectedItem != undefined) {
                     switch (aSelectedItem.getTitle()) {
                         case oBundle.getText("editarmedicao"):
-                            oController.onMaterialRodantePress()
+                            oController.onMaterialRodantePress();
                             break;
-
                         case oBundle.getText("excluirmedicao"):
-                            oController.onExcluirMedicao()
+                            oController.onExcluirMedicao();
                             break;
-
-
                         default:
                             break;
                     }
                 }
-
             },
-
 
             carregarAcoes: function () {
                 return new Promise((resolve, reject) => {
-                    var aAcoes = [];
-
-                    aAcoes.push({
-                        acao: oBundle.getText("editarmedicao"),
-                        icone: "sap-icon://edit"
-                    })
-
-
-                    aAcoes.push({
-                        acao: oBundle.getText("excluirmedicao"),
-                        icone: "sap-icon://delete"
-                    })
-
-
-                    aAcoes.sort((a, b) => a.acao.localeCompare(b.acao));
-
-                    oController.getOwnerComponent().getModel("medicaoAcoesModel").setData(aAcoes)
-                    oController.getOwnerComponent().getModel("medicaoAcoesModel").refresh()
-                    resolve()
-                })
-
+                    oController.getOwnerComponent().getModel("medicaoAcoesModel").setData([
+                        { acao: oBundle.getText("editarmedicao"),  icone: "sap-icon://edit" },
+                        { acao: oBundle.getText("excluirmedicao"), icone: "sap-icon://delete" }
+                    ])
+                    oController.getOwnerComponent().getModel("medicaoAcoesModel").refresh();
+                    resolve();
+                });
             },
 
             onExcluirMedicao: function () {
                 oController.getView().byId("idListaMaterialRodanteTable").setBusy(true);
                 var oMedicaoSelecionada = oController.getOwnerComponent().getModel("medicaoSelecionadaModel").getData()
                 MessageBox.warning(oBundle.getText("confirmaexclusao"), {
-                    title: oBundle.getText("confirmacao"),               // default
-                    styleClass: "",                                      // default
-                    actions: [sap.m.MessageBox.Action.OK,
-                    sap.m.MessageBox.Action.CANCEL],         // default
-                    emphasizedAction: sap.m.MessageBox.Action.OK,        // default
-                    initialFocus: null,                                  // default
-                    textDirection: sap.ui.core.TextDirection.Inherit,    // default
+                    title: oBundle.getText("confirmacao"),
+                    actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
+                    emphasizedAction: sap.m.MessageBox.Action.OK,
+                    initialFocus: null,
                     onClose: function (sAction) {
-                        if (sAction == 'OK') {
-                            oController.excluirMedicao(oMedicaoSelecionada).then(
-                                function (result) {
-                                    oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
-                                    oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
-                                }
-                            );
-
-                        } else if (sAction == "CANCEL") {
-
+                        if (sAction == "CANCEL") {
                             return;
                         }
+                        oController.excluirMedicao(oMedicaoSelecionada)
+                        .then(() => {
+                            oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
+                            oController.getView().byId("idListaMaterialRodanteTable").setBusy(false);
+                        });
                     }
                 });
             },
 
             excluirMedicao: function (oMedicaoSelecionada) {
                 return new Promise((resolve, reject) => {
-                    oController.lerTabelaIndexDB("tb_medicao").then(
-                        function (result) {
-                            var aMedicoes = result.tb_medicao.filter(e => e.Equnr != oMedicaoSelecionada.Equnr);
-                            oController.limparTabelaIndexDB("tb_medicao").then(
-                                function (result) {
-                                    oController.gravarTabelaIndexDB("tb_medicao", aMedicoes).then(
-                                        function (result) {
-                                            oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
-                                                var vIdx = aMedicoes.findIndex(e => e.Equnr == element.Equnr);
-                                                if (vIdx == -1) {
-                                                    element.Status = 'S';
-                                                } else {
-                                                    element.Status = aMedicoes[vIdx].Status
-                                                }
-                                            });
-                                            resolve()
-                                        })
-                                })
-                        }).catch(
-                            function (result) {
-                                resolve()
-                            })
+                    oController.lerTabelaIndexDB("tb_medicao")
+                    .then( result => {
+                        var aMedicoes = result.tb_medicao.filter(e => e.Equnr != oMedicaoSelecionada.Equnr);
+                        oController.limparTabelaIndexDB("tb_medicao")
+                        .then(() => {
+                            oController.gravarTabelaIndexDB("tb_medicao", aMedicoes)
+                            .then(() => {
+                                oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().forEach(element => {
+                                    var vIdx = aMedicoes.findIndex(e => e.Equnr == element.Equnr);
+                                    if (vIdx == -1) {
+                                        element.Status = 'S';
+                                    } else {
+                                        element.Status = aMedicoes[vIdx].Status;
+                                    }
+                                });
+                                resolve();
+                            });
+                        })
+                    }).catch(() => resolve());
                 })
-
             }
-
         });
     });

@@ -101,32 +101,6 @@
 					</f:FormContainer>		
 					<f:FormContainer title="{i18n>dadosperfil}">
 						<f:formElements>
-							<!-- <f:FormElement label="{i18n>centro}">
-								<f:fields>
-									<Input 
-										id="centroInput"
-										value="{criarUsuarioModel>Centro}"
-                                        showValueHelp="true"
-										showClearIcon="true"
-										valueHelpOnly="true"
-										required="true"
-										valueHelpRequest="_handleCentroValueHelpRequest"
-										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"								
-										/>
-								</f:fields>
-							</f:FormElement> -->
-							<!-- <f:FormElement label="{i18n>deposito}">
-								<f:fields>
-									<Input 
-										id="depositoInput"
-										value="{criarUsuarioModel>Deposito}"
-                                        maxLength="4"
-										required="true"
-										showClearIcon="true"
-										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
-										/>
-								</f:fields>
-							</f:FormElement>   -->
 							<f:FormElement label="{i18n>perfil}">
 								<f:fields>
 									<Input 
@@ -168,12 +142,8 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <Column hAlign="Begin" width="20%">
-                    <Text text="{i18n>autorizacao}" />
-                </Column>
-                <Column hAlign="Begin" width="80%">
-                    <Text text="{i18n>descricao}" />
-                </Column>									
+                <Column hAlign="Begin" width="8rem"><Text text="{i18n>autorizacao}" /></Column>
+                <Column hAlign="Begin"             ><Text text="{i18n>descricao}"   /></Column>
             </columns>
             <items>
                 <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" >
@@ -188,15 +158,18 @@
 		</content>
 		<footer>
 			<OverflowToolbar>
-				<Button id="messagePopoverBtn"
-				icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-				type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-				text= "{path: '/', formatter: '.highestSeverityMessages' }"
-				press=".handleMessagePopoverPress"
-				ariaHasPopup="Dialog"/>		 
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
+                    ariaHasPopup="Dialog"
+                />
 				<ToolbarSpacer/>
-                <Button id="confirmarUsuarioButton" text="{i18n>confirmar}" type="Success" press="onConfirmarUsuario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"	></Button>
-                <Button id="cancelarUsuarioButton" text="{i18n>cancelar}" type="Reject" press="onCancelarUsuario" icon="sap-icon://cancel" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"	></Button>   
+                <Button id="confirmarUsuarioButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmarUsuario" icon="sap-icon://save" enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}" />
+                <Button id="cancelarUsuarioButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelarUsuario"  icon="sap-icon://undo" />
 			</OverflowToolbar>
 		</footer>
     </Page>

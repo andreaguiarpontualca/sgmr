@@ -1,0 +1,37 @@
+<mvc:View
+	controllerName = "com.pontual.sgmr.controller.Formulario"    
+    xmlns          = "sap.m"
+    xmlns:mvc      = "sap.ui.core.mvc"
+	xmlns:core     = "sap.ui.core"    
+    displayBlock   = "true"
+>
+    <Table
+        id="temperaturas"
+        autoPopinMode="false" 
+        alternateRowColors="true"
+        contextualWidth="Auto"		
+        growing="true" 
+        growingThreshold="20" 
+        mode="None"
+        noDataText="{i18n>dadosnaoencontrados}"
+        items="{materialRodanteFormularioModel>/Temperaturas}"
+        >        
+        <columns>
+            <Column hAlign="Begin" minScreenWidth="Phone"  demandPopin="true" width="5rem"><Text text="{i18n>temperatura.lado}"        /></Column>
+            <Column hAlign="Begin" minScreenWidth="Phone"  demandPopin="true" width="5rem"><Text text="{i18n>temperatura.secao}"       /></Column>
+            <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true" width="8rem"><Text text="{i18n>temperatura.pino}"        /></Column>
+            <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true" width="8rem"><Text text="{i18n>temperatura.temperatura}" /></Column>
+            <Column hAlign="Begin" minScreenWidth="Tablet" demandPopin="true"             ></Column>
+        </columns>
+        <items templateShareable="false" >
+            <ColumnListItem vAlign="Middle">
+                <cells>
+                    <ObjectStatus text="{path : 'materialRodanteFormularioModel>Lado', formatter : '.formataTextoLado'}" state="{materialRodanteFormularioModel>Cor}" />
+                    <Text text="{materialRodanteFormularioModel>Secao}"/>
+                    <StepInput id="inputPino" value="{materialRodanteFormularioModel>Item}"             displayValuePrecision="0" step="1" min="0"    editable="true" change="validaTemperatura" max="{materialRodanteFormularioModel>MaxItens}"/>
+                    <StepInput id="inputTemp" value="{materialRodanteFormularioModel>ValorTemperatura}" displayValuePrecision="2" step="1" min="0.00" editable="true" change="validaTemperatura"/>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</mvc:View>

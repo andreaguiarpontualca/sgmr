@@ -130,12 +130,8 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <Column hAlign="Begin" width="20%">
-                    <Text text="{i18n>autorizacao}" />
-                </Column>
-                <Column hAlign="Begin" width="80%">
-                    <Text text="{i18n>descricao}" />
-                </Column>									
+                <Column hAlign="Begin" width="8rem"><Text text="{i18n>autorizacao}" /></Column>
+                <Column hAlign="Begin"             ><Text text="{i18n>descricao}"   /></Column>
             </columns>
             <items>
                 <ColumnListItem vAlign="Middle" navigated="true" type="Inactive" press="onOrdemPress" selected="{perfilCriarModel>Selecionado}">	
@@ -150,15 +146,18 @@
 		</content>
 		<footer>
 			<OverflowToolbar>
-				<Button id="messagePopoverBtn"
-					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-					text= "{path: '/', formatter: '.highestSeverityMessages' }"
-					press=".handleMessagePopoverPress"
-					ariaHasPopup="Dialog"/>		                
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
+                    ariaHasPopup="Dialog"
+                />
 				<ToolbarSpacer/>
-                <Button id="confirmarPerfilButton" text="{i18n>confirmar}" type="Success" press="onConfirmarPerfil" icon="sap-icon://save" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"></Button>
-                <Button id="cancelarPerfilButton" text="{i18n>cancelar}" type="Reject" press="onCancelarPerfil" icon="sap-icon://cancel" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}"></Button>   
+                <Button id="confirmarPerfilButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmarPerfil" icon="sap-icon://save" enabled="{perfilCriarModel>HabilitarTelaCriarPerfil}" />
+                <Button id="cancelarPerfilButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelarPerfil"  icon="sap-icon://undo" />
 			</OverflowToolbar>
 		</footer>
     </Page>

@@ -1212,15 +1212,18 @@
 		</content>
 		<footer>
 			<OverflowToolbar>
-				<Button id="messagePopoverBtn"
-					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-					text= "{path: '/', formatter: '.highestSeverityMessages' }"
-					press=".handleMessagePopoverPress"
-					ariaHasPopup="Dialog"/>		 
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
+                    ariaHasPopup="Dialog"
+                />
 				<ToolbarSpacer/>
-                <Button id="confirmarComboioButton" text="{i18n>confirmar}" type="Success" press="onConfirmarComboio" icon="sap-icon://save" ></Button>
-                <Button id="cancelarComboioButton" text="{i18n>cancelar}" type="Reject" press="onCancelarComboio" icon="sap-icon://cancel" ></Button>                
+                <Button id="confirmarComboioButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmarComboio" icon="sap-icon://save" />
+                <Button id="cancelarComboioButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelarComboio"  icon="sap-icon://undo" />
 			</OverflowToolbar>
 		</footer>
     </Page>

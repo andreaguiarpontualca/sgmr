@@ -16,6 +16,7 @@ sap.ui.define([
             onInit: function () {
 
                 oController = this;
+                // oController.registraModeloMensagem();
                 oView = oController.getView();
 
                 var omaterialRodante = [
@@ -28,9 +29,6 @@ sap.ui.define([
 
                 oView.bindElement("busyDialogModel>/")
 
-
-
-
                 var oModel = new JSONModel();
                 oModel.setData([]);
                 this.getView().setModel(oModel);
@@ -40,54 +38,8 @@ sap.ui.define([
 
             },
 
-
             _handleRouteMatched: function (oEvent) {
-
-
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
-                }
-
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
-
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
-
+                this.limparMensagens();
                 oView.byId("sincronismoFormContainer").setBusy(true);
                 var aLeituras = [
                     oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
@@ -96,7 +48,8 @@ sap.ui.define([
                     oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel"),
                     oController.carregarDadosIndexDB("tb_equipamento", "listaEquipamentoModel"),
                     oController.carregarDadosIndexDB("tb_formulario", "listaFormularioModel"),
-                    oController.carregarDadosIndexDB("tb_medicao", "listaMedicoesModel")];
+                    oController.carregarDadosIndexDB("tb_medicao", "listaMedicoesModel")
+                ];
 
                 Promise.all(aLeituras).then(function (result) {
                     oView.byId("sincronismoFormContainer").setBusy(false);
@@ -108,20 +61,21 @@ sap.ui.define([
                 })
             },
 
-
             onNavBack: function () {
+                this.limparMensagens();
+
                 this.getRouter().navTo("Inicio", {}, true /*no history*/);
             },
 
             onSincronizar: function (oEvent) {
+                this.limparMensagens();
+
                 oController.onSincronizarGeral(oController, false)
             },
 
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
-            },
-
             onDownloadAutorizacao: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadAutorizacaoButton"
                 var vTabela = "tb_autorizacao"
                 var vModel = "listaAutorizacaoModel"
@@ -144,6 +98,8 @@ sap.ui.define([
             },
 
             onDownloadPerfil: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadPerfilButton"
                 var vTabela = "tb_perfil"
                 var vModel = "listaPerfilModel"
@@ -164,7 +120,10 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadCentros: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadCentrosButton"
                 var vTabela = "tb_centros"
                 var vModel = "listaCentrosModel"
@@ -185,71 +144,72 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadEquipamento: function (oEvent) {
-                var vButton = "downloadEquipamentoButton"
-                var vTabela = "tb_equipamento"
-                var vModel = "listaEquipamentoModel"
+                this.limparMensagens();
+
+                const vButton = "downloadEquipamentoButton"
+                const vTabela = "tb_equipamento"
+                const vModel  = "listaEquipamentoModel"
                 oView.byId(vButton).setBusy(true);
-                oController.carregarEquipamento().then(function () {
-                    oController.limparTabelaIndexDB(vTabela).then(function (oEvent) {
-                        var aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
-                        oController.gravarTabelaIndexDB(vTabela, aDados).then(function () {
-                            var aForms = oController.agruparFormularios(aDados)
-                            var aModelos = oController.agruparPorCampo(aDados, "Modelo")
-                            var aLeiturasForm = [
-                                oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
-                                oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
-                                oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
-                                oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))                                
+                oController.carregarEquipamento()
+                .then(() => {
+                    oController.limparTabelaIndexDB(vTabela)
+                    .then(() => {
+                        const aDados = oController.getOwnerComponent().getModel(vModel).getData() || [];
+                        oController.gravarTabelaIndexDB(vTabela, aDados)
+                        .then(() => {
+                            const aForms        = oController.agruparFormularios(aDados);
+                            const aEqunrs       = oController.agruparPorCampo(aDados, "Equnr");
+                            const aModelos      = oController.agruparPorCampo(aDados, "Modelo");
+                            const aLeiturasForm = [
+                                oController.carregarComponentes(aEqunrs).catch(   () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
+                                oController.carregarCondicoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_condicoes",     "listaCondicoesModel"   )),
+                                oController.carregarInspecoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_inspecoes",     "listaInspecoesModel"   )),
+                                oController.carregarTemperaturas(aForms).catch(   () => oController.carregarDadosIndexDB("tb_temperaturas",  "listaTemperaturasModel")),
+                                oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"   ))                                
                             ];
 
-                            Promise.all(aLeiturasForm).then(
-                                function () {
-                                    //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
-                                    var aLimpezas = [
-                                        oController.limparTabelaIndexDB("tb_componentes"),
-                                        oController.limparTabelaIndexDB("tb_condicoes"),
-                                        oController.limparTabelaIndexDB("tb_inspecoes"),
-                                        oController.limparTabelaIndexDB("tb_listadesgaste")
+                            Promise.all(aLeiturasForm)
+                            .then(() => {
+                                //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
+                                const aLimpezas = [
+                                    oController.limparTabelaIndexDB("tb_componentes"),
+                                    oController.limparTabelaIndexDB("tb_condicoes"),
+                                    oController.limparTabelaIndexDB("tb_inspecoes"),
+                                    oController.limparTabelaIndexDB("tb_temperaturas"),
+                                    oController.limparTabelaIndexDB("tb_listadesgaste")
+                                ];
+                                Promise.all(aLimpezas)
+                                .then(() => {
+                                    const aComponentes  = oController.getOwnerComponent().getModel("listaComponentesModel" ).getData();
+                                    const aCondicoes    = oController.getOwnerComponent().getModel("listaCondicoesModel"   ).getData();
+                                    const aInspecoes    = oController.getOwnerComponent().getModel("listaInspecoesModel"   ).getData();
+                                    const aTemperaturas = oController.getOwnerComponent().getModel("listaTemperaturasModel").getData();
+                                    const aDesgastes    = oController.getOwnerComponent().getModel("listaDesgastesModel"   ).getData();
+                                    const aGravacoes    = [
+                                        oController.gravarTabelaIndexDB("tb_componentes",   aComponentes),
+                                        oController.gravarTabelaIndexDB("tb_condicoes",     aCondicoes),
+                                        oController.gravarTabelaIndexDB("tb_inspecoes",     aInspecoes),
+                                        oController.gravarTabelaIndexDB("tb_temperaturas",  aTemperaturas),
+                                        oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes)                                                
                                     ];
-                                    Promise.all(aLimpezas).then(
-                                        function () {
-                                            var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
-                                            var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
-                                            var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
-                                            var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();                                            
-                                            var aGravacoes = [
-                                                oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
-                                                oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
-                                                oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
-                                                oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes)                                                
-                                            ];
-                                            Promise.all(aGravacoes).then(
-                                                function (result) {
-                                                    oView.byId(vButton).setBusy(false);
-                                                    MessageToast.show("Download de Equipamentos concluído");
-                                                })
-                                        }).catch(
-                                            function (result) {
-                                                oView.byId(vButton).setBusy(false);
-                                            })
-                                }).catch(
-                                    function (result) {
+                                    Promise.all(aGravacoes)
+                                    .then((result) => {
                                         oView.byId(vButton).setBusy(false);
-                                    })
-
-                        }).catch(function () {
-                            oView.byId(vButton).setBusy(false);
-                        })
-                    }).catch(function () {
-                        oView.byId(vButton).setBusy(false);
-                    })
-                }).catch(function () {
-                    oView.byId(vButton).setBusy(false);
-                })
+                                        MessageToast.show("Download de Equipamentos concluído");
+                                    });
+                                }).catch((error) => oView.byId(vButton).setBusy(false));
+                            }).catch((error) => oView.byId(vButton).setBusy(false));
+                        }).catch((error) => oView.byId(vButton).setBusy(false));
+                    }).catch((error) => oView.byId(vButton).setBusy(false));
+                }).catch((error) => oView.byId(vButton).setBusy(false));
             },
+
             onDownloadUsuario: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadUsuarioButton"
                 var vTabela = "tb_usuario"
                 var vModel = "listaUsuariosModel"
@@ -270,7 +230,10 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },
+
             onDownloadFormulario: function (oEvent) {
+                this.limparMensagens();
+
                 var vButton = "downloadFormularioButton"
                 var vTabela = "tb_formulario"
                 var vModel = "listaFormularioModel"
@@ -291,7 +254,9 @@ sap.ui.define([
                     oView.byId(vButton).setBusy(false);
                 })
             },            
+
             onUploadMedicao: function (oEvent) {
+                this.limparMensagens();
                 oView.byId("uploadMedicaoButton").setBusy(true);
                 oController.medicaoUpdate(oController, true).then(function () {
                     oView.byId("uploadMedicaoButton").setBusy(false);

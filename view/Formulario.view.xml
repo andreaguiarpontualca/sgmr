@@ -46,9 +46,9 @@
 						</subSections>
 					</ObjectPageSection>
 
-					<ObjectPageSection titleUppercase="false" title="Componentes">
+					<ObjectPageSection titleUppercase="false" title="{i18n>componente.titulo}">
 						<subSections>
-							<ObjectPageSubSection title="Componentes" titleUppercase="false">
+							<ObjectPageSubSection title="{i18n>componente.titulo}" titleUppercase="false">
 								<blocks>
 									<blockcolor:Componentes id="componentesBlock"/>
 								</blocks>
@@ -56,9 +56,9 @@
 						</subSections>
 					</ObjectPageSection>
 
-					<ObjectPageSection titleUppercase="false" title="Condição de Operação">
+					<ObjectPageSection titleUppercase="false" title="{i18n>condicao.titulo}" visible="{= ${materialRodanteFormularioModel>/Condicoes}.length > 0 }">
 						<subSections>
-							<ObjectPageSubSection title="Condição de Operação" titleUppercase="false">
+							<ObjectPageSubSection  titleUppercase="false" title="{i18n>condicao.titulo}" visible="{= ${materialRodanteFormularioModel>/Condicoes}.length > 0 }">
 								<blocks>
 									<blockcolor:Condicoes id="condicoesBlock"/>
 								</blocks>
@@ -66,9 +66,9 @@
 						</subSections>
 					</ObjectPageSection>					
 
-					<ObjectPageSection titleUppercase="false" title="Roletes">
+					<ObjectPageSection titleUppercase="false" title="{i18n>roletes.titulo}">
 						<subSections>
-							<ObjectPageSubSection title="Roletes" titleUppercase="false">
+							<ObjectPageSubSection title="{i18n>roletes.titulo}" titleUppercase="false">
 								<blocks>
 									<blockcolor:Roletes id="roletesBlock"/>
 								</blocks>
@@ -76,9 +76,19 @@
 						</subSections>
 					</ObjectPageSection>	
 
-					<ObjectPageSection titleUppercase="false" title="Inspeção">
+					<ObjectPageSection titleUppercase="false" title="{i18n>temperatura.titulo}" visible="{= ${materialRodanteFormularioModel>/Temperaturas}.length > 0 }">
 						<subSections>
-							<ObjectPageSubSection title="Inspeção" titleUppercase="false">
+							<ObjectPageSubSection title="{temperatura.titulo}" titleUppercase="false" visible="{= ${materialRodanteFormularioModel>/Temperaturas}.length > 0 }">
+								<blocks>
+									<blockcolor:Temperatura id="temperaturaBlock"/>
+								</blocks>
+							</ObjectPageSubSection>
+						</subSections>
+					</ObjectPageSection>	
+
+					<ObjectPageSection titleUppercase="false" title="{i18n>inspecao.titulo}">
+						<subSections>
+							<ObjectPageSubSection title="{inspecao.titulo}" titleUppercase="false">
 								<blocks>
 									<blockcolor:Inspecao id="inspecaoBlock"/>
 								</blocks>
@@ -86,9 +96,9 @@
 						</subSections>
 					</ObjectPageSection>	
 
-					<ObjectPageSection titleUppercase="false" title="Anexos">
+					<ObjectPageSection titleUppercase="false" title="{i18n>anexos.titulo}">
 						<subSections>
-							<ObjectPageSubSection title="Anexos" titleUppercase="false">
+							<ObjectPageSubSection title="{i18n>anexos.titulo}" titleUppercase="false">
 								<blocks>
 									<blockcolor:Anexos id="anexosBlock"/>
 								</blocks>
@@ -112,15 +122,18 @@
 			</ObjectPageLayout>
 			<m:footer>
 				<m:OverflowToolbar>
-					<m:Button id="messagePopoverBtn"
-						icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-						type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-						text= "{path: '/', formatter: '.highestSeverityMessages' }"
-						press=".handleMessagePopoverPress"
-						ariaHasPopup="Dialog"/>		 
+					<m:Button
+						id="messagePopoverBtn"
+						visible="{=!!${mMensagens>/}.length > 0}"
+						icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+						type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+						text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+						press=".exibeMensagens"
+						ariaHasPopup="Dialog"
+					/>
 					<m:ToolbarSpacer/>
-					<m:Button id="confirmarButton" text="{i18n>confirmar}" type="Success" press="onConfirmar" icon="sap-icon://save" ></m:Button>
-					<m:Button id="cancelarButton" text="{i18n>cancelar}" type="Reject" press="onCancelar" icon="sap-icon://cancel" ></m:Button>                
+					<m:Button id="confirmarButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmar" icon="sap-icon://save" />
+					<m:Button id="cancelarButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelar"  icon="sap-icon://undo" />
 				</m:OverflowToolbar>
 			</m:footer>
 	</m:Page>

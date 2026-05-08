@@ -38,61 +38,55 @@
                         id="downloadAutorizacaoButton"
                         width="12rem"
                         text="{i18n>autorizacoes} ({= ${listaAutorizacaoModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onDownloadAutorizacao"
                         icon="sap-icon://download-from-cloud"
-                        class="sapUiSmallMarginBottom"
                     />
                     <Button
                         id="downloadCentrosButton"
                         width="12rem"
                         text="{i18n>centros} ({= ${listaCentrosModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onDownloadCentros"
                         icon="sap-icon://download-from-cloud"
-                        class="sapUiSmallMarginBottom"
                     />
                     <Button
                         id="downloadEquipamentoButton"
                         width="12rem"
                         text="{i18n>equipamentos} ({= ${listaEquipamentoModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onDownloadEquipamento"
                         icon="sap-icon://download-from-cloud"
-                        class="sapUiSmallMarginBottom"
                     />    
                     <Button
                         id="downloadFormularioButton"
                         width="12rem"
                         text="{i18n>formularios} ({= ${listaFormularioModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onDownloadFormulario"
                         icon="sap-icon://download-from-cloud"
-                        class="sapUiSmallMarginBottom"
                     />                                     
                     <Button
                         id="downloadPerfilButton"
                         width="12rem"
                         text="{i18n>perfis}  ({= ${listaPerfilModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onDownloadPerfil"
                         icon="sap-icon://download-from-cloud"
-                        class="sapUiSmallMarginBottom"
                     />
                     <Button
                         id="downloadUsuarioButton"
                         width="12rem"
                         text="{i18n>usuarios}  ({= ${listaUsuariosModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onDownloadUsuario"
                         icon="sap-icon://download-from-cloud"
-                        class="sapUiSmallMarginBottom"
                     />
                     <Button
                         id="uploadMedicaoButton"
                         width="12rem"
                         text="{i18n>medicoes}  ({= ${listaMedicoesModel>/}.length})"
-                        type="Emphasized"
+                        type="Neutral"
                         press="onUploadMedicao"
                         icon="sap-icon://upload-to-cloud"
                         class="sapUiSmallMarginBottom"
@@ -105,7 +99,6 @@
                         type="Emphasized"
                         press="onSincronizar"
                         icon="sap-icon://synchronize"
-                        class="sapUiSmallMarginBottom"
                         visible="true"
                     />
                 </items>
@@ -115,11 +108,11 @@
             <OverflowToolbar>
                 <Button
                     id="messagePopoverBtn"
-                    visible="{=!!${message>/}.length}"
-                    icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-                    type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-                    text="{path: '/', formatter: '.highestSeverityMessages' }"
-                    press=".handleMessagePopoverPress"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
                     ariaHasPopup="Dialog"
                 />
                 <ToolbarSpacer />

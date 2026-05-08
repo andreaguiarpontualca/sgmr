@@ -1,13 +1,10 @@
-/**
- * eslint-disable @sap/ui5-jsdocs/no-jsdoc
- */
-
 sap.ui.define([
         "sap/ui/core/UIComponent",
-        "sap/ui/Device",
+        "sap/m/MessagePopover",
+        "sap/m/MessageItem",
         "com/pontual/sgmr/model/models"
     ],
-    function (UIComponent, Device, models) {
+    function (UIComponent, MessagePopover, MessageItem, models) {
         "use strict";
 
         return UIComponent.extend("com.pontual.sgmr.Component", {
@@ -15,21 +12,46 @@ sap.ui.define([
                 manifest: "json"
             },
 
-            /**
-             * The component is initialized by UI5 automatically during the startup of the app and calls the init method once.
-             * @public
-             * @override
-             */
             init: function () {
-                // call the base component's init function
                 UIComponent.prototype.init.apply(this, arguments);
 
-                // enable routing
                 this.getRouter().initialize();
 
-                // set the device model
                 this.setModel(models.createDeviceModel(), "device");
-            }
+
+                this.getModel("mMensagens").setData([]);
+
+                this.inicializaPopoverMensagens();
+            },
+
+            inicializaPopoverMensagens: function() {
+                this.__popoverMensagens = new MessagePopover({
+                    items: {
+                        path  : 'mMensagens>/',
+                        template: new MessageItem({
+                            type       : "{mMensagens>type}",
+                            title      : "{mMensagens>title}",
+                            activeTitle: "{mMensagens>active}",
+                            description: "{mMensagens>description}",
+                            subtitle   : "{mMensagens>subtitle}",
+                            counter    : "{mMensagens>counter}"
+                        })
+                    },
+                    afterClose: () => {
+                        this.limparMensagens();
+                    }
+                });
+            },
+
+            obtemPopoverMensagens: function() {
+                return this.__popoverMensagens;
+            },
+
+            limparMensagens: function() {
+                this.getModel("mMensagens").setData([]);
+                this.getModel("mMensagens").refresh(true);
+                sap.ui.getCore()?.getMessageManager()?.removeAllMessages();
+            },
         });
     }
 );

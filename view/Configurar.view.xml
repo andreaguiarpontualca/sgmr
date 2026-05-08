@@ -118,16 +118,19 @@
 		</content>
 		<footer>
 			<OverflowToolbar>	
-				<Button id="messagePopoverBtn"
-					icon="{ path: '/', formatter: '.buttonIconFormatter' }"
-					type="{ path: '/', formatter: '.buttonTypeFormatter' }"
-					text= "{path: '/', formatter: '.highestSeverityMessages' }"
-					press=".handleMessagePopoverPress"
-					ariaHasPopup="Dialog"/>					
+                <Button
+                    id="messagePopoverBtn"
+                    visible="{=!!${mMensagens>/}.length > 0}"
+                    icon="{ path: 'mMensagens>/', formatter: '.buttonIconFormatter' }"
+                    type="{ path: 'mMensagens>/', formatter: '.buttonTypeFormatter' }"
+                    text="{= (${mMensagens>/}.length === 1) ? ${mMensagens>/}[0].title : ${mMensagens>/}.length }"
+                    press=".exibeMensagens"
+                    ariaHasPopup="Dialog"
+                />
 				<ToolbarSpacer/>
-				<Button id="testarButton" text="{i18n>testar}" type="Emphasized" press="onTestar" icon="sap-icon://connected" ></Button>
-				<Button id="confirmarConfigurarButton" text="{i18n>confirmar}" type="Success" press="onConfirmar" icon="sap-icon://save" ></Button>
-                <Button id="cancelarConfigurarButton" text="{i18n>cancelar}" type="Reject" press="onCancelar" icon="sap-icon://cancel" ></Button>   
+				<Button id="testarButton"              text="{i18n>testar}"    type="Success"     press="onTestar"    icon="sap-icon://connected" />
+				<Button id="confirmarConfigurarButton" text="{i18n>confirmar}" type="Emphasized"  press="onConfirmar" icon="sap-icon://save" />
+                <Button id="cancelarConfigurarButton"  text="{i18n>cancelar}"  type="Transparent" press="onCancelar"  icon="sap-icon://undo" />
 			</OverflowToolbar>
 		</footer>
     </Page>

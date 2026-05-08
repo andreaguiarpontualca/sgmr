@@ -12,12 +12,25 @@ sap.ui.define([
         var oController
         var oView
         var oMessagePopover;
+        
+        const desktopLandscapeFile = "tela_desktop_clean_1920x1080px.png";
+        const desktopPortraitFile  = "tela_desktop_1080x1920px.png";
+        const mobileLandscapeFile  = "tela_tablet_clean_960x540px.png";
+        const mobilePortraitFile   = "tela_tablet_540x960px.png";
 
         return Controller.extend("com.pontual.sgmr.controller.Login", {
+
+
             onInit: function () {
                 oController = this;
-                oView = oController.getView();
+                oView       = oController.getView();
 
+
+                sap.ui.Device.orientation.attachHandler(function (oEvt) {
+                    oController.ajustarTela();
+                });
+
+                this.getView().addStyleClass("sapUiSizeCozy");
 
                 oView.bindElement("conexaoModel>/");
                 oView.bindElement("loginModel>/");
@@ -30,65 +43,41 @@ sap.ui.define([
                 this._oRouter = sap.ui.core.UIComponent.getRouterFor(this);
                 this._oRouter.getRoute("Login").attachMatched(this._handleRouteMatched, this);
 
+                this.inicializaModeloSGMR();
             },
 
-
             _handleRouteMatched: function (oEvent) {
-                //var urlLogo = oController.obterArquivo("logo.png")
-                var oLogin = {
-                    CodUsuario: "",
-                    Senha: "",
-                    imgLogo: ""//urlLogo
-                }
-
+                const oLogin = { CodUsuario: "", Senha: "", imgLogo: "" };
                 oController.getOwnerComponent().getModel("loginModel").setData(oLogin);
                 oController.getOwnerComponent().getModel("usuarioModel").setData({});
+                oController.ajustarTela();
+                oController.prepararLogin();
+            },
 
-                var oModel = new JSONModel();
-                oModel.setData([]);
-                this.getView().setModel(oModel);
-
-                var oMessageTemplate = new MessageItem({
-                    type: '{type}',
-                    title: '{title}',
-                    activeTitle: "{active}",
-                    description: '{description}',
-                    subtitle: '{subtitle}',
-                    counter: '{counter}'
-                });
-
-                oMessagePopover = new MessagePopover({
-                    items: {
-                        path: '/',
-                        template: oMessageTemplate
-                    },
-                    activeTitlePress: function () {
-
-                    }
-                });
-
-                var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                var aMockMessages = []
-                if (aMensagens.length != undefined) {
-                    aMensagens.forEach(mensagem => {
-                        var oMockMessage = {
-                            type: mensagem.type,
-                            title: mensagem.title,
-                            active: false,
-                            description: mensagem.description,
-                            subtitle: mensagem.subtitle
-                        }
-                        aMockMessages.push(oMockMessage)
-                    });
+            determinarOrigemArquivos: function () {
+                var background = "img/login/" + (sap.ui.Device.orientation.landscape ? desktopLandscapeFile : desktopPortraitFile);
+                if (window.location.protocol == "file:") {
+                    background = "file:///android_asset/www/img/login/" + (screen.orientation.type == "landscape-primary" ? mobileLandscapeFile : mobilePortraitFile);
                 }
-                oController.getOwnerComponent().getModel("mensagensModel").setData([])
+                oController.getOwnerComponent().getModel("loginModel").setProperty("/backgroundLoginImg", background);
+            },
+            
+            ajustarTela: function () {
+                oController.determinarOrigemArquivos();
 
-                oModel.setData(aMockMessages);
-                this.getView().setModel(oModel);
-                this.byId("messagePopoverBtn").addDependent(oMessagePopover);
+                const celular    = oController.getOwnerComponent().getModel("device").getProperty("/system/phone");
+                const paisagem   = oController.getOwnerComponent().getModel("device").getProperty("/orientation/landscape");
+                const exibeIcone = !celular || (celular && !paisagem);
 
-                oController.prepararLogin()
+                oController.getOwnerComponent().getModel("loginModel").setProperty("/exibeIcone", exibeIcone);
+            },
 
+            exibeSenha: function (oEvent) {
+                const tipo  = oEvent.getSource().getType() == "Password" ? "Text" : "Password";
+                const icone = oEvent.getSource().getType() == "Password" ? "sap-icon://hide" : "sap-icon://show";
+                oEvent.getSource().setType(tipo);
+                oEvent.getSource().setValueHelpIconSrc(icone);
+                oEvent.getSource().setValue(oEvent.getSource().getValue());
             },
 
             prepararLogin: function () {
@@ -111,36 +100,11 @@ sap.ui.define([
                             function (result) {
                                 var aListaUser = oController.lerLocalStorage("SGMR_Login")
                                 if (aListaUser != null && aListaUser.length > 0) {
-                                    var oMockMessage3 = {
-                                        type: 'Warning',
-                                        title: 'Sem Conexão',
-                                        description: 'Não foi possível conectar ao SAP. Prosseguindo com acesso offline.',
-                                        subtitle: 'Problemas de conexão',
-                                        counter: 1
-                                    };
-                                    oController.getOwnerComponent().getModel("usuariosLoginModel").setData(aListaUser)
-                                    oController.getView().getModel().setData([oMockMessage3]);
-                                    oController.getView().getModel().refresh()
-                                    oView.byId("entrarButton").setEnabled(true)
+                                    oController.getOwnerComponent().getModel("usuariosLoginModel").setData(aListaUser);
+                                    oView.byId("entrarButton").setEnabled(true);
                                 } else {
                                     MessageToast.show("Por favor, verificar suas conexões antes do primeiro acesso!");
-                                    var oMockMessage = {
-                                        type: 'Error',
-                                        title: 'Sem Conexão',
-                                        description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                                        subtitle: 'Problemas de conexão',
-                                        counter: 1
-                                    };
-                                    var oMockMessage2 = {
-                                        type: 'Error',
-                                        title: 'Primeiro Acesso',
-                                        description: 'É necessário conexão com o SAP antes do primeiro acesso',
-                                        subtitle: 'Problemas de conexão',
-                                        counter: 1
-                                    };
-                                    oController.getView().getModel().setData([oMockMessage, oMockMessage2]);
-                                    oController.getView().getModel().refresh()
-                                    oView.byId("entrarButton").setEnabled(false)
+                                    oView.byId("entrarButton").setEnabled(false);
                                 }
                                 oController.closeBusyDialog();
                             });
@@ -151,23 +115,7 @@ sap.ui.define([
                         oView.byId("entrarButton").setEnabled(true)
                     } else {
                         MessageToast.show("Por favor, verificar suas conexões antes do primeiro acesso!");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: 'Sem Conexão',
-                            description: 'Sem conexão com internet no momento. Tente mais tarde novamente',
-                            subtitle: 'Problemas de conexão',
-                            counter: 1
-                        };
-                        var oMockMessage2 = {
-                            type: 'Error',
-                            title: 'Primeiro Acesso',
-                            description: 'É necessário conexão com o SAP antes do primeiro acesso',
-                            subtitle: 'Problemas de conexão',
-                            counter: 1
-                        };
-                        oController.getView().getModel().setData([oMockMessage, oMockMessage2]);
-                        oController.getView().getModel().refresh()
-                        oView.byId("entrarButton").setEnabled(false)
+                        oView.byId("entrarButton").setEnabled(false);
                     }
                 }
 
@@ -178,8 +126,6 @@ sap.ui.define([
             },
 
             onLogin: function (oEvent) {
-                // oController.iniciarAplicativo()
-                // oController.getOwnerComponent().getRouter().navTo("Inicio", null, true);
                 var aListaUsuarios = oController.getOwnerComponent().getModel("usuariosLoginModel").getData()
                 if (aListaUsuarios.length == undefined) {
                     oController.carregarUsuariosOffLine();
@@ -195,38 +141,14 @@ sap.ui.define([
                             oController.iniciarAplicativo()
                         } else {
                             MessageToast.show("Usuário bloqueado");
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: 'Bloqueado',
-                                description: 'Usuário bloqueado',
-                                subtitle: 'Usuário e Senha',
-                                counter: 1
-                            };
-                            oController.getView().getModel().setData([oMockMessage]);
                             oController.getView().getModel().refresh()
                         }
                     } else {
                         MessageToast.show("Usuário ou senha inválidos");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: 'Inválido',
-                            description: 'Usuário ou Senha inválido',
-                            subtitle: 'Usuário e Senha',
-                            counter: 1
-                        };
-                        oController.getView().getModel().setData([oMockMessage]);
                         oController.getView().getModel().refresh()
                     }
                 } else {
                     MessageToast.show("Por favor, informe usuário e senha");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: 'Campos obrigatórios',
-                        description: 'Por favor, informe usuário e senha',
-                        subtitle: 'Usuário e Senha',
-                        counter: 1
-                    };
-                    oController.getView().getModel().setData([oMockMessage]);
                     oController.getView().getModel().refresh()
                 }
             },
@@ -246,10 +168,6 @@ sap.ui.define([
                         }).catch(
                             function (result) {
                                 oController.carregarOffline().then(function (result) {
-                                    var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                                    oController.getView().getModel().setData(aMensagens);
-                                    oController.getView().getModel().refresh()
-                                    // Busy será fechado no controller Inicio após carregamento completo
                                     oController.carregarAcessos()
                                     oController.getOwnerComponent().getRouter().navTo("Inicio", null, true);
                                 })
@@ -258,16 +176,9 @@ sap.ui.define([
                     }
                 ).catch(
                     function (result) {
-                        var aMensagens = oController.getOwnerComponent().getModel("mensagensModel").getData();
-                        oController.getView().getModel().setData(aMensagens);
-                        oController.getView().getModel().refresh()
                         oController.getOwnerComponent().getModel("busyDialogModel").setProperty("/loginInProgress", false);
                         oController.forceCloseBusyDialog();
                     });
-            },
-
-            handleMessagePopoverPress: function (oEvent) {
-                oMessagePopover.toggle(oEvent.getSource());
             },
 
             carregarUsuariosOffLine: function () {
@@ -276,14 +187,12 @@ sap.ui.define([
             },
 
             prepararIndexDB: function (pUsuario) {
-
-
                 return new Promise((resolve, reject) => {
                     oController = this;
 
                     //check for support
                     if (!('indexedDB' in window)) {
-                        console.log('Armazenamento offline não suportado.');
+                        console.warn('Armazenamento offline não suportado.');
                         reject();
                         return;
                     }
@@ -297,7 +206,6 @@ sap.ui.define([
 
                     openRequest.onupgradeneeded = function (e) {
                         db = e.target.result;
-                        console.log('Banco de dados sendo criado');
 
                         if (!db.objectStoreNames.contains('tb_autorizacao')) {
                             db.createObjectStore("tb_autorizacao", { autoIncrement: true });
@@ -317,6 +225,10 @@ sap.ui.define([
 
                         if (!db.objectStoreNames.contains('tb_condicoes')) {
                             db.createObjectStore("tb_condicoes", { autoIncrement: true });
+                        }
+
+                        if (!db.objectStoreNames.contains('tb_temperaturas')) {
+                            db.createObjectStore("tb_temperaturas", { autoIncrement: true });
                         }
 
                         if (!db.objectStoreNames.contains('tb_inspecoes')) {
@@ -350,7 +262,6 @@ sap.ui.define([
                     };
 
                     openRequest.onsuccess = function (e) {
-                        console.log('Banco de dados iniciado com sucesso!');
                         db = e.target.result;
                         db.close();
                         resolve();
