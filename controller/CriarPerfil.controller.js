@@ -48,7 +48,6 @@ sap.ui.define([
                 }
             },
 
-
             onNavBack: function () {
                 this.getRouter().navTo("ListaPerfil", {}, true);
             },
@@ -186,10 +185,7 @@ sap.ui.define([
 
                 if (oPerfil.DescrPerfil == "") {
                     oPerfilInput.setValueState("Error");
-                    const title       = oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio");
-                    const subtitle    = oController.getView().getModel("i18n").getResourceBundle().getText("perfil");
-                    const description = oController.getView().getModel("i18n").getResourceBundle().getText("campoperfil");
-                    oController.adicionarMensagemErro(title, subtitle, description);
+                    oController.adicionarMensagemErro("campoobrigatorio", "perfil", "campoperfil");
                     vPodeGravar = false;
 
                 } else {
@@ -197,29 +193,20 @@ sap.ui.define([
                         var oPerfilExistente = oController.getOwnerComponent().getModel("listaPerfilModel").getData().find((oElement) => oElement.DescrPerfil.toUpperCase() == oPerfil.DescrPerfil.toUpperCase());
                         if (oPerfilExistente != undefined) {
                             oPerfilInput.setValueState("Error");
-                            const title       = oController.getView().getModel("i18n").getResourceBundle().getText("perfilexistente");
-                            const subtitle    = oController.getView().getModel("i18n").getResourceBundle().getText("perfil");
-                            const description = oController.getView().getModel("i18n").getResourceBundle().getText("perfilexistentemsg");
-                            oController.adicionarMensagemErro(title, subtitle, description);
+                            oController.adicionarMensagemErro("perfilexistente", "perfil", "perfilexistentemsg");
                             vPodeGravar = false;
                         }
                     }
                 }
 
                 if (oController.getOwnerComponent().getModel("perfilCriarModel").getData().Centros == undefined || oController.getOwnerComponent().getModel("perfilCriarModel").getData().Centros.length == 0) {
-                    const title       = oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio");
-                    const subtitle    = oController.getView().getModel("i18n").getResourceBundle().getText("centro");
-                    const description = oController.getView().getModel("i18n").getResourceBundle().getText("campocentro");
-                    oController.adicionarMensagemErro(title, subtitle, description);
+                    oController.adicionarMensagemErro("campoobrigatorio", "centro", "campocentro");
                     vPodeGravar = false;
                 }
 
                 var vAutorizacoes = oPerfil.AutorizacaoSet.find((oOperacao) => oOperacao.Selecionado == true);
                 if (vAutorizacoes == undefined) {
-                    const title       = oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio");
-                    const subtitle    = oController.getView().getModel("i18n").getResourceBundle().getText("autorizacao");
-                    const description = oController.getView().getModel("i18n").getResourceBundle().getText("campoautorizacao");
-                    oController.adicionarMensagemErro(title, subtitle, description);
+                    oController.adicionarMensagemErro("campoobrigatorio", "autorizacao", "campoautorizacao");
                     vPodeGravar = false;
                 }
 
@@ -275,7 +262,7 @@ sap.ui.define([
                     .then( () => {
                         oController.gravarTabelaIndexDB("tb_perfil", oObjetoNovo)
                         .then( () => {
-                            MessageToast.show(oController.getView().getModel("i18n").getResourceBundle().getText("dadossucesso"), {
+                            MessageToast.show(oController.i18n("dadossucesso"), {
                                 onClose: function () {
                                     if (oController.checkConnection() == true) {
                                         oController.perfilUpdate()

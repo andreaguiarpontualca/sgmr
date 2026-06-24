@@ -1,22 +1,14 @@
 sap.ui.define([
     "com/pontual/sgmr/controller/BaseController",
-    "com/pontual/sgmr/model/formatter",
-    'sap/m/MessagePopover',
-    'sap/m/MessageItem',
     'sap/ui/model/json/JSONModel',
-    "sap/m/Dialog",
-    "sap/m/Button",
     'sap/base/util/uid',
-    'sap/m/MessageToast',
     "sap/m/MessageBox"
 ],
-    function (Controller, formatter, MessagePopover, MessageItem, JSONModel, Dialog, Button, uid, MessageToast, MessageBox) {
+    function (Controller, JSONModel, uid, MessageBox) {
         "use strict";
         var oView
         var oController
         var oBundle
-        var oMedicao
-        var oMessagePopover;
         var aMockMessages = []
 
         return Controller.extend("com.pontual.sgmr.controller.Formulario", {
@@ -42,6 +34,7 @@ sap.ui.define([
             },
 
             _handleRouteMatched: function (oEvent) {
+                this.limparMensagens();
                 oBundle = oController.getView().getModel("i18n").getResourceBundle();
                 try {
                     oView.byId("idFormulario").scrollTo(0);
@@ -50,22 +43,18 @@ sap.ui.define([
                 }
 
                 var oEquipamento = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData();
-
                 if (oEquipamento.FormularioCarregado != true) {
                     oEquipamento.FormularioCarregado = true
                     oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").setData(oEquipamento)
                     oController.lerTabelaIndexDB("tb_medicao")
                     .then(result => {
-                        var aMedicoes = result.tb_medicao
-                        var oMedicaoEncontrada = aMedicoes.find((oElement) => oEquipamento.Equnr == oElement.Equnr);
-
+                        var aMedicoes           = result.tb_medicao;
+                        var oMedicaoEncontrada  = aMedicoes.find((oElement) => oEquipamento.Equnr == oElement.Equnr);
                         if (oMedicaoEncontrada != undefined) {
                             oController.getOwnerComponent().getModel("materialRodanteFormularioModel").setData(oMedicaoEncontrada);
                         } else {
-
                             oController.carregarElementosFormularios()
                         }
-
                     });
                     sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueState("None");
                     sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")?.setValueStateText("");
@@ -93,20 +82,21 @@ sap.ui.define([
             },
 
             validarFormulario: function () {
+                this.limparMensagens();
                 return new Promise((resolve, reject) => {
                     const pMedicao      = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
-                    aMockMessages       = [];
+                    const erros         = [];
                     var vValido         = true;
                     var vAlerta         = false;
                     var vMensagemAlerta = "";
-                    
-                    //-- Validações no BaseController par acompartilhar com os blocos do form --//
-                    oController.validaMedicao(aMockMessages);
-                    oController.validaDataMedicao(aMockMessages);
-                    oController.validaVazamentoRoleteDireito(aMockMessages);
-                    oController.validaVazamentoRoleteEsquerdo(aMockMessages);
 
-                    vValido = aMockMessages.length < 1;
+                    //-- Validações no BaseController par acompartilhar com os blocos do form --//
+                    oController.validaMedicao(erros);
+                    oController.validaDataMedicao(erros);
+                    oController.validaVazamentoRoleteDireito(erros);
+                    oController.validaVazamentoRoleteEsquerdo(erros);
+
+                    vValido = erros.length < 1;
                   
                     var aComponentes = oController.agruparPorCampo(pMedicao.Componentes, "ComponenteLado")
                     aComponentes.forEach(oComponente => {
@@ -115,18 +105,9 @@ sap.ui.define([
 
                         if (aCompMedNaoInformada != 0 && aCompMedInformada != 0) {
 
-                            var oComp = pMedicao.Componentes.find(c => c.ComponenteLado == oComponente.key);
-
-                            var oMockMessage = {
-                                type: 'Warning',
-                                title: oBundle.getText("componentesmedicao", [oComp.Componente, oComp.Lado]),
-                                description: oBundle.getText("componentesmedicaomsg", [oComp.Componente, oComp.Lado]),
-                                subtitle: oBundle.getText("campoobrigatorio"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
-
-                            vMensagemAlerta = oBundle.getText("componentesmedicaomsg", [oComp.Componente, oComp.Lado])
+                            const oComp = pMedicao.Componentes.find(c => c.ComponenteLado == oComponente.key);
+                            vMensagemAlerta = oController.i18n("componentesmedicaomsg", [oComp.Componente, oComp.Lado]);
+                            oController.adicionarMensagemAviso(oController.i18n("componentesmedicao", [oComp.Componente, oComp.Lado]), "campoobrigatorio", vMensagemAlerta);
 
                             pMedicao.Componentes.forEach(element => {
                                 if (element.ComponenteLado == oComp.ComponenteLado) {
@@ -147,26 +128,18 @@ sap.ui.define([
                         switch (oComponente.Ordenacao) {
                             case "D":
                                 if (vValorMedido != 0 && vValorMedido > vUltimoValorMedido) {
-                                    aMockMessages.push({
-                                        type: 'Error',
-                                        title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        description: oBundle.getText("valormaiormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        subtitle: oBundle.getText("medicao"),
-                                        counter: 1
-                                    });
+                                    const titulo    = oController.i18n("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    const descricao = oController.i18n("valormaiormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    oController.adicionarMensagemErro(titulo, "medicao", descricao);
                                     oComponente.ValorMedidoValueState = 'Error'
                                     vValido = false;
                                 }
                                 break;
                             case "C":
                                 if (vValorMedido != 0 && vValorMedido < vUltimoValorMedido) {
-                                    aMockMessages.push({
-                                        type: 'Error',
-                                        title: oBundle.getText("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        description: oBundle.getText("valormenormsg", [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]),
-                                        subtitle: oBundle.getText("medicao"),
-                                        counter: 1
-                                    })
+                                    const titulo    = oController.i18n("componenteerro", [oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    const descricao = oController.i18n("valormenormsg",  [vValorMedido, vUltimoValorMedido, oComponente.Componente, oComponente.Lado, oComponente.Posicao]);
+                                    oController.adicionarMensagemErro(titulo, "medicao", descricao);
                                     oComponente.ValorMedidoValueState = 'Error'
                                     vValido = false;
                                 }
@@ -181,7 +154,7 @@ sap.ui.define([
                     oController.getOwnerComponent().getModel("materialRodanteFormularioModel").refresh()
 
                     var oModel = new JSONModel();
-                    oModel.setData(aMockMessages);
+                    oModel.setData(erros);
                     try {
                         sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario").setModel(oModel);
                     } catch (error) {
@@ -297,25 +270,32 @@ sap.ui.define([
             carregarElementosFormularios: function (aFormularios) {
                 return new Promise((resolve, reject) => {
                     var aLeiturasForm = [
-                        oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel"),
-                        oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel"),
-                        oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")
+                        oController.carregarDadosIndexDB("tb_componentes",  "listaComponentesModel"),
+                        oController.carregarDadosIndexDB("tb_condicoes",    "listaCondicoesModel"),
+                        oController.carregarDadosIndexDB("tb_temperaturas", "listaTemperaturasModel"),
+                        oController.carregarDadosIndexDB("tb_inspecoes",    "listaInspecoesModel")
                     ];
 
                     Promise.all(aLeiturasForm).then(
                         function () {
-                            var oEquipamento = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData()
-                            var aListaComponetes = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
+                            var oEquipamento           = oController.getOwnerComponent().getModel("materialRodanteSelecionadoModel").getData();
+                            var aListaComponetes       = oController.getOwnerComponent().getModel("listaComponentesModel").getData().filter(c => c.Equipamento == oEquipamento.Equnr && c.IdForm == oEquipamento.IdForm);
                             var aListaComponentesCombo = oController.agruparComponentes(aListaComponetes);
-                            var aComponentesCombo = []
-                            var aListaCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
-                            var aListaInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
-                            const totalRoletes    = { direito  : 0, esquerdo : 0 };
-;
-                            aListaInspecoes.sort((a, b) => a.Sequencial - b.Sequencial);
+                            const aListaCondicoes      = oController.getOwnerComponent().getModel("listaCondicoesModel"   ).getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            const aListaInspecoes      = oController.getOwnerComponent().getModel("listaInspecoesModel"   ).getData().filter(c => c.IdForm == oEquipamento.IdForm && c.TipoRetorno !== 'E') || [];
+                            const aListaTemperaturas   = oController.getOwnerComponent().getModel("listaTemperaturasModel").getData().filter(c => c.IdForm == oEquipamento.IdForm ) || [];
+                            const totalRoletes         = { direito : 0, esquerdo : 0 };
+                            const aComponentesCombo    = [];
+                            let   corDireita           = "";
+                            let   corEsquerda          = "";
+
                             aListaCondicoes.sort((a, b) => Number(a.IdCondicao) - Number(b.IdCondicao));
+                            aListaInspecoes.sort((a, b) => a.Sequencial - b.Sequencial);
+
+                            var total = 0;
 
                             aListaComponetes.forEach(element => {
+                                element.Sequenciamento = element.Sequenciamento || total++;
                                 element.Valormedido = 0
                                 element.ValorMedidoValueState = 'None'
                                 element.ComponenteLado = element.IdComponente + element.IdLado
@@ -330,14 +310,26 @@ sap.ui.define([
 
                                 element.PercDesgasteValueState = 'Indication05'  //Azul
                                 oController.somaRoletes(element, totalRoletes);
+
+                                if (!corDireita && element.IdLado === "LD") {
+                                    corDireita = element.Cor;
+                                }
+                                if (!corEsquerda && element.IdLado === "LE") {
+                                    corEsquerda = element.Cor;
+                                }
                             });
 
-                            aListaComponentesCombo.forEach(element => {
-                                aComponentesCombo.push({
-                                    key: element.key,
-                                    text: element.key
-                                })
-                            })
+                            aListaTemperaturas.forEach(item => {
+                                item.Cor = item.Lado === "D" ? corDireita : corEsquerda;
+                            });
+
+                            aListaTemperaturas.sort((a, b) => {
+                                if (a.Lado < b.Lado) return -1;
+                                if (a.Lado > b.Lado) return 1;
+                                return 0;
+                            });
+
+                            aListaComponentesCombo.forEach(element => aComponentesCombo.push({ key: element.key, text: element.key }));
 
                             aComponentesCombo.push({ key: 'Todos', text: 'Todos' });
 
@@ -346,7 +338,6 @@ sap.ui.define([
                                 { key: "Lado Direito",  text: "Lado Direito" },
                                 { key: "Lado Esquerdo", text: "Lado Esquerdo" }
                             ];
-
 
                             aListaCondicoes.forEach(element => {
                                 element.Nivel = "Não Informada"
@@ -383,6 +374,7 @@ sap.ui.define([
                             oFormulario.RoleteQtdeLE            = "0";
                             oFormulario.MaxRoleteQtdeLD         = totalRoletes.direito;
                             oFormulario.MaxRoleteQtdeLE         = totalRoletes.esquerdo;
+                            oFormulario.Temperaturas            = aListaTemperaturas;
                             oFormulario.Inspecoes               = aListaInspecoes;
                             oFormulario.Observacoes             = "";
                             oFormulario.items                   = [];
@@ -407,11 +399,16 @@ sap.ui.define([
 
             inicializaCamposNumericos: function() {
                 const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
-                if (!blocoRoletes || blocoRoletes.length < 1) {
-                    return;
+                if (!!blocoRoletes && blocoRoletes.length > 0) {
+                    oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLD");
+                    oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLE");
                 }
-				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLD");
-				oController.inicializaLimpezaFoco(blocoRoletes[0], "inputRoletesVazandoLE");
+
+                const blocoTemperaturas = oController.byId("temperaturaBlock").getAggregation("_views");
+                if (!!blocoTemperaturas && blocoTemperaturas.length > 0) {
+                    oController.inicializaLimpezaFoco(blocoTemperaturas[0], "inputPino");
+                    oController.inicializaLimpezaFoco(blocoTemperaturas[0], "inputTemp");
+                }
 			},
 
             inicializaLimpezaFoco: function(bloco, id) {

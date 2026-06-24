@@ -31,7 +31,7 @@
                         <VBox fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center" class="formLogin">
                             <items>
                                 <Image src="img/favicon/trator-circulo.png" width="6rem" visible="{loginModel>/exibeIcone}"/>
-                                <Title text="On.UC.Components" class="titulo sapUiSmallMarginTop sapUiMediumMarginBottom"/>
+                                <Title text="On.Track.Equipment" class="titulo sapUiSmallMarginTop sapUiMediumMarginBottom"/>
                                 <Label text="{i18n>usuario}" required="true" labelFor="loginInput" visible="false"></Label>
                                 <Input
                                     id="usuarioInput" 

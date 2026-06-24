@@ -50,9 +50,8 @@ sap.ui.define([
 
             },
 
-
             _handleRouteMatched: function (oEvent) {
-
+                this.limparMensagens();
                 aMockMessages = [];
                 var oModel = new JSONModel();
                 oModel.setData(aMockMessages);
@@ -64,9 +63,7 @@ sap.ui.define([
                 var oConfirmarButton = oView.byId("confirmarMaterialRodanteButton")
 
                 oConfirmarButton.setBusy(false);
-
             },
-
 
             onNavBack: function () {
                 this.getRouter().navTo("ListaMaterialRodante", {}, true /*no history*/);
@@ -78,25 +75,17 @@ sap.ui.define([
 
             onConfirmarMaterialRodante: function () {
 
-                var aMockMessages = [];
-                var vPodeGravar = true;
-                var oMockMessage = {}
-                var omaterialRodante = oController.getOwnerComponent().getModel("materialRodanteCriarModel").getData()
-                var omaterialRodanteInput = oView.byId("materialRodanteInput")
-                var oConfirmarButton = oView.byId("confirmarmaterialRodanteButton")
+                var aMockMessages         = [];
+                var vPodeGravar           = true;
+                var omaterialRodante      = oController.getOwnerComponent().getModel("materialRodanteCriarModel").getData();
+                var omaterialRodanteInput = oView.byId("materialRodanteInput");
+                var oConfirmarButton      = oView.byId("confirmarmaterialRodanteButton");
                 oConfirmarButton.setEnabled(false);
                 oConfirmarButton.setBusy(true);
 
                 if (omaterialRodante.DescrmaterialRodante == "") {
                     omaterialRodanteInput.setValueState("Error");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("campomaterialRodante"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("materialRodante"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "materialRodante", "campomaterialRodante");
                     vPodeGravar = false;
 
                 } else {
@@ -104,14 +93,7 @@ sap.ui.define([
                         var omaterialRodanteExistente = oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().find((oElement) => oElement.DescrmaterialRodante.toUpperCase() == omaterialRodante.DescrmaterialRodante.toUpperCase());
                         if (omaterialRodanteExistente != undefined) {
                             omaterialRodanteInput.setValueState("Error");
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oController.getView().getModel("i18n").getResourceBundle().getText("materialRodanteexistente"),
-                                description: oController.getView().getModel("i18n").getResourceBundle().getText("materialRodanteexistentemsg"),
-                                subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("materialRodante"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
+                            oController.adicionarMensagemErro("materialRodanteexistente", "materialRodante", "materialRodanteexistentemsg");
                             vPodeGravar = false;
                         }
                     }
@@ -119,14 +101,7 @@ sap.ui.define([
 
                 var vAutorizacoes = omaterialRodante.AutorizacaoSet.find((oOperacao) => oOperacao.Selecionado == true);
                 if (vAutorizacoes == undefined) {
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("campoautorizacao"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("autorizacao"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "autorizacao", "campoautorizacao");
                     vPodeGravar = false;
                 }
 
@@ -136,10 +111,6 @@ sap.ui.define([
 
                 if (vPodeGravar == true) {
                     omaterialRodanteInput.setValueState("None");
-                    oView.byId("idListaAutorizacoesTable").getSelectedContextPaths().forEach(element => {
-                       // oController.getOwnerComponent().getModel("materialRodanteCriarModel").setProperty(element + '/Selecionado', true )
-                    });
-
                     if (oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().length == undefined) {
                         oController.getOwnerComponent().getModel("listaEquipamentoModel").setData([])
                         oController.getOwnerComponent().getModel("listaEquipamentoModel").getData().push(omaterialRodante)
@@ -148,47 +119,34 @@ sap.ui.define([
                     }
                     var oObjetoNovo = JSON.parse(JSON.stringify(oController.getOwnerComponent().getModel("listaEquipamentoModel").getData()));
                     oController.getOwnerComponent().getModel("listaEquipamentoModel").refresh();
-                    oController.limparTabelaIndexDB("tb_materialRodante").then(
-                        function (result) {
-                            oController.gravarTabelaIndexDB("tb_materialRodante", oObjetoNovo).then(
-                                function (result) {
-                                    MessageToast.show(oController.getView().getModel("i18n").getResourceBundle().getText("dadossucesso"), {
-                                        duration: 500,                  // default
-                                        onClose: function () {
-                                            if (oController.checkConnection() == true) {
-                                                oController.materialRodanteUpdate().then(
-                                                    function (result) {
-                                                        oController.closeBusyDialog();
-                                                        oController.getRouter().navTo("ListamaterialRodante", {}, true /*no history*/);
-                                                        oConfirmarButton.setEnabled(true);
-                                                        oConfirmarButton.setBusy(false);
-                                                    }).catch(
-                                                        function (result) {
-
-                                                        })
-                                            } else {
+                    oController.limparTabelaIndexDB("tb_materialRodante")
+                    .then(() => {
+                        oController.gravarTabelaIndexDB("tb_materialRodante", oObjetoNovo)
+                        .then(() => {
+                            MessageToast.show(oController.i18n("dadossucesso"), {
+                                onClose: () => {
+                                    if (oController.checkConnection() == true) {
+                                        oController.materialRodanteUpdate()
+                                        .then(() => {
                                                 oController.closeBusyDialog();
                                                 oController.getRouter().navTo("ListamaterialRodante", {}, true /*no history*/);
                                                 oConfirmarButton.setEnabled(true);
                                                 oConfirmarButton.setBusy(false);
-                                            }
-
-                                        }
-                                    });
-                                }).catch(
-                                    function (result) {
-
-                                    })
-                        }).catch(
-                            function (result) {
-
-                            })
-                }else{
+                                            });
+                                    } else {
+                                        oController.closeBusyDialog();
+                                        oController.getRouter().navTo("ListamaterialRodante", {}, true /*no history*/);
+                                        oConfirmarButton.setEnabled(true);
+                                        oConfirmarButton.setBusy(false);
+                                    }
+                                }
+                            });
+                        });
+                    });
+                } else {
                     oConfirmarButton.setEnabled(true);
                     oConfirmarButton.setBusy(false);
                 }
             }
-
-
         });
     });

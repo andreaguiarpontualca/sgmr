@@ -19,17 +19,8 @@
             growingThreshold="100"
             mode="None"
             paste="onPaste"
-            items="{
-					path: 'materialRodanteFormularioModel>/Componentes',					
-					sorter: [{
-							path: 'Componente', 
-							descending: false
-						}, {
-							path: 'Lado', 
-							descending: false
-						}]
-				}"
-        >
+            items="{ path: 'materialRodanteFormularioModel>/Componentes', sorter: [{ path: 'Sequenciamento', descending: false }] }"
+            >
             <headerToolbar>
                 <OverflowToolbar class="pontualSGMRNoPadding">
                     <ComboBox

@@ -27,7 +27,7 @@
                 id="networkStatus"
                 active="false"
                 inverted="true"
-                icon="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
+                icon ="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getIconeConexao'}"
                 state="{path: 'conexaoModel>statusConexao', formatter: 'com.pontual.sgmr.model.formatter.getCorIconeConexao'}"
             />
         </headerContent>

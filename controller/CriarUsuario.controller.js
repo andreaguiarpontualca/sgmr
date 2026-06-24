@@ -37,13 +37,13 @@ sap.ui.define([
 
 
             _handleRouteMatched: function (oEvent) {
+                this.limparMensagens();
 
-                var oUsuarioInput = oView.byId("usuarioInput")
-                var oNomeInput = oView.byId("nomeInput")
-                var oSenhaInput = oView.byId("senhaInput")
-                var oConfirmarInput = oView.byId("confirmarSenhaInput")
-                var oDepositoInput = oView.byId("depositoInput")
-                var oPerfilInput = oView.byId("perfilInput")
+                var oUsuarioInput   = oView.byId("usuarioInput");
+                var oNomeInput      = oView.byId("nomeInput");
+                var oSenhaInput     = oView.byId("senhaInput");
+                var oConfirmarInput = oView.byId("confirmarSenhaInput");
+                var oPerfilInput    = oView.byId("perfilInput");
 
                 oUsuarioInput.setValueState("None");
                 oNomeInput.setValueState("None");
@@ -51,15 +51,14 @@ sap.ui.define([
                 oConfirmarInput.setValueState("None");
                 oPerfilInput.setValueState("None");
 
-                var oConfirmarButton = oView.byId("confirmarUsuarioButton")
+                var oConfirmarButton = oView.byId("confirmarUsuarioButton");
                 oConfirmarButton.setBusy(false);
 
-                var aFilters = []
-                var filter = new sap.ui.model.Filter({ path: "Selecionado", operator: sap.ui.model.FilterOperator.EQ, value1: true });
+                const aFilters = [];
+                const filter   = new sap.ui.model.Filter({ path: "Selecionado", operator: sap.ui.model.FilterOperator.EQ, value1: true });
                 aFilters.push(filter);
                 this.getView().byId("idListaAutorizacoesTable").getBinding("items").filter(aFilters, "Application");
             },
-
 
             onNavBack: function () {
                 this.getRouter().navTo("ListaUsuario", {}, true /*no history*/);
@@ -119,97 +118,60 @@ sap.ui.define([
             },
 
             onConfirmarUsuario: function (oEvent) {
-                var aMockMessages = [];
-                var vPodeGravar = true;
-                var oMockMessage = {}
-                var oUsuario = oController.getOwnerComponent().getModel("criarUsuarioModel").getData();
-                var oUsuarioInput = oView.byId("usuarioInput")
-                var oNomeInput = oView.byId("nomeInput")
-                var oSenhaInput = oView.byId("senhaInput")
-                var oConfirmarInput = oView.byId("confirmarSenhaInput")
-                //var oCentroInput = oView.byId("centroInput")
-                var oDepositoInput = oView.byId("depositoInput")
-                var oPerfilInput = oView.byId("perfilInput")
+                this.limparMensagens();
+                var aMockMessages   = [];
+                var vPodeGravar     = true;
+                var oUsuario        = oController.getOwnerComponent().getModel("criarUsuarioModel").getData();
+                var oUsuarioInput   = oView.byId("usuarioInput");
+                var oNomeInput      = oView.byId("nomeInput");
+                var oSenhaInput     = oView.byId("senhaInput");
+                var oConfirmarInput = oView.byId("confirmarSenhaInput");
+                var oDepositoInput  = oView.byId("depositoInput");
+                var oPerfilInput    = oView.byId("perfilInput");
 
-                var oConfirmarButton = oView.byId("confirmarUsuarioButton")
+                var oConfirmarButton = oView.byId("confirmarUsuarioButton");
                 oConfirmarButton.setEnabled(false);
                 oConfirmarButton.setBusy(true);
 
-                if (oUsuario.Usuario == "") {
+                oUsuarioInput.setValueState("None");
+                oNomeInput.setValueState("None");
+                oSenhaInput.setValueState("None");
+                oConfirmarInput.setValueState("None");
+                oPerfilInput.setValueState("None");
+
+                if (oUsuario.CodUsuario == "") {
                     oUsuarioInput.setValueState("Error");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("campousuario"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("usuario"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "usuario", "usuario");
                     vPodeGravar = false;
                 } else {
                     if (oUsuario.Sincronizado != "U") {
                         var oUsuarioExistente = oController.getOwnerComponent().getModel("listaUsuariosModel").getData().find((oElement) => oElement.CodUsuario.toUpperCase() == oUsuario.CodUsuario.toUpperCase());
                         if (oUsuarioExistente != undefined) {
                             oUsuarioInput.setValueState("Error");
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oController.getView().getModel("i18n").getResourceBundle().getText("usuarioexistente"),
-                                description: oController.getView().getModel("i18n").getResourceBundle().getText("usuarioexistentemsg"),
-                                subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("usuario"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
+                            oController.adicionarMensagemErro("usuarioexistente", "usuario", "usuarioexistentemsg");
                             vPodeGravar = false;
                         }
                     }
                 }
                 if (oUsuario.Nome == "") {
                     oNomeInput.setValueState("Error");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("camponome"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("nome"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "nome", "camponome");
                     vPodeGravar = false;
                 }
 
                 if (oUsuario.Senha == "") {
                     oSenhaInput.setValueState("Error");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("camposenha"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("senha"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "senha", "camposenha");
                     vPodeGravar = false;
                 } else {
                     if (oUsuario.Senha.length < 6) {
                         oSenhaInput.setValueState("Error");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oController.getView().getModel("i18n").getResourceBundle().getText("tamanhoinvalido"),
-                            description: oController.getView().getModel("i18n").getResourceBundle().getText("tamanhosenhainvalido"),
-                            subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("senha"),
-                            counter: 1
-                        };
-                        aMockMessages.push(oMockMessage)
+                        oController.adicionarMensagemErro("tamanhoinvalido", "senha", "tamanhosenhainvalido");
                         vPodeGravar = false;
                     } else {
                         if (oUsuario.Senha != oUsuario.ConfirmarSenha) {
                             oConfirmarInput.setValueState("Error");
-                            var oMockMessage = {
-                                type: 'Error',
-                                title: oController.getView().getModel("i18n").getResourceBundle().getText("senhasdiferentes"),
-                                description: oController.getView().getModel("i18n").getResourceBundle().getText("senhasdiferentesmsg"),
-                                subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("confirmarsenha"),
-                                counter: 1
-                            };
-                            aMockMessages.push(oMockMessage)
+                            oController.adicionarMensagemErro("senhasdiferentes", "confirmarsenha", "senhasdiferentesmsg");
                             vPodeGravar = false;
                         }
                     }
@@ -217,80 +179,21 @@ sap.ui.define([
 
                 if (oUsuario.ConfirmarSenha == "") {
                     oConfirmarInput.setValueState("Error");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("campoconfirmarsenha"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("confirmarsenha"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "confirmarsenha", "campoconfirmarsenha");
                     vPodeGravar = false;
                 }
 
-                /* if (oUsuario.Centro == "") {
-                    // oCentroInput.setValueState("Error");
-                    // var oMockMessage = {
-
-                    //     type: 'Error',
-                    //     title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                    //     description: oController.getView().getModel("i18n").getResourceBundle().getText("campocentro"),
-                    //     subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("centro"),
-                    //     counter: 1
-                    // };
-                    // aMockMessages.push(oMockMessage)
-                    // vPodeGravar = false;
-                } else {
-                    if (oUsuario.Centro.length < 4) {
-                        oCentroInput.setValueState("Error");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oController.getView().getModel("i18n").getResourceBundle().getText("tamanhoinvalido"),
-                            description: oController.getView().getModel("i18n").getResourceBundle().getText("tamanhocentroinvalido"),
-                            subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("centro"),
-                            counter: 1
-                        };
-                        aMockMessages.push(oMockMessage)
-                        vPodeGravar = false;
-                    }
-                } */
-
-                if (oUsuario.Deposito == "") {
-                    // oDepositoInput.setValueState("Error");
-                    // var oMockMessage = {
-                    //     type: 'Error',
-                    //     title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                    //     description: oController.getView().getModel("i18n").getResourceBundle().getText("campodeposito"),
-                    //     subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("deposito"),
-                    //     counter: 1
-                    // };
-                    // aMockMessages.push(oMockMessage)
-                    // vPodeGravar = false;
-                } else {
+                if (oUsuario.Deposito !== "") {
                     if (oUsuario.Deposito.length < 4) {
                         oDepositoInput.setValueState("Error");
-                        var oMockMessage = {
-                            type: 'Error',
-                            title: oController.getView().getModel("i18n").getResourceBundle().getText("tamanhoinvalido"),
-                            description: oController.getView().getModel("i18n").getResourceBundle().getText("tamanhodepositoinvalido"),
-                            subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("deposito"),
-                            counter: 1
-                        };
-                        aMockMessages.push(oMockMessage)
+                        oController.adicionarMensagemErro("tamanhoinvalido", "deposito", "tamanhodepositoinvalido");
                         vPodeGravar = false;
                     }
                 }
 
                 if (oUsuario.Perfil == "") {
                     oPerfilInput.setValueState("Error");
-                    var oMockMessage = {
-                        type: 'Error',
-                        title: oController.getView().getModel("i18n").getResourceBundle().getText("campoobrigatorio"),
-                        description: oController.getView().getModel("i18n").getResourceBundle().getText("campoperfil"),
-                        subtitle: oController.getView().getModel("i18n").getResourceBundle().getText("perfil"),
-                        counter: 1
-                    };
-                    aMockMessages.push(oMockMessage)
+                    oController.adicionarMensagemErro("campoobrigatorio", "perfil", "campoperfil");
                     vPodeGravar = false;
                 }
 
@@ -303,71 +206,59 @@ sap.ui.define([
                     oNomeInput.setValueState("None");
                     oSenhaInput.setValueState("None");
                     oConfirmarInput.setValueState("None");
-                    // oCentroInput.setValueState("None");
-                    // oDepositoInput.setValueState("None");
                     oPerfilInput.setValueState("None");
-                    //oUsuario.Centro = oUsuario.Centro.toUpperCase();
-                    oUsuario.Deposito = oUsuario.Deposito.toUpperCase();
-                    oUsuario.Senha = oController.criptografar(oUsuario.Senha)
+                    oUsuario.Deposito       = oUsuario.Deposito.toUpperCase();
+                    oUsuario.Senha          = oController.criptografar(oUsuario.Senha)
                     oUsuario.ConfirmarSenha = oController.criptografar(oUsuario.ConfirmarSenha)
                     if (oUsuario.Sincronizado != "U") {
                         if (oController.getOwnerComponent().getModel("listaUsuariosModel").getData().length == undefined) {
-                            oController.getOwnerComponent().getModel("listaUsuariosModel").setData([])
-                            oController.getOwnerComponent().getModel("listaUsuariosModel").getData().push(oUsuario)
+                            oController.getOwnerComponent().getModel("listaUsuariosModel").setData([]);
+                            oController.getOwnerComponent().getModel("listaUsuariosModel").getData().push(oUsuario);
                         } else {
-                            oController.getOwnerComponent().getModel("listaUsuariosModel").getData().push(oUsuario)
+                            oController.getOwnerComponent().getModel("listaUsuariosModel").getData().push(oUsuario);
                         }
                     } else {
                         var vIndex = oController.getOwnerComponent().getModel("listaUsuariosModel").getData().findIndex((oElement) => oUsuario.CodUsuario == oElement.CodUsuario);
-                        oController.getOwnerComponent().getModel("listaUsuariosModel").getData()[vIndex] = oUsuario
+                        oController.getOwnerComponent().getModel("listaUsuariosModel").getData()[vIndex] = oUsuario;
                     }
                     oController.getOwnerComponent().getModel("listaUsuariosModel").refresh();
                     var oObjetoNovo = JSON.parse(JSON.stringify(oController.getOwnerComponent().getModel("listaUsuariosModel").getData()));
-                    oController.limparTabelaIndexDB("tb_usuario").then(
-                        function (result) {
-                            oController.gravarTabelaIndexDB("tb_usuario", oObjetoNovo).then(
-                                function (result) {
-                                    MessageToast.show(oController.getView().getModel("i18n").getResourceBundle().getText("dadossucesso"), {
-                                        duration: 500,                  // default
-                                        onClose: function () {
-                                            if (oController.checkConnection() == true) {
-                                                oController.usuarioUpdate().then(
-                                                    function (result) {
-                                                        oController.closeBusyDialog();
-                                                        oConfirmarButton.setEnabled(true);
-                                                        oConfirmarButton.setBusy(false);
-                                                        oController.getRouter().navTo("ListaUsuario", {}, true /*no history*/);
-                                                    }).catch(
-                                                        function (result) {
-                                                        oConfirmarButton.setBusy(false);
-                                                      oController.getRouter().navTo("ListaUsuario", {}, true /*no history*/);
-                                                        })
-
-                                            } else {
-                                                oController.closeBusyDialog();
-                                                oConfirmarButton.setEnabled(true);
-                                                oConfirmarButton.setBusy(false);
-                                                oController.getRouter().navTo("ListaUsuario", {}, true /*no history*/);
-
-                                            }
-                                        }
-                                    });
-                                }).catch(
-                                    function (result) {
-                                    })
-                        }).catch(
-                            function (result) {
-                            })
-
+                    oController.limparTabelaIndexDB("tb_usuario")
+                    .then(() => {
+                        oController.gravarTabelaIndexDB("tb_usuario", oObjetoNovo)
+                        .then(() => {
+                            MessageToast.show(oController.i18n("dadossucesso"), {
+                                duration: 500,
+                                onClose: function () {
+                                    if (oController.checkConnection() == true) {
+                                        oController.usuarioUpdate()
+                                        .then(() => {
+                                            oController.closeBusyDialog();
+                                            oConfirmarButton.setEnabled(true);
+                                            oConfirmarButton.setBusy(false);
+                                            oController.getRouter().navTo("ListaUsuario", {}, true);
+                                        }).catch(() => {
+                                            oConfirmarButton.setBusy(false);
+                                            oController.getRouter().navTo("ListaUsuario", {}, true);
+                                        });
+                                    } else {
+                                        oController.closeBusyDialog();
+                                        oConfirmarButton.setEnabled(true);
+                                        oConfirmarButton.setBusy(false);
+                                        oController.getRouter().navTo("ListaUsuario", {}, true);
+                                    }
+                                }
+                            });
+                        });
+                    });
                 } else {
                     oConfirmarButton.setEnabled(true);
                     oConfirmarButton.setBusy(false);
                 }
-
             },
 
             onCancelarUsuario: function () {
-                oController.getRouter().navTo("ListaUsuario", {}, true /*no history*/);
+                oController.getRouter().navTo("ListaUsuario", {}, true);
             }
 
         });

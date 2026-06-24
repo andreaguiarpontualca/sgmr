@@ -1,19 +1,18 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/core/UIComponent",
-    "sap/ui/core/routing/History",
+    'sap/ui/core/mvc/Controller',
+    'sap/ui/core/UIComponent',
+    'sap/ui/core/routing/History',
     'sap/m/MessageToast',
-    "sap/ui/core/Fragment",
-    "sap/ui/core/syncStyleClass",
-    'sap/ui/model/json/JSONModel'
-], function (Controller, UIComponent, History, MessageToast, Fragment, syncStyleClass, JSONModel) {
+    'sap/ui/core/Fragment',
+    'sap/ui/core/syncStyleClass'
+], function (Controller, UIComponent, History, MessageToast, Fragment, syncStyleClass) {
     "use strict";
     var oController
     var oView
 
     const BD_VERSION = 8;
-    var aFilters = ""
-    var oExpand = ""
+    var aFilters     = "";
+    var oExpand      = "";
     var oPerfilChave = {};
 
     return Controller.extend("com.pontual.sgmr.controller.BaseController", {
@@ -21,6 +20,25 @@ sap.ui.define([
         getRouter: function () {
             return UIComponent.getRouterFor(this);
         },
+
+		getResourceBundle: function () {
+ 			var modelo = this.getOwnerComponent().getModel("i18n");
+ 			if (!!modelo && typeof modelo.getResourceBundle === 'function') {
+ 				return modelo.getResourceBundle();
+ 			}
+			return;
+		},
+		
+		i18n: function (chave, parametros) {
+			if (!chave) {
+				return this.getResourceBundle();
+			} 
+			var rb = this.getResourceBundle(); 
+			if (rb) {
+				return rb.getText(chave, (parametros || []));
+			}
+			return chave;
+		},
 
         onNavBack: function () {
             var oHistory, sPreviousHash;
@@ -46,18 +64,15 @@ sap.ui.define([
         },
 
         carregarAcessos: function () {
-
             oController = this;
-
-            var aAutorizacoes = oController.getOwnerComponent().getModel("usuarioModel").getProperty("/Autorizacoes")
-
-            var oAcesso = {
-                administrativo: false,
-                materialrodante: false,
-                perfil: false,
-                usuario: false,
-                associar: false,
-                sincronizar: false
+            const aAutorizacoes = oController.getOwnerComponent().getModel("usuarioModel").getProperty("/Autorizacoes")
+            const oAcesso       = {
+                administrativo  : false,
+                materialrodante : false,
+                perfil          : false,
+                usuario         : false,
+                associar        : false,
+                sincronizar     : false
             }
 
             if (aAutorizacoes) {
@@ -76,14 +91,9 @@ sap.ui.define([
                         if (oAutorizacao.CodigoAutorizacao == "004") {
                             oAcesso.associar = true;
                         }
-                        /*                         if(oAutorizacao.CodigoAutorizacao == "005"){
-                                                    oAcesso.sincronizar = true;
-                                                } */
                     }
                 });
-
-
-                oController.getOwnerComponent().getModel("acessosModel").setData(oAcesso)
+                oController.getOwnerComponent().getModel("acessosModel").setData(oAcesso);
                 oController.getOwnerComponent().getModel("acessosModel").refresh();
             }
         },
@@ -163,7 +173,10 @@ sap.ui.define([
 			this.adicionarMensagem("Error", message, subtitle, descricao);
 		},
 
-		adicionarMensagem: function (type, title, subtitle, description) {
+		adicionarMensagem: function (type, titulo, subtitulo, descricao) {
+            const title       = (!titulo    || titulo.includes(" ")   ) ? titulo    : this.i18n(titulo);
+            const subtitle    = (!subtitulo || subtitulo.includes(" ")) ? subtitulo : this.i18n(subtitulo);
+            const description = (!descricao || descricao.includes(" ")) ? descricao : this.i18n(descricao);
             this._adicionaMensagem({ type, title, subtitle, description });
 		},
 		
@@ -499,7 +512,7 @@ sap.ui.define([
 
         carregarPerfil: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoperfis"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoperfis"));
                 oController.carregarDados("PerfilSet", []).then(function (result) {
                     var aPerfis = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -540,7 +553,7 @@ sap.ui.define([
 
         carregarCentro: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocentros"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocentros"));
                 oController.carregarDados("ListaCentroSet", []).then(function (result) {
                     for (let x = 0; x < result.results.length; x++) {
                         result.results.forEach(element => {
@@ -558,7 +571,7 @@ sap.ui.define([
 
         carregarAutorizacoes: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoautorizacoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoautorizacoes"));
                 oController.carregarDados("ListaAutorizacaoSet", []).then(function (result) {
                     var aAutorizacoes = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -615,7 +628,7 @@ sap.ui.define([
 
                     Promise.all(aLeituras).then(function () {
                         // Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
+                        oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
                         var aLimpezas = [
                             oController.limparTabelaIndexDB("tb_autorizacao"),
                             oController.limparTabelaIndexDB("tb_perfil"),
@@ -626,12 +639,12 @@ sap.ui.define([
                         ];
 
                         Promise.all(aLimpezas).then(function () {
-                            var aAutorizacoes = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData() || [];
-                            var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
-                            var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
-                            var aCentros = oController.getOwnerComponent().getModel("listaCentrosModel").getData() || [];
+                            var aAutorizacoes    = oController.getOwnerComponent().getModel("listaAutorizacaoModel").getData() || [];
+                            var aPerfis          = oController.getOwnerComponent().getModel("listaPerfilModel").getData()      || [];
+                            var aUsuarios        = oController.getOwnerComponent().getModel("listaUsuariosModel").getData()    || [];
+                            var aCentros         = oController.getOwnerComponent().getModel("listaCentrosModel").getData()     || [];
                             var aMaterialRodante = oController.getOwnerComponent().getModel("listaEquipamentoModel").getData() || [];
-                            var aFormularios = oController.getOwnerComponent().getModel("listaFormularioModel").getData() || [];
+                            var aFormularios     = oController.getOwnerComponent().getModel("listaFormularioModel").getData()  || [];
 
                             aPerfis.forEach(element => {
                                 element.AutorizacaoSet.forEach(auth => {
@@ -642,84 +655,82 @@ sap.ui.define([
 
                             var aGravacoes = [
                                 oController.gravarTabelaIndexDB("tb_autorizacao", aAutorizacoes),
-                                oController.gravarTabelaIndexDB("tb_perfil", aPerfis),
-                                oController.gravarTabelaIndexDB("tb_centros", aCentros),
-                                oController.gravarTabelaIndexDB("tb_usuario", aUsuarios),
+                                oController.gravarTabelaIndexDB("tb_perfil",      aPerfis),
+                                oController.gravarTabelaIndexDB("tb_centros",     aCentros),
+                                oController.gravarTabelaIndexDB("tb_usuario",     aUsuarios),
                                 oController.gravarTabelaIndexDB("tb_equipamento", aMaterialRodante),
-                                oController.gravarTabelaIndexDB("tb_formulario", aFormularios)
+                                oController.gravarTabelaIndexDB("tb_formulario",  aFormularios)
                             ];
 
                             // Aguarda todas as gravações antes de continuar
                             Promise.all(aGravacoes).then(function () {
 
-                                var aForms = oController.agruparPorCampo(aMaterialRodante, "IdForm")
-                                var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo")
+                                var aEqunrs  = oController.agruparPorCampo(aMaterialRodante, "Equnr");
+                                var aForms   = oController.agruparPorCampo(aMaterialRodante, "IdForm");
+                                var aModelos = oController.agruparPorCampo(aMaterialRodante, "Modelo");
                                 var aLeiturasForm = [
-                                    oController.carregarComponentes(aForms).catch(() => oController.carregarDadosIndexDB("tb_componentes", "listaComponentesModel")),
-                                    oController.carregarCondicoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_condicoes", "listaCondicoesModel")),
-                                    oController.carregarInspecoes(aForms).catch(() => oController.carregarDadosIndexDB("tb_inspecoes", "listaInspecoesModel")),
-                                    oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"))
+                                    oController.carregarComponentes(aEqunrs).catch(   () => oController.carregarDadosIndexDB("tb_componentes",   "listaComponentesModel" )),
+                                    oController.carregarCondicoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_condicoes",     "listaCondicoesModel"   )),
+                                    oController.carregarTemperaturas(aForms).catch(   () => oController.carregarDadosIndexDB("tb_temperaturas",  "listaTemperaturasModel")),
+                                    oController.carregarInspecoes(aForms).catch(      () => oController.carregarDadosIndexDB("tb_inspecoes",     "listaInspecoesModel"   )),
+                                    oController.carregarListaDesgaste(aModelos).catch(() => oController.carregarDadosIndexDB("tb_listadesgaste", "listaDesgastesModel"   ))
                                 ];
 
-                                Promise.all(aLeiturasForm).then(
-                                    function () {
-                                        //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                        oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("preparandobancos"));
-                                        var aLimpezas = [
-                                            oController.limparTabelaIndexDB("tb_componentes"),
-                                            oController.limparTabelaIndexDB("tb_condicoes"),
-                                            oController.limparTabelaIndexDB("tb_inspecoes"),
-                                            oController.limparTabelaIndexDB("tb_listadesgaste")
+                                Promise.all(aLeiturasForm)
+                                .then(() => {
+                                    //Preencher aqui as tabelas que precisam ser limpas antes da atualização
+                                    oController.atualizarBusyDialog(oController.i18n("preparandobancos"));
+                                    var aLimpezas = [
+                                        oController.limparTabelaIndexDB("tb_componentes"),
+                                        oController.limparTabelaIndexDB("tb_condicoes"),
+                                        oController.limparTabelaIndexDB("tb_temperaturas"),
+                                        oController.limparTabelaIndexDB("tb_inspecoes"),
+                                        oController.limparTabelaIndexDB("tb_listadesgaste")
+                                    ];
+                                    Promise.all(aLimpezas)
+                                    .then( () => {
+                                        var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
+                                        var aCondicoes   = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
+                                        var aTemperaturas= oController.getOwnerComponent().getModel("listaTemperaturasModel").getData();
+                                        var aInspecoes   = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
+                                        var aDesgastes   = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();
+                                        var aGravacoes   = [
+                                            oController.gravarTabelaIndexDB("tb_componentes",   aComponentes),
+                                            oController.gravarTabelaIndexDB("tb_condicoes",     aCondicoes),
+                                            oController.gravarTabelaIndexDB("tb_temperaturas",  aTemperaturas),
+                                            oController.gravarTabelaIndexDB("tb_inspecoes",     aInspecoes),
+                                            oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes),
                                         ];
-                                        Promise.all(aLimpezas).then(
-                                            function () {
-                                                var aComponentes = oController.getOwnerComponent().getModel("listaComponentesModel").getData();
-                                                var aCondicoes = oController.getOwnerComponent().getModel("listaCondicoesModel").getData();
-                                                var aInspecoes = oController.getOwnerComponent().getModel("listaInspecoesModel").getData();
-                                                var aDesgastes = oController.getOwnerComponent().getModel("listaDesgastesModel").getData();
-                                                var aGravacoes = [
-                                                    oController.gravarTabelaIndexDB("tb_componentes", aComponentes),
-                                                    oController.gravarTabelaIndexDB("tb_condicoes", aCondicoes),
-                                                    oController.gravarTabelaIndexDB("tb_inspecoes", aInspecoes),
-                                                    oController.gravarTabelaIndexDB("tb_listadesgaste", aDesgastes),
-                                                ];
-                                                Promise.all(aGravacoes).then(
-                                                    function (result) {
-                                                        resolve()
-                                                    })
-                                            }).catch(
-                                                function (result) {
-                                                    oController.closeBusyDialog();
-                                                    resolve()
-                                                })
-                                    }).catch(
-                                        function (result) {
-                                            oController.closeBusyDialog();
-                                            resolve()
-                                        })
-                            }).catch(function (err) {
+                                        Promise.all(aGravacoes).then( () => resolve());
+                                    }).catch(() => {
+                                        oController.closeBusyDialog();
+                                        resolve();
+                                    });
+                                }).catch(() => {
+                                    oController.closeBusyDialog();
+                                    resolve();
+                                });
+                            }).catch((err) => {
                                 oController.closeBusyDialog();
                                 reject(err);
                             });
-
-                        }).catch(function (err) {
+                        }).catch((err) => {
                             oController.closeBusyDialog();
                             reject(err);
                         });
-
-                    }).catch(function (err) {
+                    }).catch((err) => {
                         oController.closeBusyDialog();
                         reject(err);
                     });
 
                 } else {
                     // Sem conexão - carregar dados do IndexedDB
-                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregarIDB"));
+                    oController.atualizarBusyDialog(oController.i18n("carregarIDB"));
                     var aLeiturasOffline = [
                         oController.carregarDadosIndexDB("tb_autorizacao", "listaAutorizacaoModel"),
-                        oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
-                        oController.carregarDadosIndexDB("tb_centros", "listaCentrosModel"),
-                        oController.carregarDadosIndexDB("tb_usuario", "listaUsuariosModel")
+                        oController.carregarDadosIndexDB("tb_perfil",      "listaPerfilModel"),
+                        oController.carregarDadosIndexDB("tb_centros",     "listaCentrosModel"),
+                        oController.carregarDadosIndexDB("tb_usuario",     "listaUsuariosModel")
                     ];
 
                     Promise.all(aLeiturasOffline).then(function () {
@@ -863,7 +874,7 @@ sap.ui.define([
         prepararPerfil: function () {
             return new Promise((resolve, reject) => {
                 oController = this;
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoperfis"));
+                oController.atualizarBusyDialog(oController.i18n("atualizandoperfis"));
                 var aPerfis = oController.getOwnerComponent().getModel("listaPerfilModel").getData() || [];
                 var aPerfilSetPromises = [];
 
@@ -1027,24 +1038,17 @@ sap.ui.define([
 
         atualizarUsuario: function () {
             return new Promise((resolve, reject) => {
-                oController.lerTabelaIndexDB("tb_usuario").then(
-                    function (result) {
-                        if (result.tb_usuario) {
-                            oController.getOwnerComponent().getModel("listaUsuariosModel").setData(result.tb_usuario);
-                            oController.prepararUsuario().then(
-                                function (result) {
-                                    resolve()
-                                }).catch(
-                                    function (result) {
-                                        reject()
-                                    })
-                        } else {
-                            resolve()
-                        }
-                    }).catch(
-                        function (result) {
-                            reject(result)
-                        })
+                oController.lerTabelaIndexDB("tb_usuario")
+                .then( result => {
+                    if (result.tb_usuario) {
+                        oController.getOwnerComponent().getModel("listaUsuariosModel").setData(result.tb_usuario);
+                        oController.prepararUsuario()
+                        .then( (result) => resolve())
+                        .catch((result) => reject());
+                    } else {
+                        resolve()
+                    }
+                }).catch( result => reject(result));
             })
         },
 
@@ -1052,7 +1056,7 @@ sap.ui.define([
         prepararUsuario: function () {
             return new Promise((resolve, reject) => {
                 oController = this;
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
+                oController.atualizarBusyDialog(oController.i18n("atualizandousuarios"));
 
                 var aUsuarios = oController.getOwnerComponent().getModel("listaUsuariosModel").getData() || [];
                 var aUsuarioPromises = [];
@@ -1158,10 +1162,19 @@ sap.ui.define([
             })
         },
 
+        limpaElemento: function(elemento) {
+            delete elemento.__metadata;
+            delete elemento.ListaCondicoes;
+            delete elemento.Medicao;
+            delete elemento.ListaComponentes;
+            delete elemento.ListaInspecoes;
+            delete elemento.ListaTemperaturas;
+        },
+
         carregarOffline: function () {
             oController = this;
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("carregaroffline"));
+                oController.atualizarBusyDialog(oController.i18n("carregaroffline"));
                 var aLeituras = [
                     oController.carregarDadosIndexDB("tb_autorizacao", "autorizacoesModel"),
                     oController.carregarDadosIndexDB("tb_perfil", "listaPerfilModel"),
@@ -1179,7 +1192,7 @@ sap.ui.define([
 
         carregarOrdens: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoordens"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoordens"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
 
                 var aFiltros = [
@@ -1224,7 +1237,7 @@ sap.ui.define([
 
         carregarFormulario: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoformularios"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoformularios"));
                 oController.carregarDados("ListaFormularioSet").then(function (result) {
                     var aFormularios = []
                     for (let x = 0; x < result.results.length; x++) {
@@ -1243,7 +1256,7 @@ sap.ui.define([
 
         carregarEquipamento: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoequipamentos"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoequipamentos"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                 var aFiltros = [
                     {
@@ -1269,7 +1282,7 @@ sap.ui.define([
         carregarMateriais: function () {
 
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandomateriais"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandomateriais"));
                 var oUsuario = oController.getOwnerComponent().getModel("usuarioModel").getData()
                 var aFiltros = [
                     { key: "Centro",   value: oUsuario.Centro },
@@ -1305,7 +1318,7 @@ sap.ui.define([
 
         carregarCatalogos: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocatalogos"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocatalogos"));
                 var aListaCatalogos = [];
                 qtdeCatalogo = 0;
                 var aEquipamentos = oController.getOwnerComponent().getModel("equipamentosModel").getData()
@@ -1332,31 +1345,21 @@ sap.ui.define([
             })
         },
 
-        carregarComponentes: function (aFormularios) {
+        carregarComponentes: function (equipamentos) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocomponentes"));
-                var aComponentes = {
-                    Chave: 'X',
-                    ComponentesSet: []
-                }
-                aFormularios.forEach(oFormulario => {
-                    if (oFormulario.key != "") {
-                        var oComponente = {
-                            Chave: 'X',
-                            IdForm: oFormulario.key,
-                        }
-                        aComponentes.ComponentesSet.push(oComponente);
-                    }
-                })
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocomponentes"));
+                const aComponentes = { Chave: 'X', ComponentesSet: [] }
+                equipamentos.forEach(equipamento => {
+                    aComponentes.ComponentesSet.push({
+                        Chave       : 'X',
+                        Equipamento : equipamento.key
+                    });
+                });
 
                 oController.enviarDados("ListaComponentesSet", aComponentes).then(function (result) {
                     var aListaComponentes = []
                     result.ComponentesSet.results.forEach(element => {
-                        delete element.__metadata
-                        delete element.ListaCondicoes
-                        delete element.Medicao
-                        delete element.ListaComponentes
-                        delete element.ListaInspecoes
+                        oController.limpaElemento(element);
                         aListaComponentes.push(element);
                     });
 
@@ -1370,7 +1373,7 @@ sap.ui.define([
 
         carregarCondicoes: function (aFormularios) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandocondicoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandocondicoes"));
                 var aCondicoes = {
                     Chave: 'X',
                     CondicoesSet: []
@@ -1388,11 +1391,7 @@ sap.ui.define([
                 oController.enviarDados("ListaCondicoesSet", aCondicoes).then(function (result) {
                     var aListaCondicoes = []
                     result.CondicoesSet.results.forEach(element => {
-                        delete element.__metadata
-                        delete element.ListaCondicoes
-                        delete element.Medicao
-                        delete element.ListaComponentes
-                        delete element.ListaInspecoes
+                        oController.limpaElemento(element)
                         aListaCondicoes.push(element);
                     });
 
@@ -1403,9 +1402,27 @@ sap.ui.define([
             })
         },
 
+        carregarTemperaturas: function (aFormularios) {
+            return new Promise((resolve, reject) => {
+                oController.atualizarBusyDialog(oController.i18n("sincronizandotemperaturas"));
+                const aTemperaturas = { Chave: 'X', TemperaturaSet: [] }
+                oController.enviarDados("ListaTemperaturaSet", aTemperaturas).then(function (result) {
+                    const aListaTemperaturas = [];
+                    result.TemperaturaSet.results.forEach(element => {
+                        oController.limpaElemento(element);
+                        aListaTemperaturas.push(element);
+                    });
+
+                    oController.getOwnerComponent().getModel("listaTemperaturasModel").setData(aListaTemperaturas)
+                    oController.adicionarMensagemSucesso(oController.i18n("temperatura.mensagem.sucesso.sync", [aListaTemperaturas.length]), "temperatura.download", "temperatura.mensagem.sucesso");
+                    resolve();
+                }).catch( result => reject(result));
+            })
+        },
+
         carregarInspecoes: function (aFormularios) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoinspecoes"));
                 var aInspecoes = {
                     Chave: 'X',
                     InspecoesSet: []
@@ -1423,11 +1440,7 @@ sap.ui.define([
                 oController.enviarDados("ListaInspecoesSet", aInspecoes).then(function (result) {
                     var aListaInspecoes = []
                     result.InspecoesSet.results.forEach(element => {
-                        delete element.__metadata
-                        delete element.ListaCondicoes
-                        delete element.Medicao
-                        delete element.ListaComponentes
-                        delete element.ListaInspecoes
+                        oController.limpaElemento(element);
                         aListaInspecoes.push(element);
                     });
 
@@ -1440,7 +1453,7 @@ sap.ui.define([
 
         carregarListaDesgaste: function (aModelos) {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandoinspecoes"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandoinspecoes"));
                 var aDesgastes = {
                     Chave: 'X',
                     DesgastesSet: []
@@ -1589,7 +1602,7 @@ sap.ui.define([
                                 new URL(oConexao.urlsemclient);
                             } catch (urlError) {
                                 console.error("URL inválida:", oConexao.urlsemclient, urlError);
-                                oController.adicionarMensagemErro("URL inválida", oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"), "O endereço configurado não é válido: " + oConexao.urlsemclient);
+                                oController.adicionarMensagemErro("URL inválida", oController.i18n("conexaoerro"), "O endereço configurado não é válido: " + oConexao.urlsemclient);
                                 reject();
                                 return;
                             }
@@ -1604,24 +1617,24 @@ sap.ui.define([
                                     cache: 'no-cache'
                                 }).then(r => {
                                     oController.atualizarBusyDialog("Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
-                                    oController.adicionarMensagemSucesso(oController.getView().getModel("i18n").getResourceBundle().getText("sucessoservidor"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosucesso"), "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
+                                    oController.adicionarMensagemSucesso(oController.i18n("sucessoservidor"), oController.i18n("conexaosucesso"), "Conexão com o endereço " + oConexao.urlsemclient + " estabelecida com sucesso");
                                     resolve()
                                 })
                                     .catch(e => {
                                         console.error("Fetch error:", e);
-                                        oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("erroservidor"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaoerro"), "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient);
+                                        oController.adicionarMensagemErro(oController.i18n("erroservidor"), oController.i18n("conexaoerro"), "Erro de conexão: " + e.message + " - Endereço: " + oConexao.urlsemclient);
                                         resolve();
                                     });
                             } catch (error) {
                                 resolve();
                             }
                         } else {
-                            oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("configurarconexao"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"), "Configure os dados de conexão antes de continuar");
+                            oController.adicionarMensagemErro(oController.i18n("configurarconexao"), oController.i18n("conexaosem"), "Configure os dados de conexão antes de continuar");
                             reject();
                         }
 
                     } else {
-                        oController.adicionarMensagemErro(oController.getView().getModel("i18n").getResourceBundle().getText("testeerro"), oController.getView().getModel("i18n").getResourceBundle().getText("conexaosem"), "Por favor verifque a disponibilidade de rede ou wi-fi");
+                        oController.adicionarMensagemErro(oController.i18n("testeerro"), oController.i18n("conexaosem"), "Por favor verifque a disponibilidade de rede ou wi-fi");
                         reject()
                     }
                 } else {
@@ -1633,7 +1646,7 @@ sap.ui.define([
         carregarUsuario: function () {
             oController = this
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("sincronizandousuarios"));
+                oController.atualizarBusyDialog(oController.i18n("sincronizandousuarios"));
                 oController.carregarDados("UsuarioSet", []).then(function (result) {
                     var aUsuarios = []
                     // Obtém os perfis carregados (pode estar vazio se carregamento paralelo ainda não terminou)
@@ -1709,7 +1722,7 @@ sap.ui.define([
         gravarTabelaIndexDB: function (pTabela, pData) {
             var oController = this;
             return new Promise((resolve, reject) => {
-                var vMsg = oController.getView().getModel("i18n").getResourceBundle().getText("gravandotabela") + " " + pTabela;
+                var vMsg = oController.i18n("gravandotabela") + " " + pTabela;
                 oController.atualizarBusyDialog(vMsg);
 
                 var db;
@@ -1778,7 +1791,7 @@ sap.ui.define([
                         Promise.all(aLeituras).then(
                             function (result) {
                                 //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandousuarios"));
+                                oController.atualizarBusyDialog(oController.i18n("atualizandousuarios"));
                                 var aLimpezas = [oController.limparTabelaIndexDB("tb_usuario")]
                                 Promise.all(aLimpezas).then(
                                     function (result) {
@@ -1820,7 +1833,7 @@ sap.ui.define([
                         Promise.all(aLeituras).then(
                             function (result) {
                                 //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoperfis"));
+                                oController.atualizarBusyDialog(oController.i18n("atualizandoperfis"));
                                 var aLimpezas = [oController.limparTabelaIndexDB("tb_perfil")]
                                 Promise.all(aLimpezas).then(
                                     function (result) {
@@ -1873,7 +1886,7 @@ sap.ui.define([
                             oController.prepararMedicao().then(
                                 function () {
                                     //Preencher aqui as tabelas que precisam ser limpas antes da atualização
-                                    oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandomedicoes"));
+                                    oController.atualizarBusyDialog(oController.i18n("atualizandomedicoes"));
                                     var aLimpezas = [oController.limparTabelaIndexDB("tb_medicao")]
                                     Promise.all(aLimpezas).then(
                                         function () {
@@ -1934,7 +1947,7 @@ sap.ui.define([
 
         prepararMedicao: function () {
             return new Promise((resolve, reject) => {
-                oController.atualizarBusyDialog(oController.getView().getModel("i18n").getResourceBundle().getText("atualizandoordenscorretiva"));
+                oController.atualizarBusyDialog(oController.i18n("atualizandoordenscorretiva"));
                 var aMedicoes = oController.getOwnerComponent().getModel("listaMedicoesModel").getData();
                 var aListaMedicaoes = {
                     Chave: 'X',
@@ -1944,41 +1957,36 @@ sap.ui.define([
 
                 aMedicoes.forEach(oMedicao => {
 
-                    var now = oMedicao.Data;
-                    var hours = now.getHours().toString().padStart(2, '0');
-                    var minutes = now.getMinutes().toString().padStart(2, '0');
-                    var seconds = now.getSeconds().toString().padStart(2, '0');
-                    var timeString = "PT" + hours + "H" + minutes + "M" + seconds + "S"; //"PT10H19M23S"
-
-                    var oMedicaoSet = {
-                        Chave: 'X',
-                        Data: oMedicao.Data,
-                        DataSt: oMedicao.Data.toLocaleString().replace(',', ""),
-                        Eqktx: oMedicao.Eqktx,
-                        Equnr: oMedicao.Equnr,
-                        Formulario: oMedicao.IdForm,
-                        MedEqpto: oMedicao.MedEquipamento,
-                        Mensagem: "",
-                        Modelo: oMedicao.Modelo,
-                        Objnr: oMedicao.Objnr,
-                        Observacoes: oMedicao.Observacoes,
-                        Pltxt: oMedicao.Pltxt,
-                        Roleteqtdeld: oMedicao.RoleteQtdeLD?.toString() || "0",
-                        Roleteqtdele: oMedicao.RoleteQtdeLE?.toString() || "0",
+                    const oMedicaoSet = {
+                        Chave          : 'X',
+                        Data           : oMedicao.Data,
+                        DataSt         : oMedicao.Data.toLocaleString().replace(',', ""),
+                        Eqktx          : oMedicao.Eqktx,
+                        Equnr          : oMedicao.Equnr,
+                        Formulario     : oMedicao.IdForm,
+                        MedEqpto       : oMedicao.MedEquipamento,
+                        Mensagem       : "",
+                        Modelo         : oMedicao.Modelo,
+                        Objnr          : oMedicao.Objnr,
+                        Observacoes    : oMedicao.Observacoes,
+                        Pltxt          : oMedicao.Pltxt,
+                        Roleteqtdeld   : oMedicao.RoleteQtdeLD?.toString() || "0",
+                        Roleteqtdele   : oMedicao.RoleteQtdeLE?.toString() || "0",
                         Roletevazamento: oMedicao.RoleteVazamento,
-                        Status: oMedicao.Status,
-                        Tplnr: oMedicao.Tplnr,
-                        Usuario: oMedicao.Usuario,
-                        Uuid: oMedicao.Uuid,
-                        TagDireita: oMedicao.TagDireita,
-                        TagEsquerda: oMedicao.TagEsquerda,
-                        TruckDireita: oMedicao.TruckDireita,
-                        TruckEsquerda: oMedicao.TruckEsquerda,
-                        ComponentesSet: [],
-                        CondicoesSet: [],
-                        InspecoesSet: [],
-                        AnexosSet: [],
-                        RetornoSet: []
+                        Status         : oMedicao.Status,
+                        Tplnr          : oMedicao.Tplnr,
+                        Usuario        : oMedicao.Usuario,
+                        Uuid           : oMedicao.Uuid,
+                        TagDireita     : oMedicao.TagDireita,
+                        TagEsquerda    : oMedicao.TagEsquerda,
+                        TruckDireita   : oMedicao.TruckDireita,
+                        TruckEsquerda  : oMedicao.TruckEsquerda,
+                        ComponentesSet : [],
+                        CondicoesSet   : [],
+                        TemperaturaSet : [],
+                        InspecoesSet   : [],
+                        AnexosSet      : [],
+                        RetornoSet     : []
                     };
 
 
@@ -1986,32 +1994,44 @@ sap.ui.define([
                         delete oComponente.ListaComponentes
                         if (oComponente.Valormedido != "" && oComponente.Valormedido != null && oComponente.Valormedido != undefined && oComponente.Valormedido != 0) {
                             var oComp = {
-                                Chave: 'X',
-                                Valormedido: String(oComponente.Valormedido),
-                                IdComponente: oComponente.IdComponente,
-                                Posicao: oComponente.Posicao,
-                                PosicaoTec: oComponente.PosicaoTec,
-                                CodiFabr: oComponente.CodiFabr,
-                                IdLado: oComponente.IdLado
+                                Chave        : 'X',
+                                Valormedido  : String(oComponente.Valormedido),
+                                IdComponente : oComponente.IdComponente,
+                                Posicao      : oComponente.Posicao,
+                                PosicaoTec   : oComponente.PosicaoTec,
+                                CodiFabr     : oComponente.CodiFabr,
+                                IdLado       : oComponente.IdLado
                             }
 
                             oMedicaoSet.ComponentesSet.push(oComp)
                         }
                     });
 
-                    oMedicao.Condicoes.forEach(oCondicoes => {
-                        delete oCondicoes.ListaCondicoes
-                        oMedicaoSet.CondicoesSet.push(oCondicoes)
+                    const condicoes = oMedicao.Condicoes.filter(i => !i.Nivel || i.Nivel !== "Não Informada") || [];
+                    if (condicoes.length) {
+                        oMedicao.Condicoes.forEach(oCondicoes => {
+                            delete oCondicoes.ListaCondicoes;
+                            oMedicaoSet.CondicoesSet.push(oCondicoes);
+                        });
+                    }
+
+                    oMedicao.Inspecoes.forEach(oInspecao => oMedicaoSet.InspecoesSet.push(oInspecao));
+
+                    oMedicao.Temperaturas.forEach(temperatura => {
+                        if (temperatura && temperatura.Item) {
+                            oMedicaoSet.TemperaturaSet.push({
+                                Chave            : "X",
+                                Lado             : temperatura.Lado,
+                                TagEsteira       : temperatura.Lado === "D" ? oMedicaoSet.TagDireita : oMedicaoSet.TagEsquerda,
+                                IdForm           : temperatura.IdForm,
+                                Secao            : temperatura.Secao,
+                                Item             : temperatura.Item,
+                                ValorTemperatura : temperatura.ValorTemperatura.toString(10),
+                            });
+                        }
                     });
 
-                    oMedicao.Inspecoes.forEach(oInspecao => {
-                        oMedicaoSet.InspecoesSet.push(oInspecao)
-                    });
-
-                    oMedicao.items.forEach(oAnexo => {
-                        var oAnexoNovo = Object.assign({}, oAnexo); // Cria uma cópia do objeto para evitar mutações
-                        oMedicaoSet.AnexosSet.push(oAnexoNovo)
-                    });
+                    oMedicao.items.forEach(oAnexo => oMedicaoSet.AnexosSet.push(Object.assign({}, oAnexo)));
 
                     aListaMedicaoes.MedicaoSet.push(oMedicaoSet)
                 });
@@ -2042,7 +2062,7 @@ sap.ui.define([
                                 const vStatus               = vInspecao.Status;
                                 aListaMedicoesRetorno.forEach(oMedicaoRetorno => {
                                     const vTipo = tipoStatus[oMedicaoRetorno.Type] || "None";
-                                    oController.adicionarMensagem(vTipo, "Medição", oMedicaoRetorno.MessageV1, oMedicaoRetorno.Message);
+                                    oController.adicionarMensagem(vTipo, "medicao", oMedicaoRetorno.MessageV1, oMedicaoRetorno.Message);
                                     oController.getOwnerComponent().getModel("listaMedicoesErroModel").setData([]);
                                     if (vStatus == 'E') {
                                         oController.getOwnerComponent().getModel("listaMedicoesErroModel").getData().push(vInspecao);
@@ -2232,10 +2252,9 @@ sap.ui.define([
         },
 
         validaMedicao: function(parametro) {
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
-            var aMockMessages = parametro;
+            var erros = parametro;
             if (!Array.isArray(parametro)) {
-                aMockMessages = [];
+                erros = [];
             }
             this.limpaEstadoCampoMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputMedEqpto");
@@ -2243,15 +2262,10 @@ sap.ui.define([
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.MedEquipamento == null || oMedicao.MedEquipamento == "") {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.setValueStateText(oController.i18n("campoobrigatorio"));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oBundle.getText("campoobrigatorio"),
-                    description: oBundle.getText("preenchimentoobrigatorio", ["Horimero Equipamento"]),
-                    subtitle: oBundle.getText("horimetroatual"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("campoobrigatorio", "horimetroatual", oController.i18n("preenchimentoobrigatorio", ["Horimero Equipamento"]));
+                erros.push(1);
             } else {
                 oMedicao.MedEquipamento = parseInt(oMedicao.MedEquipamento).toFixed(0);
                 var vMedEpto        = parseInt(oMedicao.MedEquipamento);
@@ -2259,89 +2273,59 @@ sap.ui.define([
                 var vDifMaxMedicoes = parseInt(oMedicao.DifMaxMedicoes);
                 if (vMedEpto < vUltMedEqpto) {
                     input.setValueState("Error");
-                    input.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.setValueStateText(oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
                     input.focus();
-                    aMockMessages.push({
-                        type: 'Error',
-                        title: oBundle.getText("horimetroatual"),
-                        description: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
-                        subtitle: oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]),
-                        counter: 1
-                    });
+                    oController.adicionarMensagemErro("horimetroatual", oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]), oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
+                    erros.push(1);
                 }
 
                 if (vMedEpto > (vUltMedEqpto + vDifMaxMedicoes)) {
                     input.setValueState("Error");
-                    input.setValueStateText(oBundle.getText("valormenor", [vMedEpto, vUltMedEqpto]));
+                    input.setValueStateText(oController.i18n("valormenor", [vMedEpto, vUltMedEqpto]));
                     input.focus();
-                    aMockMessages.push({
-                        type: 'Error',
-                        title: oBundle.getText("diferencaomedicao"),
-                        description: oBundle.getText("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]),
-                        subtitle: oBundle.getText("medicao"),
-                        counter: 1
-                    });
+                    oController.adicionarMensagemErro("diferencaomedicao", "medicao", oController.i18n("diferencaomedicaomsg", [vMedEpto, vDifMaxMedicoes]));
+                    erros.push(1);
                 }
             }
         },
 
         validaDataMedicao: function(parametro) {
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             this.limpaEstadoCampoDataMedicao();
             const input = sap.ui.getCore().byId("container-com.pontual.sgmr---Formulario--cabecalhoBlock-Collapsed--idInputData")
-            var aMockMessages = parametro;
-            if (!Array.isArray(parametro)) {
-                aMockMessages = [];
-            }
+            const erros = !Array.isArray(parametro) ? [] : parametro;
             
             const oMedicao = oController.getOwnerComponent().getModel("materialRodanteFormularioModel").getData();
             if (oMedicao.Data == null || oMedicao.Data == "") {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("campoobrigatorio"));
+                input.setValueStateText(oController.i18n("campoobrigatorio"));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oBundle.getText("campoobrigatorio"),
-                    description: oBundle.getText("preenchimentoobrigatorio", ["Data"]),
-                    subtitle: oBundle.getText("data"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("campoobrigatorio", "data", oController.i18n("preenchimentoobrigatorio", ["Data"]));
+                erros.push(1);
                 return;
             }
 
             var dataAtual = input.getDateValue();
             if (dataAtual > new Date()) {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("datamaiorqueatual"));
+                input.setValueStateText(oController.i18n("datamaiorqueatual"));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oBundle.getText("datainvalida"),
-                    description: oBundle.getText("datamaiorqueatual"),
-                    subtitle: oBundle.getText("data"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("datainvalida", "data", "datamaiorqueatual");
+                erros.push(1);
                 return;
             }
 
             var vLimiteRetroativo = parseInt(oMedicao.LimiteRetroativo)
             if (oController.verificarDiferencaHoras(vLimiteRetroativo, oMedicao.Data)) {
                 input.setValueState("Error");
-                input.setValueStateText(oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]));
+                input.setValueStateText(oController.i18n("limiteretroativomsg", [vLimiteRetroativo]));
                 input.focus();
-                aMockMessages.push({
-                    type: 'Error',
-                    title: oBundle.getText("limiteretroativo"),
-                    description: oBundle.getText("limiteretroativomsg", [vLimiteRetroativo]),
-                    subtitle: oBundle.getText("limiteretroativo"),
-                    counter: 1
-                });
+                oController.adicionarMensagemErro("limiteretroativo", "limiteretroativo", oController.i18n("limiteretroativomsg", [vLimiteRetroativo]));
+                erros.push(1);
             }
         },
 
         validaVazamentoRoleteDireito: function(mensagens) {
             this.limpaEstadoCampoRoleteDireito();
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
             if (!blocoRoletes || blocoRoletes.length < 1) {
                 return;
@@ -2362,21 +2346,15 @@ sap.ui.define([
             }
 
             input.setValueState("Error");
-            input.setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.setValueStateText(oController.i18n(mensagemLimite, [limite]));
             input.focus();
 
-            mensagens.push({
-                type        : 'Error',
-                title       : oBundle.getText(mensagemLimite, [limite]),
-                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
-                subtitle    : oBundle.getText("roletes.lado.direito"),
-                counter     : 1
-            });
+            oController.adicionarMensagemErro(oController.i18n(mensagemLimite, [limite]), "roletes.lado.direito", oController.i18n(mensagemLimite + ".detalhe", [limite]));
+            mensagens.push(1);
         },
 
         validaVazamentoRoleteEsquerdo: function(mensagens) {
             this.limpaEstadoCampoRoleteEsquerdo();
-            var oBundle = this.getOwnerComponent().getModel("i18n").getResourceBundle();
             const blocoRoletes = oController.byId("roletesBlock").getAggregation("_views");
             if (!blocoRoletes || blocoRoletes.length < 1) {
                 return;
@@ -2397,16 +2375,30 @@ sap.ui.define([
             }
 
             input.setValueState("Error");
-            input.setValueStateText(oBundle.getText(mensagemLimite, [limite]));
+            input.setValueStateText(oController.i18n(mensagemLimite, [limite]));
             input.focus();
 
-            mensagens.push({
-                type        : 'Error',
-                title       : oBundle.getText(mensagemLimite, [limite]),
-                description : oBundle.getText(mensagemLimite + ".detalhe", [limite]),
-                subtitle    : oBundle.getText("roletes.lado.esquerdo"),
-                counter     : 1
-            });
-        }
+            oController.adicionarMensagemErro(oController.i18n(mensagemLimite, [limite]), "roletes.lado.esquerdo", oController.i18n(mensagemLimite + ".detalhe", [limite]));
+            mensagens.push(1);
+        },
+
+		formataTextoLado: function (value) {
+			if (!value) {
+				return "-";
+			}
+			return oController.i18n("texto.lado.L" + value) || "-";
+		},
+
+        formataMaximoItens: function (value) {
+			if (!value) {
+				return 0;
+			}
+			try {
+                return value;
+            } catch (error) {
+                return 0;
+            }
+		},
+
     });
 });

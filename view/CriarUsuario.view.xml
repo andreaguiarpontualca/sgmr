@@ -101,32 +101,6 @@
 					</f:FormContainer>		
 					<f:FormContainer title="{i18n>dadosperfil}">
 						<f:formElements>
-							<!-- <f:FormElement label="{i18n>centro}">
-								<f:fields>
-									<Input 
-										id="centroInput"
-										value="{criarUsuarioModel>Centro}"
-                                        showValueHelp="true"
-										showClearIcon="true"
-										valueHelpOnly="true"
-										required="true"
-										valueHelpRequest="_handleCentroValueHelpRequest"
-										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"								
-										/>
-								</f:fields>
-							</f:FormElement> -->
-							<!-- <f:FormElement label="{i18n>deposito}">
-								<f:fields>
-									<Input 
-										id="depositoInput"
-										value="{criarUsuarioModel>Deposito}"
-                                        maxLength="4"
-										required="true"
-										showClearIcon="true"
-										enabled="{layoutTelaModel>HabilitarTelaCriarUsuario}"										
-										/>
-								</f:fields>
-							</f:FormElement>   -->
 							<f:FormElement label="{i18n>perfil}">
 								<f:fields>
 									<Input 

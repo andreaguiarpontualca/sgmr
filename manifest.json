@@ -5,7 +5,7 @@
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
-      "version": "1.00.0002"
+      "version": "1.00.0004"
     },
     "title": "{{appTitle}}",
     "description": "{{appDescription}}",
@@ -125,6 +125,9 @@
         "type": "sap.ui.model.json.JSONModel"
       },
       "listaCondicoesModel": {
+        "type": "sap.ui.model.json.JSONModel"
+      },
+      "listaTemperaturasModel": {
         "type": "sap.ui.model.json.JSONModel"
       },
       "listaInspecoesModel": {
