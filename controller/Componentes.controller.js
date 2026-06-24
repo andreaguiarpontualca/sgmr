@@ -153,8 +153,8 @@ sap.ui.define([
 
             obtemCorLimite: function(componente) {
                 const tabela    = oController.getOwnerComponent().getModel("listaDesgastesModel").getData() || [];
-                const tabelaCre = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
-                const tabelaDec = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+                const tabelaCre = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip && c.Posmed === componente.PosMedicao);
+                const tabelaDec = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip && c.Posmed === componente.PosMedicao);
 
                 if (!tabelaCre || tabelaCre.length < 1 || !tabelaDec || tabelaDec.length < 1) {
                     return "Indication05";
@@ -175,8 +175,8 @@ sap.ui.define([
 
             obtemLimites: function(componente) {
                 const tabela    = oController.getOwnerComponent().getModel("listaDesgastesModel").getData() || [];
-                const tabelaCre = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
-                const tabelaDec = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip);
+                const tabelaCre = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip  && c.Posmed === componente.PosMedicao);
+                const tabelaDec = tabela.filter(c => c.CodiFabr === componente.CodiFabr && c.Componente === componente.IdComponente && c.TipoEquipamento === componente.ModEquip  && c.Posmed === componente.PosMedicao);
 
                 if (!tabelaCre || tabelaCre.length < 1 || !tabelaDec || tabelaDec.length < 1) {
                     return;

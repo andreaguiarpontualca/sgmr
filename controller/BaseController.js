@@ -2000,7 +2000,8 @@ sap.ui.define([
                                 Posicao      : oComponente.Posicao,
                                 PosicaoTec   : oComponente.PosicaoTec,
                                 CodiFabr     : oComponente.CodiFabr,
-                                IdLado       : oComponente.IdLado
+                                IdLado       : oComponente.IdLado,
+                                PosMedicao   : oComponente.PosMedicao
                             }
 
                             oMedicaoSet.ComponentesSet.push(oComp)
