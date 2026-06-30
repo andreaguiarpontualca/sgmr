@@ -80,16 +80,13 @@ sap.ui.define([
                     if (oAutorizacao.CodigoAutorizacao == "001") {
                         oAcesso.materialrodante = true;
                     }
-                    if (oAutorizacao.CodigoAutorizacao == "002" || oAutorizacao.CodigoAutorizacao == "003" || oAutorizacao.CodigoAutorizacao == "004" || oAutorizacao.CodigoAutorizacao == "005") {
+                    if (oAutorizacao.CodigoAutorizacao == "002" || oAutorizacao.CodigoAutorizacao == "003") {
                         oAcesso.administrativo = true;
                         if (oAutorizacao.CodigoAutorizacao == "002") {
                             oAcesso.perfil = true;
                         }
                         if (oAutorizacao.CodigoAutorizacao == "003") {
                             oAcesso.usuario = true;
-                        }
-                        if (oAutorizacao.CodigoAutorizacao == "004") {
-                            oAcesso.associar = true;
                         }
                     }
                 });

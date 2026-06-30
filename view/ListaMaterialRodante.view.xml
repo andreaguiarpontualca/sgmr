@@ -29,8 +29,13 @@
                 contextualWidth="Auto"
                 growing="false"
                 growingThreshold="10"
-                items="{listaEquipamentoModel>/}"
-                >
+                items="{
+                    path: 'listaEquipamentoModel>/',
+                    sorter: {
+                        path: 'Equnr',
+                        descending: false
+                    }
+                }">
                 <headerToolbar>
                     <OverflowToolbar id="otbSubheader">
                         <Title text="Equipamentos ({= ${listaEquipamentoModel>/}.length})" level="H2" />
