@@ -23,33 +23,11 @@
             >
             <headerToolbar>
                 <OverflowToolbar class="pontualSGMRNoPadding">
-                    <ComboBox
-                        width="30%"
-                        selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}"
-                        change="onFiltroChange"
-                        items="{
-                            path: 'materialRodanteFormularioModel>/ComponentesCombo',
-                            sorter: { path: 'text' }
-                        }"
-                    >
-                        <core:Item
-                            key="{materialRodanteFormularioModel>key}"
-                            text="{materialRodanteFormularioModel>text}"
-                        />
+                    <ComboBox width="30%" selectedKey="{materialRodanteFormularioModel>ComponenteSelecionado}" change="onFiltroChange" items="{ path: 'materialRodanteFormularioModel>/ComponentesCombo', sorter: { path: 'text' } }" >
+                        <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
                     </ComboBox>
-                    <ComboBox
-                        width="30%"
-                        selectedKey="{materialRodanteFormularioModel>LadoSelecionado}"
-                        change="onFiltroChange"
-                        items="{
-                            path: 'materialRodanteFormularioModel>/LadoCombo',
-                            sorter: { path: 'text' }
-                        }"
-                    >
-                        <core:Item
-                            key="{materialRodanteFormularioModel>key}"
-                            text="{materialRodanteFormularioModel>text}"
-                        />
+                    <ComboBox width="30%" selectedKey="{materialRodanteFormularioModel>LadoSelecionado}" change="onFiltroChange" items="{ path: 'materialRodanteFormularioModel>/LadoCombo', sorter: { path: 'text' } }" >
+                        <core:Item key="{materialRodanteFormularioModel>key}" text="{materialRodanteFormularioModel>text}" />
                     </ComboBox>
                     <CheckBox
                         text="{= !!${device>/system/phone} ? 'Info.' : 'Informações' }"
@@ -60,69 +38,19 @@
                 </OverflowToolbar>
             </headerToolbar>
             <columns>
-                <Column
-                    hAlign="Begin"
-                    minScreenWidth="Phone"
-                    demandPopin="true"
-                >
-                    <Text text="{i18n>componente.componente}" />
-                </Column>
-                <Column
-                    hAlign="Begin"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
-                >
-                    <Text text="{i18n>componente.fabricante}" />
-                </Column>
-                <Column
-                    hAlign="Begin"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    width="12rem"
-                >
-                    <Text text="{i18n>componente.valor.medido}" />
-                </Column>
-                <Column
-                    hAlign="End"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    width="8rem"
-                >
-                    <Text text="{i18n>componente.percentual.desgaste}" />
-                </Column>
-                <Column
-                    hAlign="Center"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    width="9rem"
-                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
-                >
-                    <Text text="{i18n>componente.ultima.medicao}" />
-                </Column>
-                <Column
-                    hAlign="Center"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    width="10rem"
-                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
-                >
-                    <Text text="{i18n>componente.data.ultima.medicao}" />
-                </Column>
-                <Column
-                    hAlign="Begin"
-                    minScreenWidth="Tablet"
-                    demandPopin="true"
-                    visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"
-                >
-                    <Text text="{i18n>componente.instrumento}" />
-                </Column>
+                <Column hAlign="Begin"  minScreenWidth="Phone"  demandPopin="true"                                                                                  ><Text text="{i18n>componente.componente}" /></Column>
+                <Column hAlign="Begin"  minScreenWidth="Tablet" demandPopin="true" visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"               ><Text text="{i18n>componente.fabricante}" /></Column>
+                <Column hAlign="Begin"  minScreenWidth="Tablet" demandPopin="true" width="12rem"                                                                    ><Text text="{i18n>componente.valor.medido}" /></Column>
+                <Column hAlign="End"    minScreenWidth="Tablet" demandPopin="true" width="8rem"                                                                     ><Text text="{i18n>componente.percentual.desgaste}" /></Column>
+                <Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" width="9rem" visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"  ><Text text="{i18n>componente.ultima.medicao}" /></Column>
+                <Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true" width="10rem" visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}" ><Text text="{i18n>componente.data.ultima.medicao}" /></Column>
+                <Column hAlign="Begin"  minScreenWidth="Tablet" demandPopin="true" visible="{materialRodanteFormularioModel>VisibilidadeInformacoes}"               ><Text text="{i18n>componente.instrumento}" /></Column>
             </columns>
             <items>
                 <ColumnListItem vAlign="Middle">
                     <cells>
                         <ObjectStatus
-                            text="{materialRodanteFormularioModel>Componente} {materialRodanteFormularioModel>Item}"
+                            text="{materialRodanteFormularioModel>Componente} {materialRodanteFormularioModel>Item} {= ${materialRodanteFormularioModel>IdLado} === 'LE' ? ${i18n>texto.lado.LE} : ${i18n>texto.lado.LD}}"
                             active="true"
                             press="onItemPress"
                             state="{materialRodanteFormularioModel>Cor}"

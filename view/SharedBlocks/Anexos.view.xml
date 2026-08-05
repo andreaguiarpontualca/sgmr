@@ -58,6 +58,13 @@
 				uploadEnabled="true"
 				previewDialog="FilePreviewDialog"
 				>
+				<noDataIllustration>
+					<IllustratedMessage
+						illustrationType="sapIllus-UploadCollection"
+						size="Auto"
+						enableVerticalResponsiveness="true"
+					/>
+				</noDataIllustration>
 				<rowConfiguration>
 					<upload.UploadItemConfiguration
 						fileNamePath="fileName"
